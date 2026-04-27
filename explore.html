@@ -1,0 +1,1460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>afterfive — Explore</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;500;600;700;800&display=swap" />
+  <style>
+    /* ── TOKENS ── */
+    :root {
+      --midnight: #080A14;
+      --surface:  #0D0F1F;
+      --surface2: #141728;
+      --border:   #1A1D2E;
+      --border2:  #2A2E44;
+      --lime:     #FCCC0A;
+      --lime-dim: rgba(252,204,10,0.10);
+      --text:     #E8ECF8;
+      --muted:    #7A80A0;
+      --subdued:  #3A3F58;
+      --amber:    #EE352C;   /* MTA Red */
+      --green:    #00933C;   /* MTA Green */
+      --blue:     #0039A6;   /* MTA Blue */
+      --purple:   #FF6319;   /* MTA Orange */
+      --urgency:  #EE352C;
+      --pad:      16px;
+      --r-card:   0px;       /* square — transit */
+      --r-btn:    4px;       /* square buttons */
+      --r-badge:  3px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--midnight); color: var(--text);
+      font-family: 'Syne', sans-serif; font-size: 14px;
+      line-height: 1.5; overflow-x: hidden;
+    }
+
+    /* ── NAV ── */
+    .nav {
+      position: sticky; top: 0; z-index: 200;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 var(--pad);
+      height: 52px;
+      background: var(--midnight);
+      border-bottom: 3px solid var(--lime);
+    }
+    .nav-logo {
+      font-size: 16px; font-weight: 800; text-decoration: none;
+      letter-spacing: -0.3px; font-family: 'DM Mono', monospace;
+      text-transform: uppercase;
+    }
+    .nav-logo .after { color: var(--text); }
+    .nav-logo .five  { color: var(--lime); }
+
+    .nav-links { display: none; list-style: none; gap: 2px; }
+    .nav-links a {
+      color: var(--muted); text-decoration: none; font-size: 11px;
+      font-weight: 600; padding: 6px 12px;
+      letter-spacing: 0.07em; text-transform: uppercase;
+      transition: color 0.15s;
+    }
+    .nav-links a:hover { color: var(--text); }
+    .nav-links a.active { color: var(--lime); }
+
+    .nav-cta {
+      display: none;
+      background: var(--lime); color: var(--midnight); border: none;
+      border-radius: var(--r-btn); padding: 8px 16px;
+      font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700;
+      cursor: pointer; text-decoration: none; transition: opacity 0.15s;
+      white-space: nowrap; letter-spacing: 0.06em; text-transform: uppercase;
+    }
+    .nav-cta:hover { opacity: 0.85; }
+
+    /* MTA stripe under nav */
+    .nav-stripe {
+      display: flex; height: 4px;
+    }
+    .nav-stripe span { flex: 1; }
+
+    .hamburger {
+      display: flex; flex-direction: column; gap: 5px;
+      background: none; border: none; cursor: pointer; padding: 4px;
+    }
+    .hamburger span {
+      display: block; width: 22px; height: 2px;
+      background: var(--text); border-radius: 0; transition: all 0.25s;
+    }
+    .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    /* Mobile drawer */
+    .mobile-drawer {
+      display: none; position: fixed; inset: 0; z-index: 199;
+      background: var(--midnight); flex-direction: column;
+      padding: 72px var(--pad) var(--pad); gap: 0;
+      border-top: 3px solid var(--lime);
+      margin-top: 52px;
+    }
+    .mobile-drawer.open { display: flex; }
+    .mobile-drawer a {
+      color: var(--text); text-decoration: none;
+      font-size: 22px; font-weight: 800;
+      padding: 14px 0; border-bottom: 1px solid var(--border);
+      transition: color 0.15s; display: flex;
+      align-items: center; justify-content: space-between;
+      font-family: 'DM Mono', monospace; text-transform: uppercase;
+      letter-spacing: -0.5px;
+    }
+    .mobile-drawer a::after { content: '→'; color: var(--subdued); font-size: 14px; }
+    .mobile-drawer a:hover { color: var(--lime); }
+    .mobile-drawer a.drawer-cta {
+      font-size: 13px; margin-top: 24px;
+      background: var(--lime); color: var(--midnight);
+      border: none; border-radius: var(--r-btn);
+      padding: 14px 28px; text-align: center; font-weight: 700;
+      justify-content: center; letter-spacing: 0.06em;
+    }
+    .mobile-drawer a.drawer-cta::after { display: none; }
+    .drawer-tag { margin-top: auto; font-size: 10px; color: var(--subdued); font-family: 'DM Mono', monospace; }
+
+    /* ── PAGE HEADER — station nameplate ── */
+    .page-header {
+      padding: 20px var(--pad) 16px;
+      border-bottom: 1px solid var(--border);
+      border-left: 4px solid var(--lime);
+      margin-left: 0;
+      background: var(--surface);
+    }
+    .back-link {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 10px; color: var(--muted); text-decoration: none;
+      font-family: 'DM Mono', monospace; margin-bottom: 10px;
+      transition: color 0.15s; letter-spacing: 0.08em; text-transform: uppercase;
+    }
+    .back-link:hover { color: var(--lime); }
+    .page-header h2 {
+      font-size: 22px; font-weight: 800; letter-spacing: -0.5px;
+      margin-bottom: 4px; font-family: 'DM Mono', monospace;
+      text-transform: uppercase;
+    }
+    .page-header p { font-size: 12px; color: var(--muted); font-family: 'DM Mono', monospace; }
+
+    /* ── SEARCH ── */
+    .search-wrap {
+      padding: 12px var(--pad);
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .search-input {
+      width: 100%; background: var(--surface2); border: 1px solid var(--border2);
+      border-radius: var(--r-btn); padding: 10px 16px; color: var(--text);
+      font-family: 'DM Mono', monospace; font-size: 13px; outline: none;
+      transition: border-color 0.15s; letter-spacing: 0.03em;
+    }
+    .search-input:focus { border-color: var(--lime); }
+    .search-input::placeholder { color: var(--subdued); }
+
+    /* ── FILTER BAR — transit tabs ── */
+    .filter-bar {
+      display: flex; gap: 6px; padding: 10px var(--pad);
+      overflow-x: auto; scrollbar-width: none;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .filter-bar::-webkit-scrollbar { display: none; }
+
+    .tab {
+      padding: 5px 14px;
+      border-radius: var(--r-badge); /* square transit tabs */
+      border: 1px solid var(--border2); background: transparent;
+      color: var(--muted); font-family: 'DM Mono', monospace;
+      font-size: 11px; font-weight: 500; cursor: pointer;
+      white-space: nowrap; transition: all 0.15s;
+      letter-spacing: 0.06em; text-transform: uppercase; flex-shrink: 0;
+    }
+    .tab:hover  { color: var(--text); border-color: var(--muted); }
+    .tab.active { background: var(--lime); color: var(--midnight); border-color: var(--lime); font-weight: 700; }
+
+    /* Category tabs with MTA dot */
+    .tab-dot {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 16px; height: 16px; border-radius: 50%;
+      font-size: 9px; font-weight: 800; margin-right: 5px;
+      vertical-align: middle; font-family: 'DM Mono', monospace;
+    }
+
+    /* Price chips */
+    .price-row {
+      display: flex; gap: 6px; padding: 8px var(--pad) 10px;
+      overflow-x: auto; scrollbar-width: none;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .price-row::-webkit-scrollbar { display: none; }
+    .price-chip {
+      padding: 4px 12px; border-radius: var(--r-badge);
+      border: 1px solid var(--border); background: transparent;
+      color: var(--muted); font-family: 'DM Mono', monospace;
+      font-size: 10px; font-weight: 500; cursor: pointer;
+      white-space: nowrap; transition: all 0.15s; flex-shrink: 0;
+      letter-spacing: 0.06em; text-transform: uppercase;
+    }
+    .price-chip:hover  { border-color: var(--border2); color: var(--text); }
+    .price-chip.active { background: var(--lime); color: var(--midnight); border-color: var(--lime); font-weight: 700; }
+
+    /* ── FEED COUNT ── */
+    .feed-count {
+      padding: 12px var(--pad) 8px;
+      font-size: 10px; font-weight: 500; color: var(--subdued);
+      font-family: 'DM Mono', monospace; letter-spacing: 0.12em; text-transform: uppercase;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .feed-count::before {
+      content: ''; display: block;
+      width: 12px; height: 2px; background: var(--lime);
+    }
+
+    /* ── FEED ── */
+    .feed {
+      padding: 0 var(--pad) var(--pad);
+      display: flex; flex-direction: column; gap: 10px;
+    }
+
+    /* Section label — styled as a subway line divider */
+    .feed-section {
+      padding: 12px 0 4px;
+      font-size: 9px; font-weight: 600; color: var(--subdued);
+      letter-spacing: 0.14em; text-transform: uppercase;
+      font-family: 'DM Mono', monospace;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 2px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .feed-section::before {
+      content: ''; display: block;
+      width: 3px; height: 14px; background: var(--lime); flex-shrink: 0;
+    }
+
+    /* ── CARDS ── */
+    .card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--r-card); overflow: hidden; cursor: pointer;
+      transition: border-color 0.15s, transform 0.15s;
+      border-left: 3px solid transparent;
+    }
+    .card[data-cat="fd"] { border-left-color: var(--green); }
+    .card[data-cat="dk"] { border-left-color: var(--blue); }
+    .card[data-cat="cf"] { border-left-color: var(--amber); }
+    .card[data-cat="ev"] { border-left-color: var(--purple); }
+    .card[data-cat="wk"] { border-left-color: var(--green); }
+    .card[data-cat="ac"] { border-left-color: var(--lime); }
+    .card:hover { border-color: var(--border2); transform: translateY(-1px); }
+
+    .card-img {
+      width: 100%; height: 88px; display: flex;
+      align-items: center; justify-content: center;
+      position: relative; font-size: 26px;
+    }
+    .card-img.fd  { background: #0D0800; }
+    .card-img.dk  { background: #05030D; }
+    .card-img.cf  { background: #100900; }
+    .card-img.ev  { background: #050914; }
+    .card-img.wk  { background: #030A04; }
+    .card-img.ac  { background: #030A04; }
+    .card-img.ac2 { background: #050A10; }
+    .card-img.ac3 { background: #0D0400; }
+    .card-img.ac4 { background: #0D0008; }
+    .card-img.ac5 { background: #00050D; }
+
+    /* Price tag — tilted sticker */
+    .card-price {
+      position: absolute; top: 8px; right: 8px;
+      background: var(--lime); color: var(--midnight);
+      font-size: 9px; font-weight: 800; padding: 2px 7px;
+      font-family: 'DM Mono', monospace; letter-spacing: 0.04em;
+      transform: rotate(-1.5deg);
+    }
+    .card-urgency {
+      position: absolute; bottom: 8px; left: 8px;
+      background: var(--urgency); color: #fff;
+      font-size: 9px; font-weight: 700; padding: 2px 7px;
+      font-family: 'DM Mono', monospace; letter-spacing: 0.06em;
+      text-transform: uppercase;
+      display: flex; align-items: center; gap: 4px;
+    }
+    /* blinking dot on urgency */
+    .card-urgency::before {
+      content: ''; display: block;
+      width: 5px; height: 5px; border-radius: 50%;
+      background: #fff;
+      animation: blink 1.4s ease-in-out infinite;
+      flex-shrink: 0;
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; } 50% { opacity: 0.15; }
+    }
+
+    .card-body   { padding: 12px 14px; }
+    .card-meta   { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; flex-wrap: wrap; }
+    .card-hood   { font-size: 10px; color: var(--subdued); font-family: 'DM Mono', monospace; letter-spacing: 0.06em; }
+    .card-title  { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+    .card-desc   { font-size: 12px; color: var(--muted); line-height: 1.5; margin-bottom: 10px; }
+    .card-footer { display: flex; align-items: center; justify-content: space-between; }
+    .going       { font-size: 10px; color: var(--subdued); font-family: 'DM Mono', monospace; }
+    .going strong { color: var(--lime); font-weight: 700; }
+
+    /* ── BADGES — MTA-style ── */
+    .badge {
+      font-size: 9px; font-weight: 700; padding: 2px 7px;
+      border-radius: 0; letter-spacing: 0.07em; text-transform: uppercase;
+      font-family: 'DM Mono', monospace;
+    }
+    /* MTA circle badge for category */
+    .badge-circle {
+      width: 18px; height: 18px; border-radius: 50%;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 9px; font-weight: 800; font-family: 'DM Mono', monospace;
+      flex-shrink: 0; vertical-align: middle;
+    }
+    .badge-ev   { background: var(--purple); color: #fff; }
+    .badge-fd   { background: var(--green);  color: #fff; }
+    .badge-dk   { background: var(--blue);   color: #fff; }
+    .badge-wk   { background: var(--green);  color: #fff; }
+    .badge-cf   { background: var(--amber);  color: #fff; }
+    .badge-ac   { background: var(--lime);   color: var(--midnight); }
+    .badge-free { background: var(--lime-dim); color: var(--lime); border: 1px solid rgba(252,204,10,0.25); }
+
+    /* ── BUTTONS ── */
+    .btn-join {
+      background: var(--lime); color: var(--midnight); border: 1px solid transparent;
+      border-radius: var(--r-btn); padding: 6px 14px;
+      font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 700;
+      cursor: pointer; transition: all 0.15s; text-transform: uppercase; letter-spacing: 0.06em;
+    }
+    .btn-join:hover  { opacity: 0.88; }
+    .btn-join.joined { background: transparent; color: var(--lime); border-color: var(--lime); }
+
+    .btn-primary {
+      display: inline-flex; align-items: center; justify-content: center;
+      background: var(--lime); color: var(--midnight); border: none;
+      border-radius: var(--r-btn); padding: 13px 22px;
+      font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700;
+      cursor: pointer; text-decoration: none; transition: opacity 0.15s;
+      text-transform: uppercase; letter-spacing: 0.04em;
+    }
+    .btn-primary:hover { opacity: 0.88; }
+
+    .btn-ghost {
+      display: inline-flex; align-items: center; justify-content: center;
+      background: transparent; color: var(--text); border: 1px solid var(--border2);
+      border-radius: var(--r-btn); padding: 13px 22px;
+      font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 600;
+      cursor: pointer; text-decoration: none; transition: all 0.15s;
+      text-transform: uppercase; letter-spacing: 0.04em;
+    }
+    .btn-ghost:hover { border-color: var(--muted); background: var(--surface2); }
+
+    /* ── MODAL ── */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0; z-index: 500;
+      background: rgba(0,0,0,0.85); align-items: flex-end; justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      position: relative; background: var(--surface);
+      border: 1px solid var(--border2);
+      border-top: 3px solid var(--lime);
+      border-radius: 0;
+      padding: 24px var(--pad) 48px; width: 100%; max-width: 520px;
+      animation: slideUp 0.25s ease;
+    }
+    @keyframes slideUp {
+      from { transform: translateY(40px); opacity: 0; }
+      to   { transform: translateY(0); opacity: 1; }
+    }
+    .modal-handle {
+      width: 36px; height: 3px; background: var(--border2);
+      border-radius: 0; margin: 0 auto 20px;
+    }
+    .modal-close {
+      position: absolute; top: 20px; right: var(--pad);
+      background: var(--border); border: none; color: var(--muted);
+      width: 28px; height: 28px; border-radius: 0;
+      font-size: 13px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'DM Mono', monospace;
+    }
+    .modal h2 {
+      font-size: 17px; font-weight: 800; margin-bottom: 6px;
+      font-family: 'DM Mono', monospace; text-transform: uppercase;
+      letter-spacing: -0.3px;
+    }
+    .modal-meta    { display: flex; gap: 8px; align-items: center; margin-bottom: 14px; flex-wrap: wrap; }
+    .modal-desc    { font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 18px; }
+    .modal-row     {
+      display: flex; justify-content: space-between;
+      padding: 9px 0; border-bottom: 1px solid var(--border); font-size: 12px;
+      font-family: 'DM Mono', monospace;
+    }
+    .modal-row span:first-child { color: var(--subdued); text-transform: uppercase; letter-spacing: 0.08em; font-size: 10px; }
+    .modal-row span:last-child  { font-weight: 700; color: var(--text); }
+    .modal-actions { margin-top: 20px; display: flex; gap: 10px; }
+
+    /* ── FOOTER ── */
+    .footer-stripe { display: flex; height: 4px; }
+    .footer-stripe span { flex: 1; }
+
+    footer {
+      border-top: 3px solid var(--lime);
+      padding: 20px var(--pad);
+      display: flex; flex-direction: column; gap: 16px;
+      background: var(--surface);
+    }
+    .footer-top {
+      display: flex; align-items: center;
+      justify-content: space-between; gap: 24px; width: 100%;
+    }
+    .footer-logo {
+      font-size: 14px; font-weight: 800; text-decoration: none;
+      font-family: 'DM Mono', monospace; text-transform: uppercase; letter-spacing: -0.3px;
+    }
+    .footer-logo .after { color: var(--text); }
+    .footer-logo .five  { color: var(--lime); }
+    .footer-ig {
+      display: flex; align-items: center; gap: 5px;
+      font-size: 11px; color: var(--muted); text-decoration: none;
+      transition: color 0.15s; font-family: 'DM Mono', monospace;
+    }
+    .footer-ig svg { width: 14px; height: 14px; }
+    .footer-ig:hover { color: var(--lime); }
+    .footer-bottom {
+      font-size: 10px; color: var(--subdued);
+      font-family: 'DM Mono', monospace; letter-spacing: 0.06em;
+    }
+
+    /* ── TOAST ── */
+    .toast {
+      position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%);
+      background: var(--surface); border: 1px solid var(--lime);
+      border-radius: var(--r-btn); padding: 10px 20px;
+      font-size: 12px; font-weight: 700; color: var(--lime);
+      z-index: 1000; white-space: nowrap; pointer-events: none;
+      font-family: 'DM Mono', monospace; letter-spacing: 0.06em;
+      animation: toastIn 0.2s ease; transition: opacity 0.3s;
+    }
+    @keyframes toastIn {
+      from { opacity: 0; transform: translate(-50%, 8px); }
+      to   { opacity: 1; transform: translate(-50%, 0); }
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (min-width: 640px) {
+      .hamburger  { display: none; }
+      .nav-links  { display: flex; }
+      .nav-cta    { display: inline-flex; }
+    }
+    @media (min-width: 900px) {
+      :root { --pad: 48px; }
+      .nav { padding: 0 var(--pad); }
+      .feed {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+      }
+      .feed-section { grid-column: 1 / -1; }
+      footer { flex-direction: row; align-items: center; padding: 20px var(--pad); }
+      .footer-bottom { margin-left: auto; }
+    }
+    @media (min-width: 1200px) {
+      .feed { grid-template-columns: repeat(3, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── NAV ── -->
+  <nav class="nav">
+    <a class="nav-logo" href="index.html"><span class="after">after</span><span class="five">five</span></a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="explore.html" class="active">Explore</a></li>
+      <li><a href="ai.html">Plan Generator</a></li>
+      <li><a href="submit.html">Submit a Spot</a></li>
+      <li><a href="about.html">About</a></li>
+    </ul>
+    <a class="nav-cta" href="ai.html">✦ Build My Night</a>
+    <button class="hamburger" id="hamburgerBtn" aria-label="Open menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- MTA stripe under nav -->
+  <div class="nav-stripe" aria-hidden="true">
+    <span style="background:#EE352C;"></span>
+    <span style="background:#00933C;"></span>
+    <span style="background:#FCCC0A;"></span>
+    <span style="background:#0039A6;"></span>
+    <span style="background:#FF6319;"></span>
+  </div>
+
+  <!-- Mobile Drawer -->
+  <div class="mobile-drawer" id="mobileMenu">
+    <a href="index.html">Home</a>
+    <a href="explore.html">Explore</a>
+    <a href="ai.html">Plan Generator</a>
+    <a href="submit.html">Submit a Spot</a>
+    <a href="about.html">About</a>
+    <a class="drawer-cta" href="ai.html">✦ Build My Night</a>
+    <p class="drawer-tag">"Your NYC nights, sorted."</p>
+  </div>
+
+  <!-- ── PAGE HEADER — station nameplate ── -->
+  <div class="page-header">
+    <a class="back-link" href="index.html">← Home</a>
+    <h2>Explore NYC</h2>
+    <p>Every curated spot — filtered your way</p>
+  </div>
+
+  <!-- ── SEARCH ── -->
+  <div class="search-wrap">
+    <input class="search-input" id="searchInput" type="text"
+      placeholder="Search spots, neighborhoods, vibes…" oninput="filterCards()" />
+  </div>
+
+  <!-- ── CATEGORY FILTER ── -->
+  <div class="filter-bar" id="catFilter">
+    <button class="tab active" data-filter="all">All</button>
+    <button class="tab" data-filter="fd">
+      <span class="tab-dot" style="background:#00933C;color:#fff;">6</span>Food
+    </button>
+    <button class="tab" data-filter="dk">
+      <span class="tab-dot" style="background:#0039A6;color:#fff;">A</span>Drinks
+    </button>
+    <button class="tab" data-filter="cf">
+      <span class="tab-dot" style="background:#EE352C;color:#fff;">1</span>Coffee
+    </button>
+    <button class="tab" data-filter="ev">
+      <span class="tab-dot" style="background:#FF6319;color:#fff;">B</span>Events
+    </button>
+    <button class="tab" data-filter="wk">
+      <span class="tab-dot" style="background:#00933C;color:#fff;">4</span>Workouts
+    </button>
+    <button class="tab" data-filter="ac">
+      <span class="tab-dot" style="background:#FCCC0A;color:#080A14;">N</span>Activities
+    </button>
+  </div>
+
+  <!-- ── PRICE FILTER ── -->
+  <div class="price-row" id="priceFilter">
+    <button class="price-chip active" data-price="all">All prices</button>
+    <button class="price-chip" data-price="free">Free</button>
+    <button class="price-chip" data-price="budget">Under $20</button>
+    <button class="price-chip" data-price="mid">$20–50</button>
+    <button class="price-chip" data-price="splurge">$50+</button>
+  </div>
+
+  <!-- ── FEED ── -->
+  <p class="feed-count" id="feedCount">All spots</p>
+
+  <main class="feed" id="exploreFeed">
+
+    <!-- ═══ FOOD — QUICK ═══ -->
+    <p class="feed-section" data-sec="fd">🍜 Quick Dinner</p>
+
+    <article class="card" data-cat="fd" data-price-tier="budget" data-title="Prince Street Pizza" data-hood="SoHo" data-price="Under $15" data-cost="~$8/slice" data-time="Open until 10 PM" data-going="18" data-desc="The spicy square slice SoHo is famous for. Always worth the line.">
+      <div class="card-img fd">🍕<span class="card-price">Under $15</span></div>
+      <div class="card-body">
+        <div class="card-meta"><span class="badge badge-fd">Food</span><span class="card-hood">SoHo</span></div>
+        <p class="card-title">Prince Street Pizza</p>
+        <p class="card-desc">The spicy square slice SoHo is famous for. Always worth the line.</p>
+        <div class="card-footer"><span class="going"><strong>18 interns</strong> going</span><button class="btn-join">Join</button></div>
+      </div>
+    </article>
+
+    <article class="card" data-cat="fd" data-price-tier="budget" data-title="Locanut" data-hood="Midtown" data-price="Under $20" data-cost="~$16" data-time="Open until 9 PM" data-going="5" data-desc="Fast, fresh Thai takeout. Pad see ew and mango sticky rice. Perfect post-work dinner.">
+      <div class="card-img fd">🍛<span class="card-price">Under $20</span></div>
+      <div class="card-body">
+        <div class="card-meta"><span class="badge badge-fd">Food</span><span class="card-hood">Midtown</span></div>
+        <p class="card-title">Locanut</p>
+        <p class="card-desc">Fast, fresh Thai takeout. Pad see ew and mango sticky rice.</p>
+        <div class="card-footer"><span class="going"><strong>5 interns</strong> going</span><button class="btn-join">Join</button></div>
+      </div>
+    </article>
+
+    <article class="card" data-cat="fd" data-price-tier="budget" data-title="Something Green" data-hood="Various" data-price="Under $15" data-cost="~$12" data-time="Open until 8 PM" data-going="9" data-desc="Quick healthy takeout bowls. Great for eating at your desk or in the park.">
+      <div class="card-img fd">🥗<span class="card-price">Under $15</span></div>
+      <div class="card-body">
+        <div class="card-meta"><span class="badge badge-fd">Food</span><span class="card-hood">Various</span></div>
+        <p class="card-title">Something Green</p>
+        <p class="card-desc">Quick healthy bowls. Desk lunch or park picnic approved.</p>
+        <div class="card-footer"><span class="going"><strong>9 interns</strong> going</span><button class="btn-join">Join</button></div>
+      </div>
+    </article>
+
+    <article class="card" data-cat="fd" data-price-tier="budget" data-title="Sandwell" data-hood="Lower East Side" data-price="Under $20" data-cost="~$16" data-time="Open until 8 PM" data-going="6" data-desc="Rotating sandwiches on great bread. Quick, casual, deeply satisfying.">
+      <div class="card-img fd">🥪<span class="card-price">Under $20</span></div>
+      <div class="card-body">
+        <div class="card-meta"><span class="badge badge-fd">Food</span><span class="card-hood">Lower East Side</span></div>
+        <p class="card-title">Sandwell</p>
+        <p class="card-desc">Rotating sandwiches on great bread. Quick, casual, deeply satisfying.</p>
+        <div class="card-footer"><span class="going"><strong>6 interns</strong> going</span><button class="btn-join">Join</button></div>
+      </div>
+    </article>
+
+    <article class="card" data-cat="fd" data-price-tier="budget" data-title="Milano Market" data-hood="Upper West Side" data-price="Under $20" data-cost="~$15" data-time="Open until 9 PM" data-going="4" data-desc="Italian deli and market. Great sandwiches and prepared food. Perfect pre-picnic stop.">
+      <div class="card-img fd">🥖<span class="card-price">Under $20</span></div>
+      <div class="card-body">
+        <div class="card-meta"><span class="badge badge-fd">Food</span><span class="card-hood">Upper West Side</span></div>
+        <p class="card-title">Milano Market</p>
+        <p class="card-desc">Italian deli. Great sandwiches and prepared food. Pre-picnic essential.</p>
+        <div class="card-footer"><span class="going"><strong>4 interns</strong> going</span><button class="btn-join">Join</button></div>
+      </div>
+    </article>
+
+    <article class="card" data-cat="fd" data-price-tier="budget" data-title="Bob White Counter" data-hood="East Village" data-price="Under $20" data-cost="~$16" data-time="Open until 10 PM" data-going="13" data-desc="Southern chicken sandwiches, cult favorite. Counter seating, big flavor.">
+      <div class="card-img fd">🍗<span class="card-price">Under $20</span></div>
+      <div class="card-body">
+        <div class="card-meta"><span class="badge badge-fd">Food</span><span class="card-hood">East Village</span></div>
+        <p class="card-title">Bob White Counter</p>
+        <p class="card-desc">Southern chicken sandwiches, cult favorite. Counter seating, big flavor.</p>
+        <div class="card-footer"><span class="going"><strong>13 interns</strong> going</span><button class="btn-join">Join</button></div>
+      </div>
+    </article>
+
+    <article class="card" data-cat="fd" data-price-tier="budget" data-title="Falafel on Broadway" data-hood="Upper West Side" data-price="Under $10" data-cost="~$8" data-time="Open until 10 PM" data-going="11" data-desc="Legendary cheap falafel. No frills, just excellent food.">
+      <div class="card-img fd">🧆<span class="card-price">Under $10</span></div>
+      <div class="card-body">
+        <div class="card-meta"><span class="badge badge-fd">Food</span><span class="card-hood">Upper West Side</span></div>
+        <p class="card-title">Falafel on Broadway</p>
+        <p class="card-desc">Legendary cheap falafel. No frills, just excellent food.</p>
+        <div class="card-footer"><span class="going"><strong>11 interns</strong> going</span><button class="btn-join">Join</button></div>
+      </div>
+    </article>
+
+    <article class="card" data-cat="fd" data-price-tier="budget" data-title="7th Street Burger" data-hood="East Village" data-price="Under $20" data-cost="~$14" data-time="Open until 11 PM" data-going="16" data-desc="Perfect smash burgers. Short menu, long lines, zero regrets.">
+      <div class="card-img fd">🍔<span class="card-price">Under $20</span></div>
+      <div class="card-body">
+        <div class="card-meta"><span class="badge badge-fd">Food</span><span class="card-hood">East Village</span></div>
+        <p class="card-title">7th Street Burger</p>
+        <p class="card-desc">Perfect smash burgers. Short menu, long lines, zero regrets.</p>
+        <div class="card-footer"><span class="going"><strong>16 interns</strong> going</span><button class="btn-join">Join</button></div>
+      </div>
+    </article>
+
+    <article class="card" data-cat="fd" data-price-tier="budget" data-title="B&H Dairy — Friday Special" data-hood="East Village" data-price="Under $15" data-cost="~$12" data-time="Fridays all day" data-going="20" data-desc="Friday special: matzo ball soup + grilled cheese. NYC institution since 1938. Cash only.">
+      <div class="card-img fd">🥣<span class="card-price">Under $15</span><span class="card-urgency">Fridays only</span></div>
+      <div class="card-body">
+        <div class="card-meta"><span class="badge badge-fd">Food</span><span class="badge badge-free">Special</span><span class="card-hood">East Village</span></div>
+        <p class="card-title">B&H Dairy — Friday Special</p>
+        <p class="card-desc">Matzo ball soup + grilled cheese on Fridays. NYC institution since 1938.</p>
+        <div class="card-footer"><span class="going"><strong>20 interns</strong> going</span><button class="btn-join">Join</button></div>
+      </div>
+    </article>
+
+    <!-- ═══ FOOD — SIT DOWN ═══ -->
+    <p class="feed-section" data-sec="fd">🍽️ Sit-Down Dinner</p>
+
+    <article class="card" data-cat="fd" data-price-tier="mid" data-title="St. Jardim" data-hood="West Village" data-price="$40–60" data-cost="~$50" data-time="Open until 11 PM" data-going="9" data-desc="Brazilian-inspired West Village gem. Great for solo dining at the bar or a special night out.">
+      <div class="card-img fd">🌿<span class="card-price">$40–60</span></div>
+      <div class="card-body">
+        <div class="card-meta"><span class="badge badge-fd">Food</span><span class="card-hood">West Village</span></div>
+        <p class="card-title">St. Jardim</p>
+        <p class="card-desc">Brazilian-inspired West Village gem. Great at the bar or for a special night.</p>
+        <div class="card-footer"><span class="going"><strong>9 interns</strong> going</span><button class="btn-join">Join</button></div>
+      </div>
+    </article>
+
+    <article class="card" data-cat="fd" data-price-tier="mid" data-title="Fiaschetteria Pistoia" data-hood="West Village" data-price="$40–60" data-cost="~$50" data-time="Open until 11 PM" data-going="7" data-desc="Intimate Italian from the team behind a Michelin-starred Florentine restaurant. Exceptional pasta.">
+      <div class="card-img fd">🍝<span class="card-price">$40–60</span></div>
+      <div class="card-body">
+        <div class="card-meta"><span class="badge badge-fd">Food</span><span class="card-hood">West Village</span></div>
+        <p class="card-title">Fiaschetteria Pistoia</p>
+        <p class="card-desc">Intimate Italian, Michelin-starred roots. Exceptional pasta.</p>
+        <div class="card-footer"><span class="going"><strong>7 interns</strong> going</span><button class="btn-join">Join</button></div>
+      </div>
+    </article>
+
+    <article class="card" data-cat="fd" data-price-tier="mid" data-title="Kikis" data-hood="Lower East Side" data-price="$30–50" data-cost="~$40" data-time="Open until 11 PM" data-going="14" data-desc="Greek-Mediterranean LES gem. Cash only, BYOB, always packed. Book ahead.">
+      <div class="card-img fd">🫒<span class="card-price">$30–50</span></div>
+      <div class="card-body">
+        <div class="card-meta"><span class="badge badge-fd">Food</span><span class="card-hood">Lower East Side</span></div>
+        <p class="card-title">Kikis</p>
+        <p class="card-desc">Greek-Mediterranean LES gem. Cash only, BYOB, always packed.</p>
+        <div class="card-footer"><span class="going"><strong>14 interns</strong> going</span><button class="btn-join">Join</button></div>
+      </div>
+    </article>
+
+    <article class="card" data-cat="fd" data-price-tier="mid" data-title="Baar Baar" data-hood="East Village" data-price="$35–55" data-cost="~$45" data-time="Open until midnight" data-going="12" data-desc="Modern Indian with great cocktails. Perfect for groups and happy hour.">
+      <div class="card-img fd">🍛<span class="card-price">$35–55</span></div>
+      <div class="card-body">
+        <div class="card-meta"><span class="badge badge-fd">Food</span><span class="card-hood">East Village</span></div>
+        <p class="card-title">Baar Baar</p>
+        <p class="card-desc">Modern Indian with great cocktails. Perfect for groups and happy hour.</p>
+        <div class="card-footer"><span class="going"><strong>12 interns</strong> going</span><button class="btn-join">Join</button></div>
+      </div>
+    </article>
+
+    <article class="card" data-cat="fd" data-price-tier="mid" data-title="Misi" data-hood="Williamsburg" data-price="$40–60" data-cost="~$50" data-time="Open until 10 PM" data-going="8" data-desc="Missy Robbins' exceptional fresh pasta. Williamsburg's best dinner.">
+      <div class="card-img fd">🍝<span class="card-price">$40–60</span></div>
+      <div class="card-body">
+        <div class="card-meta"><span class="badge badge-fd">Food</span><span class="card-hood">Williamsburg</span></div>
+        <p class="card-title">Misi</p>
+        <p class="card-desc">Missy Robbins' exceptional fresh pasta. Williamsburg's best dinner.</p>
+        <div class="card-footer"><span class="going"><strong>8 interns</strong> going</span><button class="btn-join">Join</button></div>
+      </div>
+    </article>
+
+    <article class="card" data-cat="fd" data-price-tier="mid" data-title="Roscioli" data-hood="Various" data-price="$40–60" data-cost="~$50" data-time="Open until 11 PM" data-going="6" data-desc="NYC outpost of the legendary Rome deli and wine bar. Excellent charcuterie and pasta.">
+      <div class="card-img fd">🇮🇹<span class="card-price">$40–60</span></div>
+      <div class="card-body">
+        <div class="card-meta"><span class="badge badge-fd">Food</span><span class="card-hood">Various</span></div>
+        <p class="card-title">Roscioli</p>
+        <p class="card-desc">NYC outpost of Rome's legendary deli. Excellent charcuterie and pasta.</p>
+        <div class="card-footer"><span class="going"><strong>6 interns</strong> going</span><button class="btn-join">Join</button></div>
+      </div>
+    </article>
+
+    <article class="card" data-cat="fd" data-price-tier="mid" data-title="Dudley's" data-hood="Lower East Side" data-price="$25–40" data-cost="~$32" data-time="Open until midnight" data-going="11" data-desc="Aussie all-day cafe turned evening bar. Great food and great vibes.">
+      <div class="card-img fd">☕<span class="card-price">$25–40</span></div>
+      <div class="card-body">
+        <div class="card-meta"><span class="badge badge-fd">Food</span><span class="card-hood">Lower East Side</span></div>
+        <p class="card-title">Dudley's</p>
+        <p class="card-desc">Aussie all-day cafe turned evening bar. Great food and great vibes.</p>
+        <div class="card-footer"><span class="going"><strong>11 interns</strong> going</span><button class="btn-join">Join</button></div>
+      </div>
+    </article>
+
+    <article class="card" data-cat="fd" data-price-tier="splurge" data-title="Don Angie" data-hood="West Village" data-price="$60–90" data-cost="~$75" data-time="Open until 10 PM" data-going="6" data-desc="Italian-American with a creative twist. Notoriously hard to book — worth the effort.">
+      <div class="card-img fd">🍝<span class="card-price">$60–90</span></div>
+      <div class="card-body">
+        <div class="card-meta"><span class="badge badge-fd">Food</span><span class="card-hood">West Village</span></div>
+        <p class="card-title">Don Angie</p>
+        <p class="card-desc">Italian-American with a creative twist. Hard to book, worth every effort.</p>
+        <div class="card-footer"><span class="going"><strong>6 interns</strong> going</span><button class="btn-join">Join</button></div>
+      </div>
+    </article>
+
+    <!-- ═══ FOOD — BRUNCH ═══ -->
+    <p class="feed-section" data-sec="fd">🥞 Brunch</p>
+
+    <article class="card" data-cat="fd" data-price-tier="mid" data-title="Sadelle's" data-hood="SoHo" data-price="$35–55" data-cost="~$45" data-time="Open until 3 PM" data-going="10" data-desc="Iconic SoHo brunch spot. The smoked fish tower is legendary. Book ahead on weekends.">
+      <div class="card-img fd">🥯<span class="card-price">$35–55</span></div>
+      <div class="card-body">
+        <div class="card-meta"><span class="badge badge-fd">Food</span><span class="card-hood">SoHo</span></div>
+        <p class="card-title">Sadelle's</p>
+        <p class="card-desc">Iconic SoHo brunch. The smoked fish tower is legendary. Book ahead.</p>
+        <div class="card-footer"><span class="going"><strong>10 interns</strong> going</span><button class="btn-join">Join</button></div>
+      </div>
+    </article>
+
+    <article class="card" data-cat="fd" data-price-tier="budget" data-title="EJ's Kitchenette" data-hood="Upper West Side" data-price="Under $25" data-cost="~$20" data-time="Open until 4 PM" data-going="8" data-desc="Classic American diner on the UWS. Excellent brunch and comfort food done well.">
+      <div class="card-img fd">🥞<span class="card-price">Under $25</span></div>
+      <div class="card-body">
+        <div class="card-meta"><span class="badge badge-fd">Food</span><span class="card-hood">Upper West Side</span></div>
+        <p class="card-title">EJ's Kitchenette</p>
+        <p class="card-desc">Classic American diner on the UWS. Excellent brunch and comfort food.</p>
+        <div class="card-footer"><span class="going"><strong>8 interns</strong> going</span><button class="btn-join">Join</button></div>
+      </div>
+    </article>
+
+    <!-- ═══ FOOD — SUSHI ═══ -->
+    <p class="feed-section" data-sec="fd">🍣 Sushi</p>
+
+    <article class="card" data-cat="fd" data-price-tier="mid" data-title="Katsu Hanna" data-hood="East Village" data-price="$40–60" data-cost="~$50" data-time="Open until 10 PM" data-going="10" data-desc="Intimate omakase-style sushi. Exceptional quality for the price point.">
+      <div class="card-img fd">🍣<span class="card-price">$40–60</span></div>
+      <div class="card-body">
+        <div class="card-meta"><span class="badge badge-fd">Food</span><span class="card-hood">East Village</span></div>
+        <p class="card-title">Katsu Hanna</p>
+        <p class="card-desc">Intimate omakase-style sushi. Exceptional quality for the price.</p>
+        <div class="card-footer"><span class="going"><strong>10 interns</strong> going</span><button class="btn-join">Join</button></div>
+      </div>
+    </article>
+
+    <article class="card" data-cat="fd" data-price-tier="mid" data-title="Madison Pickle" data-hood="Various" data-price="$25–40" data-cost="~$30" data-time="Open until 10 PM" data-going="9" data-desc="Accessible sushi with a fun, casual vibe. Great for groups without breaking the bank.">
+      <div class="card-img fd">🥒<span class="card-price">$25–40</span></div>
+      <div class="card-body">
+        <div class="card-meta"><span class="badge badge-fd">Food</span><span class="card-hood">Various</span></div>
+        <p class="card-title">Madison Pickle</p>
+        <p class="card-desc">Accessible sushi, fun casual vibe. Great for groups without breaking the bank.</p>
+        <div class="card-footer"><span class="going"><strong>9 interns</strong> going</span><button class="btn-join">Join</button></div>
+      </div>
+    </article>
+
+    <article class="card" data-cat="fd" data-price-tier="mid" data-title="Cocodaq" data-hood="West Village" data-price="$35–55" data-cost="~$45" data-time="Open until 11 PM" data-going="8" data-desc="Vegan Japanese — surprisingly incredible. Best plant-based sushi in NYC.">
+      <div class="card-img fd">🥢<span class="card-price">$35–55</span></div>
+      <div class="card-body">
+        <div class="card-meta"><span class="badge badge-fd">Food</span><span class="card-hood">West Village</span></div>
+        <p class="card-title">Cocodaq</p>
+        <p class="card-desc">Vegan Japanese — surprisingly incredible. Best plant-based sushi in NYC.</p>
+        <div class="card-footer"><span class="going"><strong>8 interns</strong> going</span><button class="btn-join">Join</button></div>
+      </div>
+    </article>
+
+    <article class="card" data-cat="fd" data-price-tier="splurge" data-title="Sugarfish" data-hood="Various" data-price="$50–70" data-cost="~$60" data-time="Open until 10 PM" data-going="15" data-desc="Trust-me omakase sets. Reliable, always excellent. Book ahead.">
+      <div class="card-img fd">🍣<span class="card-price">$50–70</span></div>
+      <div class="card-body">
+        <div class="card-meta"><span class="badge badge-fd">Food</span><span class="card-hood">Various</span></div>
+        <p class="card-title">Sugarfish</p>
+        <p class="card-desc">Trust-me omakase sets. Reliable, always excellent. Book ahead.</p>
+        <div class="card-footer"><span class="going"><strong>15 interns</strong> going</span><button class="btn-join">Join</button></div>
+      </div>
+    </article>
+
+    <!-- ═══ FOOD — SOLO ═══ -->
+    <p class="feed-section" data-sec="fd">🪑 Solo Dining</p>
+
+    <article class="card" data-cat="fd" data-price-tier="mid" data-title="All & Sundry" data-hood="Various" data-price="$30–50" data-cost="~$35" data-time="Open until 10 PM" data-going="6" data-desc="Counter seating, great solo dining vibes. Excellent food without the awkward solo table.">
+      <div class="card-img fd">🍽️<span class="card-price">$30–50</span></div>
+      <div class="card-body">
+        <div class="card-meta"><span class="badge badge-fd">Food</span><span class="badge badge-free">Solo friendly</span><span class="card-hood">Various</span></div>
+        <p class="card-title">All & Sundry</p>
+        <p class="card-desc">Counter seating. Excellent food without the awkward solo table.</p>
+        <div class="card-footer"><span class="going"><strong>6 interns</strong> going</span><button class="btn-join">Join</button></div>
+      </div>
+    </article>
+
+    <article class="card" data-cat="fd" data-price-tier="mid" data-title="Raku" data-hood="West Village" data-price="$35–50" data-cost="~$40" data-time="Open until 10 PM" data-going="6" data-desc="Intimate Japanese. Solo-friendly counter, excellent udon and Japanese comfort food.">
+      <div class="card-img fd">🍜<span class="card-price">$35–50</span></div>
+      <div class="card-body">
+        <div class="card-meta"><span class="badge badge-fd">Food</span><span class="badge badge-free">Solo friendly</span><span class="card-hood">West Village</span></div>
+        <p class="card-title">Raku</p>
+        <p class="card-desc">Intimate Japanese. Solo-friendly counter, excellent udon.</p>
+        <div class="card-footer"><span class="going"><strong>6 interns</strong> going</span><button class="btn-join">Join</button></div>
+      </div>
+    </article>
+
+    <article class="card" data-cat="fd" data-price-tier="mid" data-title="Mała Project" data-hood="East Village" data-price="$30–50" data-cost="~$40" data-time="Open until 10 PM" data-going="5" data-desc="Polish small plates in a cozy East Village setting. Wonderfully unique and solo-friendly.">
+      <div class="card-img fd">🥟<span class="card-price">$30–50</span></div>
+      <div class="card-body">
+        <div class="card-meta"><span class="badge badge-fd">Food</span><span class="badge badge-free">Solo friendly</span><span class="card-hood">East Village</span></div>
+        <p class="card-title">Mała Project</p>
+        <p class="card-desc">Polish small plates in cozy East Village. Wonderfully unique.</p>
+        <div class="card-footer"><span class="going"><strong>5 interns</strong> going</span><button class="btn-join">Join</button></div>
+      </div>
+    </article>
+
+    <!-- ═══ DRINKS ═══ -->
+    <p class="feed-section" data-sec="dk">🍹 Drinks</p>
+
+    <article class="card" data-cat="dk" data-price-tier="budget" data-title="Happy Hour at Ample Hills" data-hood="Sunset Park" data-price="$5 drinks" data-cost="$5 drafts" data-time="5 PM – 8 PM" data-going="22" data-desc="$5 draft beers and half-off apps until 8. Outdoor seating, great crowd.">
+      <div class="card-img dk">🍹<span class="card-price">$5 drinks</span><span class="card-urgency">5–8 PM</span></div>
+      <div class="card-body">
+        <div class="card-meta"><span class="badge badge-dk">Drinks</span><span class="card-hood">Sunset Park</span></div>
+        <p class="card-title">Happy Hour at Ample Hills</p>
+        <p class="card-desc">$5 drafts and half-off apps until 8. Outdoor seating available.</p>
+        <div class="card-footer"><span class="going"><strong>22 interns</strong> going</span><button class="btn-join">Join</button></div>
+      </div>
+    </article>
+
+    <article class="card" data-cat="dk" data-price-tier="budget" data-title="Piano's Rooftop Bar" data-hood="Lower East Side" data-price="Under $15" data-cost="$6 beers" data-time="8 PM – 11 PM" data-going="14" data-desc="$6 beers, jazz on Fridays, no cover. Classic intern rooftop spot.">
+      <div class="card-img dk">🎵<span class="card-price">Under $15</span></div>
+      <div class="card-body">
+        <div class="card-meta"><span class="badge badge-dk">Drinks</span><span class="card-hood">Lower East Side</span></div>
+        <p class="card-title">Piano's Rooftop Bar</p>
+        <p class="card-desc">$6 beers, jazz on Fridays, no cover. Classic intern rooftop spot.</p>
+        <div class="card-footer"><span class="going"><strong>14 interns</strong> going</span><button class="btn-join">Join</button></div>
+      </div>
+    </article>
+
+    <article class="card" data-cat="dk" data-price-tier="mid" data-title="Amor y Amargo" data-hood="East Village" data-price="$14–18" data-cost="$16 avg" data-time="Open until 1 AM" data-going="9" data-desc="Bitters-forward cocktails in an intimate speakeasy vibe. Unforgettable.">
+      <div class="card-img dk">🍸<span class="card-price">$14–18</span></div>
+      <div class="card-body">
+        <div class="card-meta"><span class="badge badge-dk">Drinks</span><span class="card-hood">East Village</span></div>
+        <p class="card-title">Amor y Amargo</p>
+        <p class="card-desc">Bitters-forward cocktails in an intimate speakeasy vibe.</p>
+        <div class="card-footer"><span class="going"><strong>9 interns</strong> going</span><button class="btn-join">Join</button></div>
+      </div>
+    </article>
+
+    <article class="card" data-cat="dk" data-price-tier="mid" data-title="Westlight Rooftop" data-hood="Williamsburg" data-price="$15–22" data-cost="$18 avg" data-time="Open until midnight" data-going="17" data-desc="Best rooftop views in Brooklyn. Hard to top for a date or group night out.">
+      <div class="card-img dk">🌃<span class="card-price">$15–22</span></div>
+      <div class="card-body">
+        <div class="card-meta"><span class="badge badge-dk">Drinks</span><span class="card-hood">Williamsburg</span></div>
+        <p class="card-title">Westlight Rooftop</p>
+        <p class="card-desc">Best rooftop views in Brooklyn. Hard to top for a date or group.</p>
+        <div class="card-footer"><span class="going"><strong>17 interns</strong> going</span><button class="btn-join">Join</button></div>
+      </div>
+    </article>
+
+    <article class="card" data-cat="dk" data-price-tier="mid" data-title="Attaboy" data-hood="Lower East Side" data-price="$16–22" data-cost="$18 avg" data-time="Open until 2 AM" data-going="7" data-desc="No menu — tell them your vibe, they build it perfectly. Speakeasy classic.">
+      <div class="card-img dk">🕯️<span class="card-price">$16–22</span></div>
+      <div class="card-body">
+        <div class="card-meta"><span class="badge badge-dk">Drinks</span><span class="card-hood">Lower East Side</span></div>
+        <p class="card-title">Attaboy</p>
+        <p class="card-desc">No menu — tell them your vibe, they build it perfectly.</p>
+        <div class="card-footer"><span class="going"><strong>7 interns</strong> going</span><button class="btn-join">Join</button></div>
+      </div>
+    </article>
+
+    <article class="card" data-cat="dk" data-price-tier="splurge" data-title="Death & Co" data-hood="East Village" data-price="$18–25" data-cost="$22 avg" data-time="Open until 2 AM" data-going="4" data-desc="NYC cocktail institution. Splurge-worthy on payday. Mezcal negroni is unmatched.">
+      <div class="card-img dk">💀<span class="card-price">$18–25</span></div>
+      <div class="card-body">
+        <div class="card-meta"><span class="badge badge-dk">Drinks</span><span class="card-hood">East Village</span></div>
+        <p class="card-title">Death & Co</p>
+        <p class="card-desc">NYC cocktail institution. Splurge-worthy on payday. Mezcal negroni is unmatched.</p>
+        <div class="card-footer"><span class="going"><strong>4 interns</strong> going</span><button class="btn-join">Join</button></div>
+      </div>
+    </article>
+
+    <!-- ═══ COFFEE ═══ -->
+    <p class="feed-section" data-sec="cf">☕ Coffee & Cafes</p>
+
+    <article class="card" data-cat="cf" data-price-tier="budget" data-title="Le Gaz" data-hood="SoHo" data-price="Under $10" data-cost="~$6" data-time="Open until 6 PM" data-going="7" data-desc="French-vibes espresso bar in SoHo. Minimal, excellent, fast.">
+      <div class="card-img cf">☕<span class="card-price">Under $10</span></div>
+      <div class="card-body">
+        <div class="card-meta"><span class="badge badge-cf">Coffee</span><span class="card-hood">SoHo</span></div>
+        <p class="card-title">Le Gaz</p>
+        <p class="card-desc">French-vibes espresso bar in SoHo. Minimal, excellent, fast.</p>
+        <div class="card-footer"><span class="going"><strong>7 interns</strong> going</span><button class="btn-join">Save</button></div>
+      </div>
+    </article>
+
+    <article class="card" data-cat="cf" data-price-tier="budget" data-title="Sieve — Matcha" data-hood="East Village" data-price="Under $10" data-cost="~$7" data-time="Open until 6 PM" data-going="9" data-desc="Matcha specialist in East Village. The best matcha latte in the city.">
+      <div class="card-img cf">🍵<span class="card-price">Under $10</span></div>
+      <div class="card-body">
+        <div class="card-meta"><span class="badge badge-cf">Coffee</span><span class="badge badge-free">Matcha</span><span class="card-hood">East Village</span></div>
+        <p class="card-title">Sieve — Matcha Specialist</p>
+        <p class="card-desc">The best matcha latte in the city. East Village gem.</p>
+        <div class="card-footer"><span class="going"><strong>9 interns</strong> going</span><button class="btn-join">Save</button></div>
+      </div>
+    </article>
+
+    <article class="card" data-cat="cf" data-price-tier="budget" data-title="Culture Espresso" data-hood="Midtown" data-price="Under $10" data-cost="~$6" data-time="Open until 6 PM" data-going="12" data-desc="Excellent espresso in Midtown. Intern favorite for the morning or afternoon.">
+      <div class="card-img cf">☕<span class="card-price">Under $10</span></div>
+      <div class="card-body">
+        <div class="card-meta"><span class="badge badge-cf">Coffee</span><span class="card-hood">Midtown</span></div>
+        <p class="card-title">Culture Espresso</p>
+        <p class="card-desc">Excellent espresso in Midtown. Intern favorite for the afternoon.</p>
+        <div class="card-footer"><span class="going"><strong>12 interns</strong> going</span><button class="btn-join">Save</button></div>
+      </div>
+    </article>
+
+    <article class="card" data-cat="cf" data-price-tier="budget" data-title="Librae Bakery" data-hood="Various" data-price="Under $15" data-cost="~$10" data-time="Open until 5 PM" data-going="15" data-desc="Incredible pastries and excellent coffee. One of NYC's best bakery combos.">
+      <div class="card-img cf">🥐<span class="card-price">Under $15</span></div>
+      <div class="card-body">
+        <div class="card-meta"><span class="badge badge-cf">Coffee</span><span class="card-hood">Various</span></div>
+        <p class="card-title">Librae Bakery</p>
+        <p class="card-desc">Incredible pastries and excellent coffee. One of NYC's best bakery combos.</p>
+        <div class="card-footer"><span class="going"><strong>15 interns</strong> going</span><button class="btn-join">Save</button></div>
+      </div>
+    </article>
+
+    <article class="card" data-cat="cf" data-price-tier="budget" data-title="Ralph's Coffee" data-hood="Midtown" data-price="Under $10" data-cost="~$7" data-time="Open until 6 PM" data-going="10" data-desc="Ralph Lauren's coffee shop. Aesthetic, great coffee, fun to say you've been.">
+      <div class="card-img cf">☕<span class="card-price">Under $10</span></div>
+      <div class="card-body">
+        <div class="card-meta"><span class="badge badge-cf">Coffee</span><span class="card-hood">Midtown</span></div>
+        <p class="card-title">Ralph's Coffee</p>
+        <p class="card-desc">Ralph Lauren's coffee shop. Aesthetic, great coffee, fun to say you've been.</p>
+        <div class="card-footer"><span class="going"><strong>10 interns</strong> going</span><button class="btn-join">Save</button></div>
+      </div>
+    </article>
+
+    <article class="card" data-cat="cf" data-price-tier="budget" data-title="Jack's Stir Brew" data-hood="West Village" data-price="Under $10" data-cost="~$6" data-time="Open until 6 PM" data-going="8" data-desc="Organic fair trade coffee in the West Village. A true neighbourhood staple.">
+      <div class="card-img cf">☕<span class="card-price">Under $10</span></div>
+      <div class="card-body">
+        <div class="card-meta"><span class="badge badge-cf">Coffee</span><span class="card-hood">West Village</span></div>
+        <p class="card-title">Jack's Stir Brew</p>
+        <p class="card-desc">Organic fair trade coffee in the West Village. A true neighbourhood staple.</p>
+        <div class="card-footer"><span class="going"><strong>8 interns</strong> going</span><button class="btn-join">Save</button></div>
+      </div>
+    </article>
+
+    <article class="card" data-cat="cf" data-price-tier="budget" data-title="Laughing Man" data-hood="Tribeca" data-price="Under $10" data-cost="~$6" data-time="Open until 5 PM" data-going="6" data-desc="Hugh Jackman's fair trade coffee shop in Tribeca. Great cause, great coffee.">
+      <div class="card-img cf">☕<span class="card-price">Under $10</span></div>
+      <div class="card-body">
+        <div class="card-meta"><span class="badge badge-cf">Coffee</span><span class="card-hood">Tribeca</span></div>
+        <p class="card-title">Laughing Man</p>
+        <p class="card-desc">Hugh Jackman's fair trade coffee shop. Great cause, great coffee.</p>
+        <div class="card-footer"><span class="going"><strong>6 interns</strong> going</span><button class="btn-join">Save</button></div>
+      </div>
+    </article>
+
+    <p class="feed-section" data-sec="cf">💻 WFH Cafes</p>
+
+    <article class="card" data-cat="cf" data-price-tier="budget" data-title="Maman Flagship" data-hood="Tribeca" data-price="Under $15" data-cost="~$10" data-time="Open until 6 PM" data-going="11" data-desc="Spacious, wifi, outlets everywhere, great pastries. Best WFH cafe in the city.">
+      <div class="card-img cf">💻<span class="card-price">Under $15</span></div>
+      <div class="card-body">
+        <div class="card-meta"><span class="badge badge-cf">Coffee</span><span class="badge badge-wk">WFH</span><span class="card-hood">Tribeca</span></div>
+        <p class="card-title">Maman Flagship</p>
+        <p class="card-desc">Spacious, wifi, outlets everywhere, great pastries. Best WFH cafe in the city.</p>
+        <div class="card-footer"><span class="going"><strong>11 interns</strong> going</span><button class="btn-join">Save</button></div>
+      </div>
+    </article>
+
+    <article class="card" data-cat="cf" data-price-tier="budget" data-title="12 Matcha" data-hood="Various" data-price="Under $10" data-cost="~$7" data-time="Open until 6 PM" data-going="8" data-desc="Matcha-focused cafe with good wifi and a calm atmosphere. WFH friendly.">
+      <div class="card-img cf">🍵<span class="card-price">Under $10</span></div>
+      <div class="card-body">
+        <div class="card-meta"><span class="badge badge-cf">Coffee</span><span class="badge badge-free">Matcha</span><span class="badge badge-wk">WFH</span><span class="card-hood">Various</span></div>
+        <p class="card-title">12 Matcha</p>
+        <p class="card-desc">Matcha-focused cafe with good wifi and a calm atmosphere.</p>
+        <div class="card-footer"><span class="going"><strong>8 interns</strong> going</span><button class="btn-join">Save</button></div>
+      </div>
+    </article>
+
+    <article class="card" data-cat="cf" data-price-tier="budget" data-title="Coffee Project NY" data-hood="East Village" data-price="Under $10" data-cost="~$7" data-time="Open until 6 PM" data-going="7" data-desc="Specialty coffee, good wifi, no side-eye for staying a few hours.">
+      <div class="card-img cf">💻<span class="card-price">Under $10</span></div>
+      <div class="card-body">
+        <div class="card-meta"><span class="badge badge-cf">Coffee</span><span class="badge badge-wk">WFH</span><span class="card-hood">East Village</span></div>
+        <p class="card-title">Coffee Project NY</p>
+        <p class="card-desc">Specialty coffee, good wifi, no side-eye for staying a few hours.</p>
+        <div class="card-footer"><span class="going"><strong>7 interns</strong> going</span><button class="btn-join">Save</button></div>
+      </div>
+    </article>
+
+    <!-- ═══ EVENTS ═══ -->
+    <p class="feed-section" data-sec="ev">🎵 Events & Culture</p>
+
+    <article class="card" data-cat="ev" data-price-tier="free" data-title="MoMA Free Fridays" data-hood="Midtown" data-price="Free" data-cost="Free 5:30–9 PM" data-time="5:30 PM – 9:00 PM" data-going="28" data-desc="MoMA is free every Friday evening from 5:30 to 9 PM. One of the best free things in NYC.">
+      <div class="card-img ev">🎨<span class="card-price">Free</span></div>
+      <div class="card-body">
+        <div class="card-meta"><span class="badge badge-ev">Events</span><span class="badge badge-free">Free</span><span class="card-hood">Midtown</span></div>
+        <p class="card-title">MoMA Free Fridays</p>
+        <p class="card-desc">World-class modern art, free every Friday evening. NYC's best kept secret.</p>
+        <div class="card-footer"><span class="going"><strong>28 interns</strong> going</span><button class="btn-join">Join</button></div>
+      </div>
+    </article>
+
+    <article class="card" data-cat="ev" data-price-tier="free" data-title="Jazz on the Rooftop at Piano's" data-hood="Lower East Side" data-price="Free" data-cost="Free entry" data-time="8 PM – 11 PM" data-going="14" data-desc="Live jazz every Friday at Piano's rooftop. No cover, $6 beers, great views.">
+      <div class="card-img ev">🎵<span class="card-price">Free</span><span class="card-urgency">Ends 11 PM</span></div>
+      <div class="card-body">
+        <div class="card-meta"><span class="badge badge-ev">Events</span><span class="badge badge-free">Free</span><span class="card-hood">Lower East Side</span></div>
+        <p class="card-title">Jazz on the Rooftop at Piano's</p>
+        <p class="card-desc">Live jazz every Friday. No cover, $6 beers, great city views.</p>
+        <div class="card-footer"><span class="going"><strong>14 interns</strong> going</span><button class="btn-join">Join</button></div>
+      </div>
+    </article>
+
+    <article class="card" data-cat="ev" data-price-tier="free" data-title="Free Comedy Night @ The Stand" data-hood="Gramercy" data-price="Free" data-cost="Free (2-drink min)" data-time="9 PM – 11 PM" data-going="19" data-desc="Open-mic comedy with free admission. Two-drink minimum, drinks start at $7.">
+      <div class="card-img ev">😂<span class="card-price">Free</span></div>
+      <div class="card-body">
+        <div class="card-meta"><span class="badge badge-ev">Events</span><span class="badge badge-free">Free</span><span class="card-hood">Gramercy</span></div>
+        <p class="card-title">Free Comedy Night @ The Stand</p>
+        <p class="card-desc">Open-mic laughs, 2-drink min. $7 drinks, unlimited good vibes.</p>
+        <div class="card-footer"><span class="going"><strong>19 interns</strong> going</span><button class="btn-join">Join</button></div>
+      </div>
+    </article>
+
+    <article class="card" data-cat="ev" data-price-tier="free" data-title="Free Talk Show Tickets" data-hood="Midtown" data-price="Free" data-cost="Free" data-time="Weekday mornings" data-going="12" data-desc="Free tickets to Tonight Show, Late Night, SNL and more. Request at 1iota.com.">
+      <div class="card-img ev">🎙️<span class="card-price">Free</span></div>
+      <div class="card-body">
+        <div class="card-meta"><span class="badge badge-ev">Events</span><span class="badge badge-free">Free</span><span class="card-hood">Midtown</span></div>
+        <p class="card-title">Free Talk Show Tickets</p>
+        <p class="card-desc">Free tickets to Tonight Show, Late Night, SNL and more. Request at 1iota.com.</p>
+        <div class="card-footer"><span class="going"><strong>12 interns</strong> going</span><button class="btn-join">Join</button></div>
+      </div>
+    </article>
+
+    <article class="card" data-cat="ev" data-price-tier="budget" data-title="The Met — Pay What You Wish" data-hood="Upper East Side" data-price="Pay what you wish" data-cost="Suggested $30" data-time="Open until 9 PM Fri–Sat" data-going="22" data-desc="Suggested $30 but you can pay $5. World-class museum, every single time.">
+      <div class="card-img ev">🏛️<span class="card-price">Pay what you wish</span></div>
+      <div class="card-body">
+        <div class="card-meta"><span class="badge badge-ev">Events</span><span class="card-hood">Upper East Side</span></div>
+        <p class="card-title">The Met — Pay What You Wish</p>
+        <p class="card-desc">Suggested $30, pay $5. World-class museum, every single time.</p>
+        <div class="card-footer"><span class="going"><strong>22 interns</strong> going</span><button class="btn-join">Join</button></div>
+      </div>
+    </article>
+
+    <article class="card" data-cat="ev" data-price-tier="budget" data-title="Whitney Museum" data-hood="Meatpacking" data-price="~$25" data-cost="$25" data-time="Open until 10 PM Fri–Sat" data-going="14" data-desc="World-class American art with incredible views from the top floor. Free for under-25s.">
+      <div class="card-img ev">🖼️<span class="card-price">~$25</span></div>
+      <div class="card-body">
+        <div class="card-meta"><span class="badge badge-ev">Events</span><span class="card-hood">Meatpacking</span></div>
+        <p class="card-title">Whitney Museum</p>
+        <p class="card-desc">World-class American art. Great Hudson views. Free for under-25s.</p>
+        <div class="card-footer"><span class="going"><strong>14 interns</strong> going</span><button class="btn-join">Join</button></div>
+      </div>
+    </article>
+
+    <article class="card" data-cat="ev" data-price-tier="budget" data-title="NY Liberty at Barclays" data-hood="Brooklyn" data-price="From $25" data-cost="From $25" data-time="Check schedule" data-going="18" data-desc="WNBA game at Barclays. Electric atmosphere and genuinely affordable tickets.">
+      <div class="card-img ev">🏀<span class="card-price">From $25</span></div>
+      <div class="card-body">
+        <div class="card-meta"><span class="badge badge-ev">Events</span><span class="card-hood">Brooklyn</span></div>
+        <p class="card-title">NY Liberty at Barclays</p>
+        <p class="card-desc">WNBA game at Barclays. Electric atmosphere, genuinely affordable.</p>
+        <div class="card-footer"><span class="going"><strong>18 interns</strong> going</span><button class="btn-join">Join</button></div>
+      </div>
+    </article>
+
+    <article class="card" data-cat="ev" data-price-tier="mid" data-title="Broadway / Off-Broadway Rush" data-hood="Theater District" data-price="From $30" data-cost="From $30" data-time="Check TodayTix" data-going="11" data-desc="Rush and lottery tickets from $30. Check TodayTix app morning of for availability.">
+      <div class="card-img ev">🎭<span class="card-price">From $30</span></div>
+      <div class="card-body">
+        <div class="card-meta"><span class="badge badge-ev">Events</span><span class="card-hood">Theater District</span></div>
+        <p class="card-title">Broadway / Off-Broadway Rush</p>
+        <p class="card-desc">Rush and lottery tickets from $30. Check TodayTix app morning of.</p>
+        <div class="card-footer"><span class="going"><strong>11 interns</strong> going</span><button class="btn-join">Join</button></div>
+      </div>
+    </article>
+
+    <!-- ═══ WORKOUTS — RUN CLUBS ═══ -->
+    <p class="feed-section" data-sec="wk">🏃 Run Clubs</p>
+
+    <article class="card" data-cat="wk" data-price-tier="free" data-title="Midnight Runners NYC" data-hood="Various" data-price="Free" data-cost="Free" data-time="Check Instagram" data-going="24" data-desc="Night run club that meets after dark across the city. Social, energetic, very NYC.">
+      <div class="card-img wk">🌙<span class="card-price">Free</span></div>
+      <div class="card-body">
+        <div class="card-meta"><span class="badge badge-wk">Workouts</span><span class="badge badge-free">Free</span><span class="card-hood">Various</span></div>
+        <p class="card-title">Midnight Runners NYC</p>
+        <p class="card-desc">Night run club after dark across the city. Social, energetic, very NYC.</p>
+        <div class="card-footer"><span class="going"><strong>24 interns</strong> going</span><button class="btn-join">Join</button></div>
+      </div>
+    </article>
+
+    <article class="card" data-cat="wk" data-price-tier="free" data-title="No Bad Days Run Club" data-hood="Various" data-price="Free" data-cost="Free" data-time="Check Instagram" data-going="19" data-desc="Free social run club. Great community, no pace requirement, good energy.">
+      <div class="card-img wk">🏃<span class="card-price">Free</span></div>
+      <div class="card-body">
+        <div class="card-meta"><span class="badge badge-wk">Workouts</span><span class="badge badge-free">Free</span><span class="card-hood">Various</span></div>
+        <p class="card-title">No Bad Days Run Club</p>
+        <p class="card-desc">Free social run club. Great community, no pace requirement.</p>
+        <div class="card-footer"><span class="going"><strong>19 interns</strong> going</span><button class="btn-join">Join</button></div>
+      </div>
+    </article>
+
+    <article class="card" data-cat="wk" data-price-tier="free" data-title="After Hours Run Club" data-hood="Various" data-price="Free" data-cost="Free" data-time="Check Instagram" data-going="14" data-desc="Evening run club across NYC. Meet people, explore the city after dark.">
+      <div class="card-img wk">🌆<span class="card-price">Free</span></div>
+      <div class="card-body">
+        <div class="card-meta"><span class="badge badge-wk">Workouts</span><span class="badge badge-free">Free</span><span class="card-hood">Various</span></div>
+        <p class="card-title">After Hours Run Club</p>
+        <p class="card-desc">Evening run club across NYC. Meet people, explore the city after dark.</p>
+        <div class="card-footer"><span class="going"><strong>14 interns</strong> going</span><button class="btn-join">Join</button></div>
+      </div>
+    </article>
+
+    <article class="card" data-cat="wk" data-price-tier="free" data-title="Brooklyn Bridge Park Yoga" data-hood="DUMBO" data-price="Free" data-cost="Free" data-time="6:00 PM – 7:30 PM" data-going="16" data-desc="Free outdoor yoga with views of the bridge. All levels welcome. Bring a mat.">
+      <div class="card-img wk">🧘<span class="card-price">Free</span></div>
+      <div class="card-body">
+        <div class="card-meta"><span class="badge badge-wk">Workouts</span><span class="badge badge-free">Free</span><span class="card-hood">DUMBO</span></div>
+        <p class="card-title">Brooklyn Bridge Park Yoga</p>
+        <p class="card-desc">Free outdoor yoga with NYC skyline views. All levels welcome.</p>
+        <div class="card-footer"><span class="going"><strong>16 interns</strong> going</span><button class="btn-join">Join</button></div>
+      </div>
+    </article>
+
+    <!-- ═══ WORKOUTS — YOGA & PILATES ═══ -->
+    <p class="feed-section" data-sec="wk">🧘 Yoga & Pilates</p>
+
+    <article class="card" data-cat="wk" data-price-tier="budget" data-title="St. Marks Yoga" data-hood="East Village" data-price="$12/class" data-cost="$12" data-time="Various times" data-going="13" data-desc="Great yoga classes for just $12. Best value in the city by far.">
+      <div class="card-img wk">🧘<span class="card-price">$12/class</span></div>
+      <div class="card-body">
+        <div class="card-meta"><span class="badge badge-wk">Workouts</span><span class="card-hood">East Village</span></div>
+        <p class="card-title">St. Marks Yoga</p>
+        <p class="card-desc">Great yoga classes for just $12. Best value in the city.</p>
+        <div class="card-footer"><span class="going"><strong>13 interns</strong> going</span><button class="btn-join">Join</button></div>
+      </div>
+    </article>
+
+    <article class="card" data-cat="wk" data-price-tier="budget" data-title="East River Pilates" data-hood="Lower East Side" data-price="$20/class" data-cost="$20" data-time="Various times" data-going="9" data-desc="Reformer pilates for $20. Excellent teachers, great community vibes.">
+      <div class="card-img wk">💪<span class="card-price">$20/class</span></div>
+      <div class="card-body">
+        <div class="card-meta"><span class="badge badge-wk">Workouts</span><span class="card-hood">Lower East Side</span></div>
+        <p class="card-title">East River Pilates</p>
+        <p class="card-desc">Reformer pilates for $20. Excellent teachers, great community.</p>
+        <div class="card-footer"><span class="going"><strong>9 interns</strong> going</span><button class="btn-join">Join</button></div>
+      </div>
+    </article>
+
+    <article class="card" data-cat="wk" data-price-tier="mid" data-title="SLT" data-hood="NoHo · Tribeca · UES" data-price="$30–40/class" data-cost="~$36" data-time="Various times" data-going="11" data-desc="Megaformer pilates. Intense, effective, genuinely worth the splurge.">
+      <div class="card-img wk">💪<span class="card-price">$30–40</span></div>
+      <div class="card-body">
+        <div class="card-meta"><span class="badge badge-wk">Workouts</span><span class="card-hood">NoHo · Tribeca · UES</span></div>
+        <p class="card-title">SLT</p>
+        <p class="card-desc">Megaformer pilates. Intense, effective, genuinely worth the splurge.</p>
+        <div class="card-footer"><span class="going"><strong>11 interns</strong> going</span><button class="btn-join">Join</button></div>
+      </div>
+    </article>
+
+    <article class="card" data-cat="wk" data-price-tier="mid" data-title="DanceBody" data-hood="Various" data-price="$25–35/class" data-cost="~$30" data-time="Various times" data-going="8" data-desc="Dance-cardio workout classes. Fun, energetic, and genuinely effective.">
+      <div class="card-img wk">💃<span class="card-price">$25–35</span></div>
+      <div class="card-body">
+        <div class="card-meta"><span class="badge badge-wk">Workouts</span><span class="card-hood">Various</span></div>
+        <p class="card-title">DanceBody</p>
+        <p class="card-desc">Dance-cardio workout classes. Fun, energetic, and genuinely effective.</p>
+        <div class="card-footer"><span class="going"><strong>8 interns</strong> going</span><button class="btn-join">Join</button></div>
+      </div>
+    </article>
+
+    <article class="card" data-cat="wk" data-price-tier="mid" data-title="Kove Cold Plunge & Sauna" data-hood="Various" data-price="~$40/session" data-cost="~$40" data-time="Book online" data-going="10" data-desc="Cold plunge and sauna session. Recovery, relaxation, and a great reset after a long week.">
+      <div class="card-img wk">🧊<span class="card-price">~$40</span></div>
+      <div class="card-body">
+        <div class="card-meta"><span class="badge badge-wk">Workouts</span><span class="card-hood">Various</span></div>
+        <p class="card-title">Kove Cold Plunge & Sauna</p>
+        <p class="card-desc">Cold plunge and sauna. Recovery and relaxation after a long week.</p>
+        <div class="card-footer"><span class="going"><strong>10 interns</strong> going</span><button class="btn-join">Join</button></div>
+      </div>
+    </article>
+
+    <!-- ═══ ACTIVITIES — THINGS TO DO ═══ -->
+    <p class="feed-section" data-sec="ac">🗺️ Things To Do</p>
+
+    <article class="card" data-cat="ac" data-price-tier="free" data-title="Brooklyn Bridge Walk" data-hood="DUMBO" data-price="Free" data-cost="Free" data-time="Any time" data-going="33" data-desc="Walk the bridge at sunset. One of NYC's most iconic free things.">
+      <div class="card-img ac2">🌉<span class="card-price">Free</span></div>
+      <div class="card-body">
+        <div class="card-meta"><span class="badge badge-ac">Activities</span><span class="badge badge-free">Free</span><span class="card-hood">DUMBO</span></div>
+        <p class="card-title">Brooklyn Bridge Walk</p>
+        <p class="card-desc">Walk the bridge at sunset. One of NYC's most iconic free things.</p>
+        <div class="card-footer"><span class="going"><strong>33 interns</strong> going</span><button class="btn-join">Join</button></div>
+      </div>
+    </article>
+
+    <article class="card" data-cat="ac" data-price-tier="free" data-title="Little Island" data-hood="Hudson River Park" data-price="Free" data-cost="Free" data-time="Open until 10 PM" data-going="21" data-desc="Dreamy elevated park on the Hudson. Free, stunning, and very NYC.">
+      <div class="card-img ac">🏝️<span class="card-price">Free</span></div>
+      <div class="card-body">
+        <div class="card-meta"><span class="badge badge-ac">Activities</span><span class="badge badge-free">Free</span><span class="card-hood">Hudson River Park</span></div>
+        <p class="card-title">Little Island</p>
+        <p class="card-desc">Dreamy elevated park on the Hudson. Free, stunning, very NYC.</p>
+        <div class="card-footer"><span class="going"><strong>21 interns</strong> going</span><button class="btn-join">Join</button></div>
+      </div>
+    </article>
+
+    <article class="card" data-cat="ac" data-price-tier="free" data-title="Sunset — West Side Highway" data-hood="Hudson River" data-price="Free" data-cost="Free" data-time="Sunset" data-going="19" data-desc="Watch the Hudson sunset with the Statue of Liberty in view. Free and perfect.">
+      <div class="card-img ac3">🌅<span class="card-price">Free</span></div>
+      <div class="card-body">
+        <div class="card-meta"><span class="badge badge-ac">Activities</span><span class="badge badge-free">Free</span><span class="card-hood">Hudson River</span></div>
+        <p class="card-title">Sunset — West Side Highway</p>
+        <p class="card-desc">Watch the Hudson sunset with the Statue of Liberty in view.</p>
+        <div class="card-footer"><span class="going"><strong>19 interns</strong> going</span><button class="btn-join">Join</button></div>
+      </div>
+    </article>
+
+    <article class="card" data-cat="ac" data-price-tier="free" data-title="Picnic on the Great Lawn" data-hood="Central Park" data-price="Free" data-cost="Free (bring food)" data-time="Daytime" data-going="27" data-desc="Grab Trader Joe's, picnic on the Great Lawn. Peak NYC intern summer moment.">
+      <div class="card-img ac">🌿<span class="card-price">Free</span></div>
+      <div class="card-body">
+        <div class="card-meta"><span class="badge badge-ac">Activities</span><span class="badge badge-free">Free</span><span class="card-hood">Central Park</span></div>
+        <p class="card-title">Picnic on the Great Lawn</p>
+        <p class="card-desc">Grab Trader Joe's, picnic on the Great Lawn. Peak intern summer moment.</p>
+        <div class="card-footer"><span class="going"><strong>27 interns</strong> going</span><button class="btn-join">Join</button></div>
+      </div>
+    </article>
+
+    <article class="card" data-cat="ac" data-price-tier="free" data-title="Sweet Pickle Books" data-hood="Lower East Side" data-price="Free to browse" data-cost="Free to browse" data-time="Open daily" data-going="12" data-desc="Tiny, beloved bookshop on the LES. Perfect afternoon browse.">
+      <div class="card-img ac">📚<span class="card-price">Free to browse</span></div>
+      <div class="card-body">
+        <div class="card-meta"><span class="badge badge-ac">Activities</span><span class="card-hood">Lower East Side</span></div>
+        <p class="card-title">Sweet Pickle Books</p>
+        <p class="card-desc">Tiny, beloved bookshop on the LES. Perfect afternoon browse.</p>
+        <div class="card-footer"><span class="going"><strong>12 interns</strong> going</span><button class="btn-join">Join</button></div>
+      </div>
+    </article>
+
+    <article class="card" data-cat="ac" data-price-tier="free" data-title="Green Markets" data-hood="Various Boroughs" data-price="Free to browse" data-cost="Free to browse" data-time="Weekends" data-going="13" data-desc="Farmers markets across all five boroughs on weekends. Union Square is the biggest and best.">
+      <div class="card-img ac">🥦<span class="card-price">Free</span></div>
+      <div class="card-body">
+        <div class="card-meta"><span class="badge badge-ac">Activities</span><span class="badge badge-free">Free</span><span class="card-hood">Various Boroughs</span></div>
+        <p class="card-title">Green Markets</p>
+        <p class="card-desc">Farmers markets across all five boroughs. Union Square is the biggest.</p>
+        <div class="card-footer"><span class="going"><strong>13 interns</strong> going</span><button class="btn-join">Join</button></div>
+      </div>
+    </article>
+
+    <article class="card" data-cat="ac" data-price-tier="budget" data-title="Old Friend Photo Booth" data-hood="Lower East Side" data-price="~$6" data-cost="~$6" data-time="Open late" data-going="16" data-desc="Retro photo booth on the LES. $6 for a strip. Great with friends or a date.">
+      <div class="card-img ac3">📸<span class="card-price">~$6</span></div>
+      <div class="card-body">
+        <div class="card-meta"><span class="badge badge-ac">Activities</span><span class="card-hood">Lower East Side</span></div>
+        <p class="card-title">Old Friend Photo Booth</p>
+        <p class="card-desc">Retro photo booth on the LES. $6 for a strip. Great with friends.</p>
+        <div class="card-footer"><span class="going"><strong>16 interns</strong> going</span><button class="btn-join">Join</button></div>
+      </div>
+    </article>
+
+    <article class="card" data-cat="ac" data-price-tier="budget" data-title="Governors Island Ferry" data-hood="Downtown" data-price="~$3" data-cost="$3 ferry" data-time="Seasonal · check schedule" data-going="14" data-desc="$3 ferry to a car-free island. Hammocks, art, skyline views, and great vibes.">
+      <div class="card-img ac2">⛴️<span class="card-price">~$3</span></div>
+      <div class="card-body">
+        <div class="card-meta"><span class="badge badge-ac">Activities</span><span class="card-hood">Downtown</span></div>
+        <p class="card-title">Governors Island Ferry</p>
+        <p class="card-desc">$3 ferry to a car-free island. Hammocks, art, and skyline views.</p>
+        <div class="card-footer"><span class="going"><strong>14 interns</strong> going</span><button class="btn-join">Join</button></div>
+      </div>
+    </article>
+
+    <article class="card" data-cat="ac" data-price-tier="budget" data-title="Central Park Boathouse" data-hood="Central Park" data-price="~$20/hr" data-cost="~$20/hr" data-time="Seasonal" data-going="12" data-desc="Row a boat on the lake in Central Park. Romantic, fun, and totally worth it.">
+      <div class="card-img ac">🚣<span class="card-price">~$20/hr</span></div>
+      <div class="card-body">
+        <div class="card-meta"><span class="badge badge-ac">Activities</span><span class="card-hood">Central Park</span></div>
+        <p class="card-title">Central Park Boathouse</p>
+        <p class="card-desc">Row a boat on the lake. Romantic, fun, totally worth it.</p>
+        <div class="card-footer"><span class="going"><strong>12 interns</strong> going</span><button class="btn-join">Join</button></div>
+      </div>
+    </article>
+
+    <!-- ═══ ACTIVITIES — SPAS ═══ -->
+    <p class="feed-section" data-sec="ac">🧖 Spas & Wellness</p>
+
+    <article class="card" data-cat="ac" data-price-tier="mid" data-title="Remedy Wellness" data-hood="Various" data-price="$60–120" data-cost="Varies" data-time="Book online" data-going="6" data-desc="Wellness spa offering massage, facials, and body treatments across NYC locations.">
+      <div class="card-img ac4">🧖<span class="card-price">$60–120</span></div>
+      <div class="card-body">
+        <div class="card-meta"><span class="badge badge-ac">Activities</span><span class="card-hood">Various</span></div>
+        <p class="card-title">Remedy Wellness</p>
+        <p class="card-desc">Wellness spa offering massage, facials, and body treatments.</p>
+        <div class="card-footer"><span class="going"><strong>6 interns</strong> going</span><button class="btn-join">Join</button></div>
+      </div>
+    </article>
+
+    <article class="card" data-cat="ac" data-price-tier="mid" data-title="Aedes Perfumery" data-hood="West Village" data-price="Varies" data-cost="Varies" data-time="By appointment" data-going="5" data-desc="Make your own perfume in West Village. Unique, memorable, great for a date.">
+      <div class="card-img ac4">🌸<span class="card-price">Varies</span></div>
+      <div class="card-body">
+        <div class="card-meta"><span class="badge badge-ac">Activities</span><span class="card-hood">West Village</span></div>
+        <p class="card-title">Aedes Perfumery</p>
+        <p class="card-desc">Make your own perfume. Unique, memorable, great for a date.</p>
+        <div class="card-footer"><span class="going"><strong>5 interns</strong> going</span><button class="btn-join">Join</button></div>
+      </div>
+    </article>
+
+  </main>
+
+  <!-- ── FOOTER ── -->
+  <footer>
+    <div class="footer-stripe" aria-hidden="true">
+      <span style="background:#EE352C;"></span>
+      <span style="background:#00933C;"></span>
+      <span style="background:#FCCC0A;"></span>
+      <span style="background:#0039A6;"></span>
+      <span style="background:#FF6319;"></span>
+    </div>
+    <div class="footer-top">
+      <a class="footer-logo" href="index.html">
+        <span class="after">after</span><span class="five">five</span>
+      </a>
+      <a class="footer-ig" href="https://instagram.com/afterfivenyc" target="_blank">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="2" y="2" width="20" height="20" rx="5"/>
+          <circle cx="12" cy="12" r="4"/>
+          <circle cx="17.5" cy="6.5" r="0.5" fill="currentColor"/>
+        </svg>
+        @afterfivenyc
+      </a>
+    </div>
+    <p class="footer-bottom">"Your NYC nights, sorted." · afterfive · 2025</p>
+  </footer>
+
+  <!-- ── MODAL ── -->
+  <div class="modal-overlay" id="cardModal">
+    <div class="modal">
+      <div class="modal-handle"></div>
+      <button class="modal-close" id="modalClose">✕</button>
+      <h2 id="mTitle"></h2>
+      <div class="modal-meta" id="mMeta"></div>
+      <p class="modal-desc" id="mDesc"></p>
+      <div class="modal-row"><span>Time</span><span id="mTime"></span></div>
+      <div class="modal-row"><span>Cost</span><span id="mCost"></span></div>
+      <div class="modal-row"><span>Neighborhood</span><span id="mHood"></span></div>
+      <div class="modal-actions">
+        <button class="btn-primary" style="flex:1;" id="modalJoinBtn">I'm going!</button>
+        <a class="btn-ghost" href="submit.html">Submit a spot →</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ── NAV ──
+    const hamburgerBtn = document.getElementById('hamburgerBtn');
+    const mobileMenu   = document.getElementById('mobileMenu');
+    hamburgerBtn.addEventListener('click', () => {
+      hamburgerBtn.classList.toggle('open');
+      mobileMenu.classList.toggle('open');
+      document.body.style.overflow = mobileMenu.classList.contains('open') ? 'hidden' : '';
+    });
+    mobileMenu.querySelectorAll('a').forEach(a => {
+      a.addEventListener('click', () => {
+        hamburgerBtn.classList.remove('open');
+        mobileMenu.classList.remove('open');
+        document.body.style.overflow = '';
+      });
+    });
+
+    // ── FILTERS ──
+    let activeCat = 'all', activePrice = 'all';
+
+    function filterCards() {
+      const query = document.getElementById('searchInput').value.toLowerCase();
+      let visible = 0;
+
+      document.querySelectorAll('.feed-section').forEach(sec => {
+        sec.style.display = (activeCat === 'all' || sec.dataset.sec === activeCat) ? '' : 'none';
+      });
+
+      document.querySelectorAll('#exploreFeed .card').forEach(c => {
+        const matchCat    = activeCat === 'all' || c.dataset.cat === activeCat;
+        const matchPrice  = activePrice === 'all' || c.dataset.priceTier === activePrice;
+        const matchSearch = !query ||
+          (c.dataset.title || '').toLowerCase().includes(query) ||
+          (c.dataset.hood  || '').toLowerCase().includes(query) ||
+          (c.dataset.desc  || '').toLowerCase().includes(query);
+        const show = matchCat && matchPrice && matchSearch;
+        c.style.display = show ? '' : 'none';
+        if (show) visible++;
+      });
+
+      document.getElementById('feedCount').textContent =
+        visible + ' spot' + (visible !== 1 ? 's' : '');
+    }
+
+    document.querySelectorAll('#catFilter .tab').forEach(t => {
+      t.addEventListener('click', function() {
+        document.querySelectorAll('#catFilter .tab').forEach(x => x.classList.remove('active'));
+        this.classList.add('active');
+        activeCat = this.dataset.filter;
+        filterCards();
+      });
+    });
+
+    document.querySelectorAll('#priceFilter .price-chip').forEach(t => {
+      t.addEventListener('click', function() {
+        document.querySelectorAll('#priceFilter .price-chip').forEach(x => x.classList.remove('active'));
+        this.classList.add('active');
+        activePrice = this.dataset.price;
+        filterCards();
+      });
+    });
+
+    // ── MODAL ──
+    function openModal(card) {
+      document.getElementById('mTitle').textContent = card.dataset.title;
+      document.getElementById('mDesc').textContent  = card.dataset.desc;
+      document.getElementById('mTime').textContent  = card.dataset.time;
+      document.getElementById('mCost').textContent  = card.dataset.cost;
+      document.getElementById('mHood').textContent  = card.dataset.hood;
+      document.getElementById('mMeta').innerHTML =
+        `<span style="font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;letter-spacing:0.08em;text-transform:uppercase;">${card.dataset.hood}</span>`;
+      document.getElementById('cardModal').classList.add('open');
+    }
+    function closeModal() { document.getElementById('cardModal').classList.remove('open'); }
+    document.getElementById('modalClose').addEventListener('click', closeModal);
+    document.getElementById('modalJoinBtn').addEventListener('click', closeModal);
+    document.getElementById('cardModal').addEventListener('click', e => {
+      if (e.target.id === 'cardModal') closeModal();
+    });
+    document.querySelectorAll('.card').forEach(card => {
+      card.addEventListener('click', e => {
+        if (!e.target.classList.contains('btn-join')) openModal(card);
+      });
+    });
+
+    // ── JOIN ──
+    document.querySelectorAll('.btn-join').forEach(btn => {
+      btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        if (this.classList.contains('joined')) return;
+        this.classList.add('joined');
+        this.textContent = '✓';
+        showToast('Saved! ✓');
+      });
+    });
+
+    function showToast(msg) {
+      const existing = document.querySelector('.toast');
+      if (existing) existing.remove();
+      const t = document.createElement('div');
+      t.className = 'toast'; t.textContent = msg;
+      document.body.appendChild(t);
+      setTimeout(() => t.style.opacity = '0', 2000);
+      setTimeout(() => t.remove(), 2400);
+    }
+
+    filterCards();
+  </script>
+</body>
+</html>

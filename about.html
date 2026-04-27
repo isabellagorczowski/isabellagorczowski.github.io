@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>afterfive — About</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;500;600;700;800&display=swap" />
+  <style>
+    :root {
+      --midnight: #080A14;
+      --surface:  #0D0F1F;
+      --surface2: #141728;
+      --border:   #1A1D2E;
+      --border2:  #2A2E44;
+      --lime:     #FCCC0A;
+      --lime-dim: rgba(252,204,10,0.10);
+      --text:     #E8ECF8;
+      --muted:    #7A80A0;
+      --subdued:  #3A3F58;
+      --amber:    #EE352C;
+      --green:    #00933C;
+      --blue:     #0039A6;
+      --purple:   #FF6319;
+      --urgency:  #EE352C;
+      --pad:      16px;
+      --r-card:   0px;
+      --r-btn:    4px;
+      --r-badge:  3px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--midnight); color: var(--text);
+      font-family: 'Syne', sans-serif; font-size: 14px;
+      line-height: 1.5; overflow-x: hidden;
+    }
+
+    /* ── NAV ── */
+    .nav {
+      position: sticky; top: 0; z-index: 200;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 var(--pad); height: 52px;
+      background: var(--midnight);
+      border-bottom: 3px solid var(--lime);
+    }
+    .nav-logo {
+      font-size: 16px; font-weight: 800; text-decoration: none;
+      letter-spacing: -0.3px; font-family: 'DM Mono', monospace; text-transform: uppercase;
+    }
+    .nav-logo .after { color: var(--text); }
+    .nav-logo .five  { color: var(--lime); }
+    .nav-links { display: none; list-style: none; gap: 2px; }
+    .nav-links a {
+      color: var(--muted); text-decoration: none; font-size: 11px;
+      font-weight: 600; padding: 6px 12px; letter-spacing: 0.07em;
+      text-transform: uppercase; transition: color 0.15s;
+    }
+    .nav-links a:hover  { color: var(--text); }
+    .nav-links a.active { color: var(--lime); }
+    .nav-cta {
+      display: none; background: var(--lime); color: var(--midnight); border: none;
+      border-radius: var(--r-btn); padding: 8px 16px;
+      font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700;
+      cursor: pointer; text-decoration: none; transition: opacity 0.15s;
+      white-space: nowrap; letter-spacing: 0.06em; text-transform: uppercase;
+    }
+    .nav-cta:hover { opacity: 0.85; }
+
+    .nav-stripe { display: flex; height: 4px; }
+    .nav-stripe span { flex: 1; }
+
+    .hamburger {
+      display: flex; flex-direction: column; gap: 5px;
+      background: none; border: none; cursor: pointer; padding: 4px;
+    }
+    .hamburger span {
+      display: block; width: 22px; height: 2px;
+      background: var(--text); border-radius: 0; transition: all 0.25s;
+    }
+    .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    .mobile-drawer {
+      display: none; position: fixed; inset: 0; z-index: 199;
+      background: var(--midnight); flex-direction: column;
+      padding: 72px var(--pad) var(--pad); gap: 0;
+      border-top: 3px solid var(--lime); margin-top: 52px;
+    }
+    .mobile-drawer.open { display: flex; }
+    .mobile-drawer a {
+      color: var(--text); text-decoration: none;
+      font-size: 22px; font-weight: 800; padding: 14px 0;
+      border-bottom: 1px solid var(--border); transition: color 0.15s;
+      display: flex; align-items: center; justify-content: space-between;
+      font-family: 'DM Mono', monospace; text-transform: uppercase; letter-spacing: -0.5px;
+    }
+    .mobile-drawer a::after { content: '→'; color: var(--subdued); font-size: 14px; }
+    .mobile-drawer a:hover { color: var(--lime); }
+    .mobile-drawer a.drawer-cta {
+      font-size: 13px; margin-top: 24px; background: var(--lime); color: var(--midnight);
+      border: none; border-radius: var(--r-btn); padding: 14px 28px;
+      text-align: center; font-weight: 700; justify-content: center; letter-spacing: 0.06em;
+    }
+    .mobile-drawer a.drawer-cta::after { display: none; }
+    .drawer-tag { margin-top: auto; font-size: 10px; color: var(--subdued); font-family: 'DM Mono', monospace; }
+
+    /* ── CONTENT WRAP ── */
+    .about-wrap {
+      max-width: 580px;
+      margin: 0 auto;
+      padding: 32px var(--pad) 80px;
+    }
+
+    /* ── HERO — station nameplate style ── */
+    .about-hero { margin-bottom: 36px; }
+
+    .about-tag {
+      font-size: 9px; font-weight: 600; color: var(--lime);
+      letter-spacing: 0.18em; text-transform: uppercase;
+      font-family: 'DM Mono', monospace; margin-bottom: 10px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .about-tag::before {
+      content: ''; display: block; width: 16px; height: 2px; background: var(--lime);
+    }
+
+    .about-hero h1 {
+      font-size: 28px; font-weight: 800; line-height: 1.12;
+      margin-bottom: 20px; letter-spacing: -0.5px;
+      font-family: 'DM Mono', monospace; text-transform: uppercase;
+      border-left: 4px solid var(--lime); padding-left: 14px;
+    }
+    .about-hero h1 em { font-style: normal; color: var(--lime); }
+
+    .about-hero p {
+      font-size: 13px; color: var(--muted); line-height: 1.75;
+      margin-bottom: 14px; padding-left: 18px;
+      border-left: 1px solid var(--border2);
+    }
+    .about-hero p:last-child { margin-bottom: 0; }
+
+    /* ── CREATOR CARD — looks like a transit ID badge ── */
+    .creator-card {
+      background: var(--surface); border: 1px solid var(--border2);
+      border-top: 3px solid var(--lime);
+      border-radius: var(--r-card); padding: 20px; margin-bottom: 36px;
+      display: flex; gap: 16px; align-items: flex-start;
+      position: relative; overflow: hidden;
+    }
+    .creator-card::before {
+      content: 'STAFF'; position: absolute; top: 10px; right: 14px;
+      font-size: 8px; font-weight: 800; color: var(--lime);
+      font-family: 'DM Mono', monospace; letter-spacing: 0.18em;
+      opacity: 0.4;
+    }
+
+    .creator-avatar {
+      width: 52px; height: 52px; border-radius: 0;
+      background: var(--lime-dim); border: 2px solid var(--lime);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; flex-shrink: 0;
+    }
+    .creator-info { flex: 1; }
+    .creator-name {
+      font-size: 14px; font-weight: 800; margin-bottom: 2px;
+      font-family: 'DM Mono', monospace; text-transform: uppercase; letter-spacing: 0.04em;
+    }
+    .creator-bio  { font-size: 12px; color: var(--muted); line-height: 1.6; margin-bottom: 12px; }
+    .creator-links { display: flex; gap: 8px; flex-wrap: wrap; }
+    .creator-link {
+      display: flex; align-items: center; gap: 6px;
+      padding: 5px 12px; border-radius: var(--r-btn);
+      border: 1px solid var(--border2); background: transparent;
+      color: var(--muted); font-size: 10px; font-weight: 600;
+      text-decoration: none; font-family: 'DM Mono', monospace;
+      transition: all 0.15s; letter-spacing: 0.04em;
+    }
+    .creator-link:hover { border-color: var(--lime); color: var(--lime); }
+    .creator-link svg { width: 12px; height: 12px; }
+
+    /* ── MISSION GRID — route map cards ── */
+    .mission-section-label {
+      font-size: 9px; font-weight: 600; color: var(--subdued);
+      letter-spacing: 0.14em; text-transform: uppercase;
+      font-family: 'DM Mono', monospace; margin-bottom: 12px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .mission-section-label::before {
+      content: ''; display: block; width: 3px; height: 14px;
+      background: var(--lime); flex-shrink: 0;
+    }
+
+    .mission-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 8px; margin-bottom: 36px;
+    }
+    .mission-block {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--r-card); padding: 16px;
+      border-left: 3px solid var(--border2);
+      transition: border-color 0.15s;
+    }
+    .mission-block:nth-child(1) { border-left-color: var(--green); }
+    .mission-block:nth-child(2) { border-left-color: var(--blue); }
+    .mission-block:nth-child(3) { border-left-color: var(--purple); }
+    .mission-block:nth-child(4) { border-left-color: var(--lime); }
+
+    .mission-icon  { font-size: 20px; margin-bottom: 8px; display: block; }
+    .mission-title {
+      font-size: 11px; font-weight: 800; margin-bottom: 5px;
+      font-family: 'DM Mono', monospace; text-transform: uppercase; letter-spacing: 0.06em;
+    }
+    .mission-desc  { font-size: 11px; color: var(--muted); line-height: 1.6; }
+
+    /* ── FAQ — accordion ── */
+    .faq-section { margin-bottom: 0; }
+    .faq-section h2 {
+      font-size: 16px; font-weight: 800; margin-bottom: 16px;
+      font-family: 'DM Mono', monospace; text-transform: uppercase;
+      letter-spacing: -0.3px; display: flex; align-items: center; gap: 10px;
+    }
+    .faq-section h2::before {
+      content: '?'; display: flex; align-items: center; justify-content: center;
+      width: 24px; height: 24px; border-radius: 50%;
+      background: var(--lime); color: var(--midnight);
+      font-size: 12px; font-weight: 900; flex-shrink: 0;
+      font-family: 'DM Mono', monospace;
+    }
+
+    .faq-list { display: flex; flex-direction: column; gap: 6px; }
+    .faq-item {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--r-card); overflow: hidden;
+      transition: border-color 0.15s; border-left: 3px solid transparent;
+    }
+    .faq-item.open { border-color: var(--border2); border-left-color: var(--lime); }
+    .faq-q {
+      padding: 14px 16px; display: flex; justify-content: space-between;
+      align-items: center; cursor: pointer; gap: 12px;
+      font-size: 12px; font-weight: 700; line-height: 1.4;
+      font-family: 'DM Mono', monospace; letter-spacing: 0.02em;
+    }
+    .faq-q:hover { color: var(--lime); }
+    .faq-arrow {
+      color: var(--subdued); font-size: 18px; flex-shrink: 0;
+      transition: transform 0.2s, color 0.15s; line-height: 1;
+      font-weight: 300;
+    }
+    .faq-item.open .faq-arrow { transform: rotate(45deg); color: var(--lime); }
+    .faq-a {
+      max-height: 0; overflow: hidden;
+      transition: max-height 0.3s ease, padding 0.2s;
+      font-size: 12px; color: var(--muted); line-height: 1.75;
+      padding: 0 16px;
+    }
+    .faq-item.open .faq-a { max-height: 300px; padding: 0 16px 16px; }
+
+    /* ── INSTAGRAM CTA — end-of-line terminus ── */
+    .ig-cta {
+      margin-top: 36px;
+      background: var(--surface);
+      border: 1px solid var(--border2);
+      border-top: 3px solid var(--lime);
+      border-radius: var(--r-card); padding: 28px 24px;
+      text-align: center; position: relative; overflow: hidden;
+    }
+    .ig-cta::before {
+      content: 'LAST STOP';
+      position: absolute; top: 14px; left: 50%; transform: translateX(-50%);
+      font-size: 8px; font-weight: 800; color: var(--subdued);
+      font-family: 'DM Mono', monospace; letter-spacing: 0.2em;
+    }
+    .ig-cta h3 {
+      font-size: 15px; font-weight: 800; margin-bottom: 8px; margin-top: 12px;
+      font-family: 'DM Mono', monospace; text-transform: uppercase; letter-spacing: -0.3px;
+    }
+    .ig-cta p { font-size: 12px; color: var(--muted); margin-bottom: 20px; line-height: 1.7; }
+    .ig-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--lime); color: var(--midnight);
+      border-radius: var(--r-btn); padding: 11px 24px;
+      font-family: 'DM Mono', monospace; font-size: 12px; font-weight: 700;
+      text-decoration: none; transition: opacity 0.15s;
+      text-transform: uppercase; letter-spacing: 0.06em;
+    }
+    .ig-btn:hover { opacity: 0.88; }
+    .ig-btn svg { width: 15px; height: 15px; }
+
+    /* ── FOOTER ── */
+    .footer-stripe { display: flex; height: 4px; }
+    .footer-stripe span { flex: 1; }
+    footer {
+      border-top: 3px solid var(--lime); padding: 20px var(--pad);
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 12px; background: var(--surface);
+    }
+    .footer-logo {
+      font-size: 14px; font-weight: 800; text-decoration: none;
+      font-family: 'DM Mono', monospace; text-transform: uppercase; letter-spacing: -0.3px;
+    }
+    .footer-logo .after { color: var(--text); }
+    .footer-logo .five  { color: var(--lime); }
+    .footer-ig {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 11px; color: var(--muted); text-decoration: none;
+      font-family: 'DM Mono', monospace; transition: color 0.15s;
+    }
+    .footer-ig svg { width: 14px; height: 14px; }
+    .footer-ig:hover { color: var(--lime); }
+    footer p { font-size: 10px; color: var(--subdued); font-family: 'DM Mono', monospace; letter-spacing: 0.06em; }
+
+    /* ── RESPONSIVE ── */
+    @media (min-width: 640px) {
+      .hamburger { display: none; }
+      .nav-links  { display: flex; }
+      .nav-cta    { display: inline-flex; }
+    }
+    @media (min-width: 900px) {
+      .nav { padding: 0 48px; }
+      .about-wrap { padding-top: 48px; }
+      .about-hero h1 { font-size: 36px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="nav">
+    <a class="nav-logo" href="index.html"><span class="after">after</span><span class="five">five</span></a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="explore.html">Explore</a></li>
+      <li><a href="ai.html">Plan Generator</a></li>
+      <li><a href="submit.html">Submit a Spot</a></li>
+      <li><a href="about.html" class="active">About</a></li>
+    </ul>
+    <a class="nav-cta" href="ai.html">✦ Build My Night</a>
+    <button class="hamburger" id="hamburgerBtn" aria-label="Open menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <div class="nav-stripe" aria-hidden="true">
+    <span style="background:#EE352C;"></span>
+    <span style="background:#00933C;"></span>
+    <span style="background:#FCCC0A;"></span>
+    <span style="background:#0039A6;"></span>
+    <span style="background:#FF6319;"></span>
+  </div>
+
+  <div class="mobile-drawer" id="mobileMenu">
+    <a href="index.html">Home</a>
+    <a href="explore.html">Explore</a>
+    <a href="ai.html">Plan Generator</a>
+    <a href="submit.html">Submit a Spot</a>
+    <a href="about.html">About</a>
+    <a class="drawer-cta" href="ai.html">✦ Build My Night</a>
+    <p class="drawer-tag">"Your NYC nights, sorted."</p>
+  </div>
+
+  <!-- ── CONTENT ── -->
+  <div class="about-wrap">
+
+    <!-- HERO -->
+    <div class="about-hero">
+      <p class="about-tag">The story</p>
+      <h1>NYC is incredible.<br>It's also <em>a lot.</em></h1>
+      <p>When you're new to the city, on an intern budget, and working long hours — figuring out what to do after work shouldn't be another stressful thing to figure out. The good spots exist. They're just buried under tourist traps, expensive restaurant guides, and recommendations that assume you have unlimited time and money.</p>
+      <p>after5nyc started as a personal list. Every good spot I found, every cheap dinner that was actually worth it, every free thing that felt genuinely New York — I kept notes. This is that list, turned into something shareable.</p>
+      <p>Everything here is intern-tested. If it's on the site, it's actually good.</p>
+    </div>
+
+    <!-- CREATOR CARD -->
+    <div class="creator-card">
+      <div class="creator-avatar">✦</div>
+      <div class="creator-info">
+        <p class="creator-name">Isabella Gorczowski</p>
+        <p class="creator-bio">Cornell student, NYC intern, perpetual list-maker. Built after5nyc because I wanted a resource I actually wished existed.</p>
+        <div class="creator-links">
+          <a class="creator-link" href="https://instagram.com/isabellagorczowski" target="_blank">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.5" fill="currentColor"/></svg>
+            @isabellagorczowski
+          </a>
+          <a class="creator-link" href="https://instagram.com/afterfivenyc" target="_blank">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.5" fill="currentColor"/></svg>
+            @afterfivenyc
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- MISSION -->
+    <p class="mission-section-label">Why this exists</p>
+    <div class="mission-grid">
+      <div class="mission-block">
+        <span class="mission-icon">💸</span>
+        <p class="mission-title">Budget-first</p>
+        <p class="mission-desc">Every spot is chosen with intern budgets in mind. Price is always front and centre.</p>
+      </div>
+      <div class="mission-block">
+        <span class="mission-icon">🗺️</span>
+        <p class="mission-title">Actually local</p>
+        <p class="mission-desc">No tourist traps. No sponsored content. Just spots that are genuinely worth going to.</p>
+      </div>
+      <div class="mission-block">
+        <span class="mission-icon">🫶</span>
+        <p class="mission-title">Community built</p>
+        <p class="mission-desc">The best spots come from other interns. Submit yours and help grow the list.</p>
+      </div>
+      <div class="mission-block">
+        <span class="mission-icon">✦</span>
+        <p class="mission-title">Always free</p>
+        <p class="mission-desc">No paywalls, no ads, no sign-up required. Just a resource for interns, full stop.</p>
+      </div>
+    </div>
+
+    <!-- FAQ -->
+    <div class="faq-section">
+      <h2>FAQs</h2>
+      <div class="faq-list">
+
+        <div class="faq-item" onclick="toggleFaq(this)">
+          <div class="faq-q">Who is this for?<span class="faq-arrow">+</span></div>
+          <div class="faq-a">Primarily NYC summer interns — especially people who are new to the city and don't have an existing network of friends to ask for recommendations. That said, anyone who wants curated, budget-conscious NYC picks will find it useful.</div>
+        </div>
+
+        <div class="faq-item" onclick="toggleFaq(this)">
+          <div class="faq-q">How do spots get added?<span class="faq-arrow">+</span></div>
+          <div class="faq-a">Every spot on the site has been personally vetted or submitted by an intern. Nothing gets added just because it's popular or well-reviewed online. If it's here, someone with an intern budget thought it was worth it.</div>
+        </div>
+
+        <div class="faq-item" onclick="toggleFaq(this)">
+          <div class="faq-q">Can I submit a spot?<span class="faq-arrow">+</span></div>
+          <div class="faq-a">Yes — that's the whole point. Hit the "Submit a spot" button on any page and fill in the details. Good submissions get reviewed and added within a few days. The more interns contribute, the better the site gets for everyone.</div>
+        </div>
+
+        <div class="faq-item" onclick="toggleFaq(this)">
+          <div class="faq-q">Is any of this sponsored or paid?<span class="faq-arrow">+</span></div>
+          <div class="faq-a">No. Nothing on this site is paid placement or sponsored content. No restaurant has paid to be listed here. Everything is here because it's genuinely good for interns on a budget — that's the only criteria.</div>
+        </div>
+
+        <div class="faq-item" onclick="toggleFaq(this)">
+          <div class="faq-q">How does the AI Plan Generator work?<span class="faq-arrow">+</span></div>
+          <div class="faq-a">It's not quite AI... yet — it's a smart recommendation engine. You tell it your vibe, budget, neighborhood, and group size, and it builds a sequenced night out from the curated spot database. It prioritises spots near your chosen neighborhood and filters by budget. Think of it as a very opinionated friend who knows the city well.</div>
+        </div>
+
+        <div class="faq-item" onclick="toggleFaq(this)">
+          <div class="faq-q">Prices seem off — is the site updated?<span class="faq-arrow">+</span></div>
+          <div class="faq-a">Prices are updated regularly but NYC menus change constantly. Always check the spot's own menu or Google for the latest. If something is noticeably wrong, submit a correction via the Submit page and it'll get fixed quickly.</div>
+        </div>
+
+        <div class="faq-item" onclick="toggleFaq(this)">
+          <div class="faq-q">I'm not an intern — can I still use this?<span class="faq-arrow">+</span></div>
+          <div class="faq-a">Of course. The site is free and public. The focus is intern-friendly budgets and vibes but honestly most of the spots are just good NYC recommendations for anyone who doesn't want to spend $40 on a cocktail.</div>
+        </div>
+
+        <div class="faq-item" onclick="toggleFaq(this)">
+          <div class="faq-q">Will you expand beyond NYC?<span class="faq-arrow">+</span></div>
+          <div class="faq-a">Maybe eventually — Boston, DC, Chicago, and LA all have big intern summers. But the goal right now is to make the NYC version genuinely excellent before expanding anywhere. Quality over coverage.</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- INSTAGRAM CTA -->
+    <div class="ig-cta">
+      <h3>Follow along this summer ✦</h3>
+      <p>Daily NYC picks, hidden gems, and intern tips on Instagram. New spots added as they're discovered.</p>
+      <a class="ig-btn" href="https://instagram.com/afterfivenyc" target="_blank">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.5" fill="currentColor"/></svg>
+        @afterfivenyc
+      </a>
+    </div>
+
+  </div>
+
+  <div class="footer-stripe" aria-hidden="true">
+    <span style="background:#EE352C;"></span>
+    <span style="background:#00933C;"></span>
+    <span style="background:#FCCC0A;"></span>
+    <span style="background:#0039A6;"></span>
+    <span style="background:#FF6319;"></span>
+  </div>
+  <footer>
+    <a class="footer-logo" href="index.html"><span class="after">after</span><span class="five">five</span></a>
+    <a class="footer-ig" href="https://instagram.com/afterfivenyc" target="_blank">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.5" fill="currentColor"/></svg>
+      @afterfivenyc
+    </a>
+    <p>"Your NYC nights, sorted."</p>
+  </footer>
+
+  <script>
+    const hamburgerBtn = document.getElementById('hamburgerBtn');
+    const mobileMenu   = document.getElementById('mobileMenu');
+    hamburgerBtn.addEventListener('click', () => {
+      hamburgerBtn.classList.toggle('open');
+      mobileMenu.classList.toggle('open');
+      document.body.style.overflow = mobileMenu.classList.contains('open') ? 'hidden' : '';
+    });
+    mobileMenu.querySelectorAll('a').forEach(a => {
+      a.addEventListener('click', () => {
+        hamburgerBtn.classList.remove('open');
+        mobileMenu.classList.remove('open');
+        document.body.style.overflow = '';
+      });
+    });
+
+    function toggleFaq(item) {
+      const isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item').forEach(f => f.classList.remove('open'));
+      if (!isOpen) item.classList.add('open');
+    }
+  </script>
+</body>
+</html>

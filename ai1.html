@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>afterfive — Plan Generator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;500;600;700;800&display=swap" />
+  <style>
+    /* ── TOKENS ── */
+    :root {
+      --midnight: #080A14;
+      --surface:  #0D0F1F;
+      --surface2: #141728;
+      --border:   #1A1D2E;
+      --border2:  #2A2E44;
+      --lime:     #FCCC0A;
+      --lime-dim: rgba(252,204,10,0.10);
+      --text:     #E8ECF8;
+      --muted:    #7A80A0;
+      --subdued:  #3A3F58;
+      --amber:    #EE352C;
+      --green:    #00933C;
+      --blue:     #0039A6;
+      --purple:   #FF6319;
+      --urgency:  #EE352C;
+      --pad:      16px;
+      --r-card:   0px;
+      --r-btn:    4px;
+      --r-badge:  3px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--midnight); color: var(--text);
+      font-family: 'Syne', sans-serif; font-size: 14px;
+      line-height: 1.5; overflow-x: hidden;
+      display: flex; flex-direction: column; min-height: 100dvh;
+    }
+
+    /* ── NAV ── */
+    .nav {
+      position: sticky; top: 0; z-index: 200;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 var(--pad); height: 52px;
+      background: var(--midnight);
+      border-bottom: 3px solid var(--lime);
+      flex-shrink: 0;
+    }
+    .nav-logo {
+      font-size: 16px; font-weight: 800; text-decoration: none;
+      letter-spacing: -0.3px; font-family: 'DM Mono', monospace;
+      text-transform: uppercase;
+    }
+    .nav-logo .after { color: var(--text); }
+    .nav-logo .five  { color: var(--lime); }
+    .nav-links { display: none; list-style: none; gap: 2px; }
+    .nav-links a {
+      color: var(--muted); text-decoration: none; font-size: 11px;
+      font-weight: 600; padding: 6px 12px;
+      letter-spacing: 0.07em; text-transform: uppercase; transition: color 0.15s;
+    }
+    .nav-links a:hover  { color: var(--text); }
+    .nav-links a.active { color: var(--lime); }
+    .nav-cta {
+      display: none;
+      background: var(--lime); color: var(--midnight); border: none;
+      border-radius: var(--r-btn); padding: 8px 16px;
+      font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700;
+      cursor: pointer; text-decoration: none; transition: opacity 0.15s;
+      white-space: nowrap; letter-spacing: 0.06em; text-transform: uppercase;
+    }
+    .nav-cta:hover { opacity: 0.85; }
+
+    /* MTA stripe */
+    .nav-stripe { display: flex; height: 4px; flex-shrink: 0; }
+    .nav-stripe span { flex: 1; }
+
+    .hamburger {
+      display: flex; flex-direction: column; gap: 5px;
+      background: none; border: none; cursor: pointer; padding: 4px;
+    }
+    .hamburger span {
+      display: block; width: 22px; height: 2px;
+      background: var(--text); border-radius: 0; transition: all 0.25s;
+    }
+    .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    .mobile-drawer {
+      display: none; position: fixed; inset: 0; z-index: 199;
+      background: var(--midnight); flex-direction: column;
+      padding: 72px var(--pad) var(--pad); gap: 0;
+      border-top: 3px solid var(--lime); margin-top: 52px;
+    }
+    .mobile-drawer.open { display: flex; }
+    .mobile-drawer a {
+      color: var(--text); text-decoration: none;
+      font-size: 22px; font-weight: 800;
+      padding: 14px 0; border-bottom: 1px solid var(--border);
+      transition: color 0.15s; display: flex;
+      align-items: center; justify-content: space-between;
+      font-family: 'DM Mono', monospace; text-transform: uppercase; letter-spacing: -0.5px;
+    }
+    .mobile-drawer a::after { content: '→'; color: var(--subdued); font-size: 14px; }
+    .mobile-drawer a:hover  { color: var(--lime); }
+    .mobile-drawer a.drawer-cta {
+      font-size: 13px; margin-top: 24px;
+      background: var(--lime); color: var(--midnight);
+      border: none; border-radius: var(--r-btn);
+      padding: 14px 28px; text-align: center; font-weight: 700;
+      justify-content: center; letter-spacing: 0.06em;
+    }
+    .mobile-drawer a.drawer-cta::after { display: none; }
+    .drawer-tag { margin-top: auto; font-size: 10px; color: var(--subdued); font-family: 'DM Mono', monospace; }
+
+    /* ── PLANNER WRAP ── */
+    .planner-wrap { flex: 1; display: flex; flex-direction: column; }
+
+    /* ── STEP BAR — transit progress indicator ── */
+    .step-bar {
+      padding: 14px var(--pad) 0;
+      display: flex; align-items: center; flex-shrink: 0;
+      background: var(--surface);
+    }
+    .step-item { display: flex; align-items: center; flex: 1; }
+
+    /* MTA-style circle stops */
+    .step-dot {
+      width: 28px; height: 28px; border-radius: 50%;
+      border: 2px solid var(--border2); background: var(--surface2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 800; color: var(--subdued);
+      flex-shrink: 0; transition: all 0.25s; font-family: 'DM Mono', monospace;
+    }
+    .step-dot.active { border-color: var(--lime); color: var(--lime); background: var(--lime-dim); }
+    .step-dot.done   { background: var(--lime); border-color: var(--lime); color: var(--midnight); }
+
+    /* Transit line between stops */
+    .step-line {
+      flex: 1; height: 3px; background: var(--border2);
+      margin: 0 2px; transition: background 0.3s; position: relative;
+    }
+    .step-line.done { background: var(--lime); }
+
+    .step-labels {
+      display: flex; padding: 6px var(--pad) 12px;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0; background: var(--surface);
+    }
+    .step-label {
+      flex: 1; font-size: 9px; font-weight: 600; color: var(--subdued);
+      letter-spacing: 0.1em; text-transform: uppercase;
+      font-family: 'DM Mono', monospace; text-align: center;
+    }
+    .step-label.active { color: var(--lime); }
+
+    /* ── STEP PANELS ── */
+    .steps-container { flex: 1; overflow: hidden; position: relative; }
+    .step-panel {
+      position: absolute; inset: 0; padding: 22px var(--pad);
+      overflow-y: auto; opacity: 0; pointer-events: none;
+      transform: translateX(40px); transition: opacity 0.25s, transform 0.25s;
+    }
+    .step-panel.active { opacity: 1; pointer-events: auto; transform: translateX(0); }
+    .step-panel.exit   { opacity: 0; transform: translateX(-40px); }
+
+    .step-panel h3 {
+      font-size: 19px; font-weight: 800; margin-bottom: 4px;
+      font-family: 'DM Mono', monospace; text-transform: uppercase;
+      letter-spacing: -0.5px;
+    }
+    .step-eyebrow {
+      font-size: 9px; color: var(--lime); font-family: 'DM Mono', monospace;
+      letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 10px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .step-eyebrow::before {
+      content: ''; display: block; width: 12px; height: 2px; background: var(--lime);
+    }
+    .step-panel > p.step-sub { font-size: 12px; color: var(--muted); margin-bottom: 20px; line-height: 1.6; }
+
+    /* ── CHOICE GRID ── */
+    .choice-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 20px; }
+    .choice-card {
+      background: var(--surface); border: 1px solid var(--border2);
+      border-radius: 0; padding: 14px 12px;
+      cursor: pointer; transition: all 0.15s; text-align: left;
+      border-left: 3px solid transparent;
+    }
+    .choice-card:hover    { border-color: var(--border2); background: var(--surface2); border-left-color: var(--muted); }
+    .choice-card.selected { border-color: var(--lime); background: var(--lime-dim); border-left-color: var(--lime); }
+    .choice-card .icon  { font-size: 22px; margin-bottom: 8px; display: block; }
+    .choice-card .label {
+      font-size: 12px; font-weight: 700; display: block; margin-bottom: 2px;
+      font-family: 'DM Mono', monospace; text-transform: uppercase; letter-spacing: 0.04em;
+    }
+    .choice-card .sub   { font-size: 10px; color: var(--muted); display: block; }
+    .choice-card.selected .sub { color: var(--lime); }
+
+    /* ── BUDGET ── */
+    .budget-display { text-align: center; margin-bottom: 16px; padding: 20px; background: var(--surface); border: 1px solid var(--border); }
+    .budget-number {
+      font-size: 52px; font-weight: 800; color: var(--lime);
+      font-family: 'DM Mono', monospace; line-height: 1;
+      letter-spacing: -2px;
+    }
+    .budget-label {
+      font-size: 10px; color: var(--muted); margin-top: 6px;
+      font-family: 'DM Mono', monospace; letter-spacing: 0.1em; text-transform: uppercase;
+    }
+    .budget-slider {
+      -webkit-appearance: none; appearance: none;
+      width: 100%; height: 4px; border-radius: 0;
+      background: var(--border2); outline: none; margin-bottom: 8px; cursor: pointer;
+    }
+    .budget-slider::-webkit-slider-thumb {
+      -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%;
+      background: var(--lime); cursor: pointer; border: 3px solid var(--midnight);
+      box-shadow: 0 0 0 2px var(--lime);
+    }
+    .budget-slider::-moz-range-thumb {
+      width: 20px; height: 20px; border-radius: 50%;
+      background: var(--lime); cursor: pointer; border: 3px solid var(--midnight);
+    }
+    .budget-ticks {
+      display: flex; justify-content: space-between;
+      font-size: 9px; color: var(--subdued); font-family: 'DM Mono', monospace;
+      letter-spacing: 0.04em;
+    }
+
+    /* ── CHIPS ── */
+    .chip-grid { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px; }
+    .area-chip {
+      padding: 7px 14px; border-radius: var(--r-btn);
+      border: 1px solid var(--border2); background: transparent;
+      color: var(--muted); font-family: 'DM Mono', monospace;
+      font-size: 11px; font-weight: 500; cursor: pointer; transition: all 0.15s;
+      letter-spacing: 0.04em;
+    }
+    .area-chip:hover    { color: var(--text); border-color: var(--muted); }
+    .area-chip.selected { background: var(--lime); color: var(--midnight); border-color: var(--lime); font-weight: 700; }
+
+    /* ── GROUP SIZE ── */
+    .size-stepper { display: flex; align-items: center; justify-content: center; gap: 24px; margin-bottom: 24px; }
+    .size-btn {
+      width: 44px; height: 44px; border-radius: 0;
+      background: var(--surface2); border: 1px solid var(--border2);
+      color: var(--text); font-size: 22px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; transition: all 0.15s;
+      font-family: 'DM Mono', monospace;
+    }
+    .size-btn:hover { background: var(--lime); color: var(--midnight); border-color: var(--lime); }
+    .size-num {
+      font-size: 52px; font-weight: 800; font-family: 'DM Mono', monospace;
+      color: var(--lime); min-width: 60px; text-align: center; letter-spacing: -2px;
+    }
+
+    /* ── TOGGLES ── */
+    .toggle-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+    .toggle-item {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 0; padding: 13px;
+      display: flex; align-items: center; justify-content: space-between;
+      cursor: pointer; transition: border-color 0.15s;
+      border-left: 3px solid transparent;
+    }
+    .toggle-item:hover { border-color: var(--border2); }
+    .toggle-item.on    { border-color: var(--border2); border-left-color: var(--lime); }
+    .toggle-left  { display: flex; gap: 12px; align-items: center; }
+    .toggle-icon  { font-size: 18px; }
+    .t-label { font-size: 12px; font-weight: 700; font-family: 'DM Mono', monospace; text-transform: uppercase; letter-spacing: 0.04em; }
+    .t-sub   { font-size: 10px; color: var(--muted); margin-top: 1px; }
+    .toggle-switch {
+      width: 36px; height: 20px; border-radius: 0;
+      background: var(--border2); position: relative; flex-shrink: 0; transition: background 0.2s;
+    }
+    .toggle-switch::after {
+      content: ''; position: absolute; top: 3px; left: 3px;
+      width: 14px; height: 14px; border-radius: 0; background: var(--muted); transition: transform 0.2s;
+    }
+    .toggle-item.on .toggle-switch { background: var(--lime-dim); border: 1px solid var(--lime); }
+    .toggle-item.on .toggle-switch::after { transform: translateX(16px); background: var(--lime); }
+
+    /* ── RESULT ── */
+    .result-panel {
+      flex: 1; padding: 22px var(--pad); overflow-y: auto;
+      display: none; flex-direction: column; gap: 16px;
+    }
+    .result-panel.visible { display: flex; }
+
+    .result-header { border-left: 4px solid var(--lime); padding-left: 12px; }
+    .result-header h2 {
+      font-size: 20px; font-weight: 800; margin-bottom: 4px;
+      font-family: 'DM Mono', monospace; text-transform: uppercase; letter-spacing: -0.5px;
+    }
+    .result-header p { font-size: 11px; color: var(--muted); font-family: 'DM Mono', monospace; }
+
+    /* Transit timeline */
+    .result-stop {
+      display: flex; gap: 14px; align-items: flex-start;
+      padding: 14px 0; border-bottom: 1px solid var(--border);
+    }
+    .result-stop:last-child { border-bottom: none; }
+    .stop-timeline {
+      display: flex; flex-direction: column; align-items: center;
+      flex-shrink: 0; padding-top: 2px;
+    }
+    /* MTA-style circle stop */
+    .stop-circle {
+      width: 36px; height: 36px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; font-weight: 800;
+    }
+    /* dashed vertical line between stops */
+    .stop-vline {
+      width: 2px; flex: 1; min-height: 20px;
+      background: repeating-linear-gradient(
+        to bottom,
+        var(--border2) 0px, var(--border2) 4px,
+        transparent 4px, transparent 8px
+      );
+      margin: 4px 0;
+    }
+    .result-stop:last-child .stop-vline { display: none; }
+    .stop-body { flex: 1; }
+    .stop-time {
+      font-size: 9px; color: var(--lime); font-family: 'DM Mono', monospace;
+      font-weight: 700; margin-bottom: 3px; letter-spacing: 0.1em; text-transform: uppercase;
+    }
+    .stop-name { font-size: 13px; font-weight: 700; margin-bottom: 3px; font-family: 'DM Mono', monospace; }
+    .stop-desc { font-size: 12px; color: var(--muted); line-height: 1.5; margin-bottom: 8px; }
+    .stop-tags { display: flex; gap: 5px; flex-wrap: wrap; }
+    .stop-tag {
+      font-size: 9px; padding: 2px 6px;
+      background: var(--surface2); color: var(--muted);
+      font-family: 'DM Mono', monospace; letter-spacing: 0.04em;
+    }
+    .stop-tag.price {
+      color: var(--midnight); background: var(--lime); font-weight: 700;
+      transform: rotate(-1deg); display: inline-block;
+    }
+
+    /* Summary table */
+    .result-summary {
+      background: var(--surface); border: 1px solid var(--border);
+      border-top: 3px solid var(--lime); padding: 14px;
+    }
+    .sum-row {
+      display: flex; justify-content: space-between;
+      font-size: 12px; padding: 6px 0; border-bottom: 1px solid var(--border);
+      font-family: 'DM Mono', monospace;
+    }
+    .sum-row:last-child { border-bottom: none; font-weight: 800; font-size: 13px; }
+    .sum-row span:first-child { color: var(--subdued); text-transform: uppercase; letter-spacing: 0.08em; font-size: 10px; }
+    .sum-row span:last-child  { color: var(--lime); }
+
+    .result-actions { display: flex; gap: 8px; }
+
+    /* ── BUTTONS ── */
+    .btn-primary {
+      background: var(--lime); color: var(--midnight); border: none;
+      border-radius: var(--r-btn); padding: 12px 22px;
+      font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700;
+      cursor: pointer; text-decoration: none; display: inline-flex;
+      align-items: center; justify-content: center;
+      transition: opacity 0.15s, transform 0.1s;
+      text-transform: uppercase; letter-spacing: 0.05em;
+    }
+    .btn-primary:hover  { opacity: 0.88; }
+    .btn-primary:active { transform: scale(0.97); }
+    .btn-ghost {
+      background: transparent; color: var(--text);
+      border: 1px solid var(--border2); border-radius: var(--r-btn);
+      padding: 12px 22px; font-family: 'Syne', sans-serif;
+      font-size: 13px; font-weight: 600; cursor: pointer;
+      text-decoration: none; display: inline-flex;
+      align-items: center; justify-content: center; transition: all 0.15s;
+      text-transform: uppercase; letter-spacing: 0.04em;
+    }
+    .btn-ghost:hover { border-color: var(--muted); background: var(--surface2); }
+
+    /* ── STEP NAV BAR ── */
+    .step-nav {
+      padding: 12px var(--pad);
+      border-top: 1px solid var(--border);
+      display: flex; gap: 8px;
+      background: var(--surface);
+      flex-shrink: 0;
+    }
+
+    /* ── TOAST ── */
+    .toast {
+      position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%);
+      background: var(--surface); border: 1px solid var(--lime);
+      border-radius: var(--r-btn); padding: 10px 20px;
+      font-size: 12px; font-weight: 700; color: var(--lime);
+      z-index: 1000; white-space: nowrap; pointer-events: none;
+      font-family: 'DM Mono', monospace; letter-spacing: 0.06em;
+      animation: toastIn 0.2s ease; transition: opacity 0.3s;
+    }
+    @keyframes toastIn {
+      from { opacity: 0; transform: translate(-50%, 8px); }
+      to   { opacity: 1; transform: translate(-50%, 0); }
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (min-width: 640px) {
+      .hamburger  { display: none; }
+      .nav-links  { display: flex; }
+      .nav-cta    { display: inline-flex; }
+    }
+    @media (min-width: 900px) {
+      .nav { padding: 0 48px; }
+      .step-panel, .result-panel { padding-left: 48px; padding-right: 48px; max-width: 760px; }
+      .step-bar, .step-labels, .step-nav { padding-left: 48px; padding-right: 48px; }
+      .choice-grid { grid-template-columns: repeat(4, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── NAV ── -->
+  <nav class="nav">
+    <a class="nav-logo" href="index.html"><span class="after">after</span><span class="five">five</span></a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="explore.html">Explore</a></li>
+      <li><a href="ai.html" class="active">Plan Generator</a></li>
+      <li><a href="submit.html">Submit a Spot</a></li>
+      <li><a href="about.html">About</a></li>
+    </ul>
+    <a class="nav-cta" href="ai.html">✦ Build My Night</a>
+    <button class="hamburger" id="hamburgerBtn" aria-label="Open menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- MTA stripe -->
+  <div class="nav-stripe" aria-hidden="true">
+    <span style="background:#EE352C;"></span>
+    <span style="background:#00933C;"></span>
+    <span style="background:#FCCC0A;"></span>
+    <span style="background:#0039A6;"></span>
+    <span style="background:#FF6319;"></span>
+  </div>
+
+  <!-- Mobile Drawer -->
+  <div class="mobile-drawer" id="mobileMenu">
+    <a href="index.html">Home</a>
+    <a href="explore.html">Explore</a>
+    <a href="ai.html">Plan Generator</a>
+    <a href="submit.html">Submit a Spot</a>
+    <a href="about.html">About</a>
+    <a class="drawer-cta" href="ai.html">✦ Build My Night</a>
+    <p class="drawer-tag">"Your NYC nights, sorted."</p>
+  </div>
+
+  <!-- ── PLANNER ── -->
+  <div class="planner-wrap" id="plannerWrap">
+
+    <!-- PROGRESS BAR — MTA line map -->
+    <div class="step-bar" id="stepBar">
+      <div class="step-item"><div class="step-dot active" id="dot-1">1</div><div class="step-line" id="line-1"></div></div>
+      <div class="step-item"><div class="step-dot"        id="dot-2">2</div><div class="step-line" id="line-2"></div></div>
+      <div class="step-item"><div class="step-dot"        id="dot-3">3</div><div class="step-line" id="line-3"></div></div>
+      <div class="step-item"><div class="step-dot"        id="dot-4">4</div></div>
+    </div>
+    <div class="step-labels">
+      <span class="step-label active" id="label-1">Vibe</span>
+      <span class="step-label"        id="label-2">Budget</span>
+      <span class="step-label"        id="label-3">Area</span>
+      <span class="step-label"        id="label-4">Details</span>
+    </div>
+
+    <!-- STEP PANELS -->
+    <div class="steps-container" id="stepsContainer">
+
+      <!-- 1: VIBE -->
+      <div class="step-panel active" id="step-1">
+        <p class="step-eyebrow">Step 01 of 04</p>
+        <h3>What's your vibe?</h3>
+        <p class="step-sub">Pick everything that sounds good tonight — mix and match freely.</p>
+        <div class="choice-grid">
+          <div class="choice-card" data-vibe="food"    onclick="toggleVibe(this)"><span class="icon">🍜</span><span class="label">Food</span><span class="sub">Dinner, eats, snacks</span></div>
+          <div class="choice-card" data-vibe="drinks"  onclick="toggleVibe(this)"><span class="icon">🍹</span><span class="label">Drinks</span><span class="sub">Bars, happy hour</span></div>
+          <div class="choice-card" data-vibe="events"  onclick="toggleVibe(this)"><span class="icon">🎵</span><span class="label">Events</span><span class="sub">Music, comedy, art</span></div>
+          <div class="choice-card" data-vibe="workout" onclick="toggleVibe(this)"><span class="icon">⚡</span><span class="label">Workout</span><span class="sub">Run, yoga, gym</span></div>
+          <div class="choice-card" data-vibe="explore" onclick="toggleVibe(this)"><span class="icon">🗺️</span><span class="label">Explore</span><span class="sub">Walks, parks, views</span></div>
+          <div class="choice-card" data-vibe="chill"   onclick="toggleVibe(this)"><span class="icon">🛋️</span><span class="label">Low-key</span><span class="sub">Chill, relax</span></div>
+          <div class="choice-card" data-vibe="social"  onclick="toggleVibe(this)"><span class="icon">🫶</span><span class="label">Social</span><span class="sub">Meet people, group</span></div>
+          <div class="choice-card" data-vibe="date"    onclick="toggleVibe(this)"><span class="icon">✨</span><span class="label">Date night</span><span class="sub">Impressive & fun</span></div>
+        </div>
+      </div>
+
+      <!-- 2: BUDGET -->
+      <div class="step-panel" id="step-2">
+        <p class="step-eyebrow">Step 02 of 04</p>
+        <h3>Your budget?</h3>
+        <p class="step-sub">Per person, for the whole night. Drag or tap a quick pick.</p>
+        <div class="budget-display">
+          <div class="budget-number" id="budgetNum">$25</div>
+          <div class="budget-label">per person tonight</div>
+        </div>
+        <input class="budget-slider" type="range" id="budgetSlider" min="0" max="100" value="25" step="5" oninput="updateBudget(this.value)" />
+        <div class="budget-ticks"><span>Free</span><span>$25</span><span>$50</span><span>$75</span><span>$100+</span></div>
+        <div style="margin-top:22px;">
+          <p style="font-size:9px;font-weight:600;color:var(--subdued);letter-spacing:0.12em;text-transform:uppercase;font-family:'DM Mono',monospace;margin-bottom:10px;">Quick pick</p>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;" id="budgetChips">
+            <button class="area-chip" onclick="setBudget(0,this)">Free only</button>
+            <button class="area-chip" onclick="setBudget(15,this)">Under $15</button>
+            <button class="area-chip" onclick="setBudget(25,this)">Under $25</button>
+            <button class="area-chip" onclick="setBudget(50,this)">Under $50</button>
+            <button class="area-chip" onclick="setBudget(100,this)">Treat yourself</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3: AREA -->
+      <div class="step-panel" id="step-3">
+        <p class="step-eyebrow">Step 03 of 04</p>
+        <h3>Where in NYC?</h3>
+        <p class="step-sub">Pick your neighborhood or where you're heading after work.</p>
+        <div class="chip-grid" id="areaChips">
+          <button class="area-chip" data-area="Lower East Side"   onclick="selectArea(this)">Lower East Side</button>
+          <button class="area-chip" data-area="Williamsburg"      onclick="selectArea(this)">Williamsburg</button>
+          <button class="area-chip" data-area="Midtown"           onclick="selectArea(this)">Midtown</button>
+          <button class="area-chip" data-area="East Village"      onclick="selectArea(this)">East Village</button>
+          <button class="area-chip" data-area="SoHo"              onclick="selectArea(this)">SoHo</button>
+          <button class="area-chip" data-area="Bushwick"          onclick="selectArea(this)">Bushwick</button>
+          <button class="area-chip" data-area="Astoria"           onclick="selectArea(this)">Astoria</button>
+          <button class="area-chip" data-area="Harlem"            onclick="selectArea(this)">Harlem</button>
+          <button class="area-chip" data-area="Greenwich Village" onclick="selectArea(this)">Greenwich Village</button>
+          <button class="area-chip" data-area="DUMBO"             onclick="selectArea(this)">DUMBO</button>
+          <button class="area-chip" data-area="Chelsea"           onclick="selectArea(this)">Chelsea</button>
+          <button class="area-chip" data-area="Flushing"          onclick="selectArea(this)">Flushing</button>
+          <button class="area-chip" data-area="Sunset Park"       onclick="selectArea(this)">Sunset Park</button>
+          <button class="area-chip" data-area="Upper East Side"   onclick="selectArea(this)">Upper East Side</button>
+          <button class="area-chip" data-area="Anywhere"          onclick="selectArea(this)">🗽 Anywhere</button>
+        </div>
+      </div>
+
+      <!-- 4: DETAILS -->
+      <div class="step-panel" id="step-4">
+        <p class="step-eyebrow">Step 04 of 04</p>
+        <h3>Last few things</h3>
+        <p class="step-sub">Help us nail the perfect plan for tonight.</p>
+        <p style="font-size:9px;font-weight:600;color:var(--subdued);letter-spacing:0.12em;text-transform:uppercase;font-family:'DM Mono',monospace;margin-bottom:12px;">Group size</p>
+        <div class="size-stepper">
+          <button class="size-btn" onclick="changeSize(-1)">−</button>
+          <div class="size-num" id="sizeNum">2</div>
+          <button class="size-btn" onclick="changeSize(1)">+</button>
+        </div>
+        <p style="font-size:9px;font-weight:600;color:var(--subdued);letter-spacing:0.12em;text-transform:uppercase;font-family:'DM Mono',monospace;margin-bottom:10px;">Preferences</p>
+        <div class="toggle-list">
+          <div class="toggle-item" id="tog-outdoor" onclick="toggleOpt(this,'outdoor')">
+            <div class="toggle-left"><span class="toggle-icon">🌤️</span><div><div class="t-label">Outdoor preferred</div><div class="t-sub">Parks, rooftops, patios</div></div></div>
+            <div class="toggle-switch"></div>
+          </div>
+          <div class="toggle-item" id="tog-walking" onclick="toggleOpt(this,'walking')">
+            <div class="toggle-left"><span class="toggle-icon">🚶</span><div><div class="t-label">Walkable only</div><div class="t-sub">Keep stops close together</div></div></div>
+            <div class="toggle-switch"></div>
+          </div>
+          <div class="toggle-item on" id="tog-intern" onclick="toggleOpt(this,'intern')">
+            <div class="toggle-left"><span class="toggle-icon">👔</span><div><div class="t-label">Intern-friendly</div><div class="t-sub">Good for networking & meeting people</div></div></div>
+            <div class="toggle-switch"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RESULT -->
+    <div class="result-panel" id="resultPanel">
+      <div class="result-header">
+        <h2 id="resultTitle">Your Night</h2>
+        <p id="resultSubtitle"></p>
+      </div>
+      <div id="resultStops"></div>
+      <div class="result-summary" id="resultSummary"></div>
+      <div class="result-actions">
+        <a class="btn-primary" href="explore.html" style="flex:1;text-align:center;">Explore More →</a>
+        <button class="btn-ghost" onclick="resetPlanner()">Try again</button>
+      </div>
+    </div>
+
+    <!-- STEP NAV -->
+    <div class="step-nav" id="stepNav">
+      <button class="btn-ghost" id="backBtn" onclick="prevStep()" style="display:none;">← Back</button>
+      <button class="btn-primary" id="nextBtn" onclick="nextStep()" style="flex:1;">Continue →</button>
+    </div>
+
+  </div>
+
+  <script>
+    // ── NAV ──
+    const hamburgerBtn = document.getElementById('hamburgerBtn');
+    const mobileDrawer = document.getElementById('mobileMenu');
+    hamburgerBtn.addEventListener('click', () => {
+      hamburgerBtn.classList.toggle('open');
+      mobileDrawer.classList.toggle('open');
+      document.body.style.overflow = mobileDrawer.classList.contains('open') ? 'hidden' : '';
+    });
+    mobileDrawer.querySelectorAll('a').forEach(a => {
+      a.addEventListener('click', () => {
+        hamburgerBtn.classList.remove('open');
+        mobileDrawer.classList.remove('open');
+        document.body.style.overflow = '';
+      });
+    });
+
+    function showToast(msg) {
+      const existing = document.querySelector('.toast');
+      if (existing) existing.remove();
+      const t = document.createElement('div');
+      t.className = 'toast'; t.textContent = msg;
+      document.body.appendChild(t);
+      setTimeout(() => t.style.opacity = '0', 2000);
+      setTimeout(() => t.remove(), 2400);
+    }
+
+    // ── STATE ──
+    const S = { vibes:[], budget:25, area:'', size:2, outdoor:false, walking:false, intern:true };
+    let step = 1;
+    const TOTAL = 4;
+
+    function goTo(n) {
+      document.getElementById('step-'+step).classList.remove('active');
+      document.getElementById('step-'+step).classList.add('exit');
+      setTimeout(() => document.getElementById('step-'+step).classList.remove('exit'), 300);
+      step = n;
+      document.getElementById('step-'+n).classList.add('active');
+      for (let i = 1; i <= TOTAL; i++) {
+        document.getElementById('dot-'+i).className   = 'step-dot' + (i===n?' active':i<n?' done':'');
+        document.getElementById('label-'+i).className = 'step-label' + (i===n?' active':'');
+        if (i<TOTAL) document.getElementById('line-'+i).className = 'step-line' + (i<n?' done':'');
+      }
+      document.getElementById('backBtn').style.display = n>1?'':'none';
+      document.getElementById('nextBtn').textContent   = n===TOTAL ? '✦ Build my plan' : 'Continue →';
+    }
+
+    function nextStep() {
+      if (step===1 && S.vibes.length===0) { showToast('Pick at least one vibe!'); return; }
+      if (step===3 && !S.area)            { showToast('Pick a neighborhood!'); return; }
+      if (step < TOTAL) goTo(step+1);
+      else generatePlan();
+    }
+    function prevStep() { if (step>1) goTo(step-1); }
+
+    function toggleVibe(el) {
+      el.classList.toggle('selected');
+      const v = el.dataset.vibe;
+      S.vibes = S.vibes.includes(v) ? S.vibes.filter(x=>x!==v) : [...S.vibes, v];
+    }
+    function updateBudget(v) {
+      S.budget = +v;
+      document.getElementById('budgetNum').textContent = +v===0?'Free':+v>=100?'$100+':'$'+v;
+      document.getElementById('budgetSlider').value = v;
+    }
+    function setBudget(v, el) {
+      updateBudget(v);
+      document.querySelectorAll('#budgetChips .area-chip').forEach(c=>c.classList.remove('selected'));
+      el.classList.add('selected');
+    }
+    function selectArea(el) {
+      document.querySelectorAll('#areaChips .area-chip').forEach(c=>c.classList.remove('selected'));
+      el.classList.add('selected'); S.area = el.dataset.area;
+    }
+    function changeSize(d) { S.size=Math.max(1,Math.min(12,S.size+d)); document.getElementById('sizeNum').textContent=S.size; }
+    function toggleOpt(el, key) { el.classList.toggle('on'); S[key]=el.classList.contains('on'); }
+
+    // ── SPOT DATABASE ──
+    const DB = {
+      food:[
+        {n:'Prince Street Pizza',      h:'SoHo',              c:8,  desc:'Spicy square slice, best in SoHo. Lines worth every second.',        tags:['pizza','soho'],           out:false, min:20},
+        {n:'Locanut — Quick Thai',     h:'Midtown',           c:16, desc:'Pad see ew and mango sticky rice. Fast, fresh, affordable.',          tags:['thai','quick'],           out:false, min:30},
+        {n:'Bob White Counter',        h:'East Village',      c:16, desc:'Southern chicken sandwiches. Counter seating, cult favorite.',        tags:['chicken'],                out:false, min:30},
+        {n:'7th Street Burger',        h:'East Village',      c:14, desc:'Perfect smash burgers. Short menu, long lines, zero regrets.',        tags:['burgers'],                out:false, min:25},
+        {n:"Joe's Pizza",              h:'Greenwich Village', c:4,  desc:'The $4 NYC slice. Open until midnight. A true institution.',          tags:['pizza','late-night'],     out:false, min:20},
+        {n:'Kikis',                    h:'Lower East Side',   c:40, desc:'Greek-Mediterranean LES gem. Cash only, BYOB, always packed.',        tags:['greek','byob'],           out:true,  min:90},
+        {n:'Misi',                     h:'Williamsburg',      c:50, desc:"Missy Robbins' exceptional fresh pasta. Williamsburg's best.",        tags:['pasta','italian'],        out:false, min:90},
+        {n:'Baar Baar',                h:'East Village',      c:45, desc:'Modern Indian with great cocktails. Perfect for groups.',             tags:['indian','cocktails'],     out:false, min:75},
+        {n:'St. Jardim',               h:'West Village',      c:50, desc:'Brazilian-inspired West Village gem. Great at the bar.',              tags:['brazilian'],              out:false, min:75},
+        {n:'Katsu Hanna',              h:'East Village',      c:50, desc:'Intimate omakase-style sushi. Exceptional quality for the price.',    tags:['sushi','omakase'],        out:false, min:90},
+        {n:'Don Angie',                h:'West Village',      c:75, desc:'Italian-American with a creative twist. Hard to book, worth it.',     tags:['italian','splurge'],      out:false, min:90},
+        {n:'Lucali',                   h:'Carroll Gardens',   c:28, desc:'BYOB, cash only, the best pizza in NYC. Zero regrets.',              tags:['pizza','date'],           out:false, min:90},
+        {n:'Sugarfish',                h:'Various',           c:60, desc:'Trust-me omakase sets. Reliable and always excellent.',               tags:['sushi','omakase'],        out:false, min:90},
+        {n:"Sadelle's",                h:'SoHo',              c:45, desc:'Iconic SoHo brunch spot. The smoked fish tower is legendary.',        tags:['brunch','soho'],          out:false, min:60},
+      ],
+      drinks:[
+        {n:'Happy Hour @ Ample Hills', h:'Sunset Park',       c:5,  desc:'$5 draft beers 5–8pm. Outdoor seating and a great crowd.',           tags:['happy-hour','cheap'],     out:true,  min:90},
+        {n:"Piano's Rooftop Bar",      h:'Lower East Side',   c:8,  desc:'$6 beers, jazz on Fridays, no cover. Classic intern spot.',           tags:['rooftop','jazz'],         out:true,  min:90},
+        {n:'Attaboy',                  h:'Lower East Side',   c:18, desc:'No menu — tell them your vibe, they build it perfectly.',             tags:['cocktails','speakeasy'],  out:false, min:90},
+        {n:'Amor y Amargo',            h:'East Village',      c:16, desc:'Bitters-forward cocktails. Intimate, excellent, memorable.',          tags:['cocktails','intimate'],   out:false, min:75},
+        {n:'Westlight Rooftop',        h:'Williamsburg',      c:18, desc:'Best rooftop in Brooklyn. Skyline views, great for groups.',          tags:['rooftop','views'],        out:true,  min:90},
+        {n:'Death & Co',               h:'East Village',      c:22, desc:'NYC cocktail institution. Mezcal negroni is unmatched.',              tags:['cocktails','upscale'],    out:false, min:90},
+        {n:'Dram Shop',                h:'Park Slope',        c:10, desc:'Craft beer dive. $6 local drafts and an excellent jukebox.',          tags:['dive','brooklyn'],        out:false, min:90},
+      ],
+      events:[
+        {n:'MoMA Free Fridays',        h:'Midtown',           c:0,  desc:'World-class art, free every Friday 5:30–9pm.',                       tags:['art','museum','free'],    out:false, min:90},
+        {n:"Jazz on Piano's Rooftop",  h:'Lower East Side',   c:0,  desc:'Live jazz, no cover on Fridays. $6 beers. Very NYC.',                tags:['jazz','music','free'],    out:true,  min:120},
+        {n:'Comedy Night @ The Stand', h:'Gramercy',          c:0,  desc:'Free open-mic comedy. 2-drink minimum, drinks from $7.',            tags:['comedy','free'],          out:false, min:90},
+        {n:'The Met (pay-what-you-wish)',h:'Upper East Side',  c:5,  desc:'Suggested $30, pay $5. World-class museum, every time.',            tags:['art','museum'],           out:false, min:120},
+        {n:'Brooklyn Bowl',            h:'Williamsburg',      c:20, desc:'Live music + bowling. Incredible sound system, great groups.',       tags:['music','bowling'],        out:false, min:120},
+        {n:'NY Liberty at Barclays',   h:'Brooklyn',          c:25, desc:'WNBA game at Barclays. Electric atmosphere, affordable tickets.',    tags:['sports'],                 out:false, min:120},
+      ],
+      workout:[
+        {n:'Midnight Runners NYC',     h:'Various',           c:0,  desc:'Night run club. Bring energy, make friends, feel alive.',           tags:['running','night','free'], out:true,  min:75},
+        {n:'Brooklyn Bridge Park Yoga',h:'DUMBO',             c:0,  desc:'Free outdoor yoga with bridge views. All levels welcome.',          tags:['yoga','outdoor','free'],  out:true,  min:75},
+        {n:'St. Marks Yoga',           h:'East Village',      c:12, desc:'Great yoga classes for just $12. Best value in the city.',          tags:['yoga','cheap'],           out:false, min:75},
+        {n:'East River Pilates',       h:'Lower East Side',   c:20, desc:'Reformer pilates for $20. Excellent teachers, great vibes.',        tags:['pilates','les'],          out:false, min:60},
+        {n:'Kove Cold Plunge & Sauna', h:'Various',           c:40, desc:'Cold plunge and sauna. Recovery and relaxation.',                   tags:['wellness'],               out:false, min:60},
+      ],
+      explore:[
+        {n:'Brooklyn Bridge Walk',     h:'DUMBO',             c:0,  desc:"Walk the bridge at sunset. One of NYC's most iconic views.",        tags:['walk','views','free'],    out:true,  min:45},
+        {n:'Little Island',            h:'Hudson River Park', c:0,  desc:'Dreamy elevated park on the Hudson. Free and stunning.',            tags:['park','outdoor','free'],  out:true,  min:60},
+        {n:'Governors Island Ferry',   h:'Downtown',          c:3,  desc:'$3 ferry to a car-free island. Hammocks, art, views.',              tags:['island','outdoor'],       out:true,  min:180},
+        {n:'Old Friend Photo Booth',   h:'Lower East Side',   c:6,  desc:'Retro photo booth in LES. $6 for a strip. Great with friends.',    tags:['photos','fun'],           out:false, min:20},
+        {n:'Central Park Boathouse',   h:'Central Park',      c:20, desc:'Row a boat on the lake in Central Park. Romantic and fun.',        tags:['outdoor','romantic'],     out:true,  min:60},
+      ],
+      chill:[
+        {n:'Picnic — The Great Lawn',  h:'Central Park',      c:10, desc:"Grab Trader Joe's, picnic on the Great Lawn. Peak NYC summer.",    tags:['picnic','outdoor'],       out:true,  min:120},
+        {n:'Little Island',            h:'Hudson River Park', c:0,  desc:'Dreamy free park on the Hudson. Hammocks and great views.',        tags:['park','outdoor','free'],  out:true,  min:60},
+        {n:'Sunset — West Side Highway',h:'Hudson River',     c:0,  desc:'Hudson River sunset with Statue of Liberty views. Free.',         tags:['sunset','free'],          out:true,  min:45},
+        {n:'Sweet Pickle Books',       h:'Lower East Side',   c:0,  desc:'Tiny bookshop on the LES. Perfect slow afternoon browse.',        tags:['books','chill'],          out:false, min:45},
+      ],
+      social:[
+        {n:'Comedy Night @ The Stand', h:'Gramercy',          c:0,  desc:'Free open-mic comedy. Great energy for groups.',                   tags:['comedy','groups'],        out:false, min:90},
+        {n:'Brooklyn Bowl',            h:'Williamsburg',      c:20, desc:'Bowling + live music = automatic conversation starter.',           tags:['bowling','groups'],       out:false, min:120},
+        {n:'Midnight Runners NYC',     h:'Various',           c:0,  desc:'Night run club — make friends, explore the city after dark.',     tags:['running','social'],       out:true,  min:75},
+        {n:'NY Liberty at Barclays',   h:'Brooklyn',          c:25, desc:'WNBA game. Great crowd, affordable, and genuinely fun.',          tags:['sports','social'],        out:false, min:120},
+      ],
+      date:[
+        {n:'Lucali',                   h:'Carroll Gardens',   c:28, desc:'BYOB, cash only, best pizza in NYC. Genuinely impressive.',        tags:['pizza','romantic'],       out:false, min:90},
+        {n:'Westlight Rooftop',        h:'Williamsburg',      c:18, desc:'Best rooftop views in Brooklyn. Hard to top for a date.',          tags:['rooftop','romantic'],     out:true,  min:90},
+        {n:'Amor y Amargo',            h:'East Village',      c:16, desc:'Intimate bitters bar. Sophisticated and unforgettable.',           tags:['cocktails','romantic'],   out:false, min:75},
+        {n:'Governors Island',         h:'Downtown',          c:3,  desc:'$3 ferry, hammocks, skyline views. A genuinely great date.',       tags:['island','romantic'],      out:true,  min:180},
+        {n:'Katsu Hanna',              h:'East Village',      c:50, desc:'Intimate omakase sushi. Impressive without being stuffy.',         tags:['sushi','romantic'],       out:false, min:90},
+        {n:'Little Island at Sunset',  h:'Hudson River Park', c:0,  desc:'Golden hour on Little Island. Free and absolutely beautiful.',    tags:['outdoor','romantic'],     out:true,  min:60},
+        {n:'Aedes Perfumery',          h:'West Village',      c:40, desc:'Make your own perfume together. Unique, memorable date activity.', tags:['experience','romantic'],  out:false, min:90},
+        {n:'St. Jardim',               h:'West Village',      c:50, desc:'Brazilian-inspired West Village gem. Perfect for a special night.',tags:['dinner','romantic'],      out:false, min:75},
+      ],
+    };
+
+    const CLUSTERS = {
+      'Lower East Side':   [['Lower East Side','East Village','NoHo'],['SoHo','West Village','Greenwich Village'],['Midtown']],
+      'East Village':      [['East Village','Lower East Side','NoHo'],['West Village','Greenwich Village','SoHo'],['Tribeca']],
+      'West Village':      [['West Village','Greenwich Village','NoHo'],['SoHo','East Village','Chelsea'],['Midtown']],
+      'Greenwich Village': [['Greenwich Village','West Village','East Village'],['SoHo','Chelsea'],['Midtown']],
+      'SoHo':              [['SoHo','NoHo'],['West Village','East Village','Tribeca'],['Midtown']],
+      'Midtown':           [['Midtown','Gramercy'],['Chelsea','Upper East Side'],['East Village']],
+      'Chelsea':           [['Chelsea','West Village'],['Midtown','Greenwich Village'],['East Village']],
+      'Upper East Side':   [['Upper East Side'],['Midtown'],['Gramercy']],
+      'Harlem':            [['Harlem'],['Upper West Side'],['Midtown']],
+      'Williamsburg':      [['Williamsburg','Bushwick'],['DUMBO'],['Lower East Side']],
+      'Bushwick':          [['Bushwick','Williamsburg'],['DUMBO'],['Brooklyn Heights']],
+      'DUMBO':             [['DUMBO'],['Williamsburg'],['Park Slope']],
+      'Park Slope':        [['Park Slope','Carroll Gardens'],['DUMBO'],['Williamsburg']],
+      'Sunset Park':       [['Sunset Park'],['Park Slope'],['DUMBO']],
+      'Astoria':           [['Astoria'],['Long Island City'],['Midtown']],
+      'Flushing':          [['Flushing'],['Astoria'],['Midtown']],
+      'Anywhere':          null,
+    };
+
+    function getRings() {
+      if (!S.area || S.area === 'Anywhere') return null;
+      return CLUSTERS[S.area] || null;
+    }
+
+    function pickFrom(cat, maxCost, used) {
+      const allSpots = (DB[cat] || []).filter(s =>
+        s.c <= maxCost && (!S.outdoor || s.out) && !used.has(s.n)
+      );
+      if (!allSpots.length) return null;
+      const rings = getRings();
+      if (!rings) return allSpots[Math.floor(Math.random() * allSpots.length)];
+      for (const ring of rings) {
+        const inRing = allSpots.filter(s => ring.some(h =>
+          s.h.toLowerCase().includes(h.toLowerCase()) || h.toLowerCase().includes(s.h.toLowerCase())
+        ));
+        if (inRing.length) return inRing[Math.floor(Math.random() * inRing.length)];
+      }
+      return allSpots[Math.floor(Math.random() * allSpots.length)];
+    }
+
+    function generatePlan() {
+      const vibes = S.vibes;
+      let picks = [], used = new Set(), rem = S.budget, elapsed = 0;
+      const START = 18 * 60;
+      const order = ['explore','chill','workout','food','events','social','date','drinks'];
+      for (const cat of order) {
+        if (!vibes.includes(cat) && !(cat==='food' && vibes.includes('date'))) continue;
+        const s = pickFrom(cat, rem, used);
+        if (!s) continue;
+        s._cat = cat; s._start = START + elapsed;
+        picks.push(s); used.add(s.n);
+        elapsed += s.min + 15; rem -= s.c;
+        if (rem < 0) rem = 0;
+      }
+      if (!vibes.includes('drinks') && rem >= 5 && picks.length < 4) {
+        const s = pickFrom('drinks', rem, used);
+        if (s) { s._cat = 'drinks'; s._start = START + elapsed; picks.push(s); }
+      }
+      if (!picks.length) {
+        const f = pickFrom('food', S.budget, new Set()) || DB.food[0];
+        const d = pickFrom('drinks', S.budget, new Set()) || DB.drinks[0];
+        f._cat='food';   f._start=START;
+        d._cat='drinks'; d._start=START+75;
+        picks=[f,d];
+      }
+      showResult(picks);
+    }
+
+    /* MTA line colors per category */
+    const CAT_COLOR = {
+      food:    '#00933C',  /* MTA green */
+      drinks:  '#0039A6',  /* MTA blue */
+      events:  '#FF6319',  /* MTA orange */
+      workout: '#00933C',  /* MTA green */
+      explore: '#FCCC0A',  /* MTA yellow */
+      chill:   '#FCCC0A',
+      social:  '#0039A6',
+      date:    '#EE352C',  /* MTA red */
+    };
+    const CAT_LETTER = {food:'6',drinks:'A',events:'B',workout:'4',explore:'N',chill:'N',social:'A',date:'1'};
+    const CAT_EMOJI  = {food:'🍜',drinks:'🍹',events:'🎵',workout:'⚡',explore:'🗺️',chill:'🛋️',social:'🫶',date:'✨'};
+
+    function timeFmt(mins) {
+      const h = Math.floor(mins/60)%24, m = mins%60;
+      return (h%12||12)+':'+(m?String(m).padStart(2,'0'):'00')+' '+(h>=12?'PM':'AM');
+    }
+
+    function showResult(picks) {
+      document.getElementById('stepsContainer').style.display='none';
+      document.getElementById('stepBar').style.display='none';
+      document.querySelector('.step-labels').style.display='none';
+      document.getElementById('stepNav').style.display='none';
+
+      const total = picks.reduce((s,p)=>s+p.c,0);
+      const area  = S.area&&S.area!=='Anywhere' ? S.area+' ' : '';
+      document.getElementById('resultTitle').textContent = area+'Night Plan';
+      document.getElementById('resultSubtitle').textContent =
+        `${S.size} person${S.size>1?'s':''} · ~$${total}/person · ~$${total*S.size} total`;
+
+      let html = '';
+      picks.forEach(p => {
+        const col    = CAT_COLOR[p._cat]  || '#FCCC0A';
+        const letter = CAT_LETTER[p._cat] || '●';
+        const textCol= col === '#FCCC0A' ? '#080A14' : '#fff';
+        const costLabel = p.c===0?'Free':'~$'+p.c;
+        const tagsHtml = (p.tags||[]).map(t=>`<span class="stop-tag">${t}</span>`).join('');
+        html += `
+          <div class="result-stop">
+            <div class="stop-timeline">
+              <div class="stop-circle" style="background:${col};color:${textCol};font-family:'DM Mono',monospace;font-weight:800;font-size:14px;">${letter}</div>
+              <div class="stop-vline"></div>
+            </div>
+            <div class="stop-body">
+              <div class="stop-time">${timeFmt(p._start)}</div>
+              <div class="stop-name">${p.n}</div>
+              <div class="stop-desc">${p.desc}</div>
+              <div class="stop-tags">
+                <span class="stop-tag price">${costLabel}</span>
+                <span class="stop-tag">${p.h}</span>
+                <span class="stop-tag">${p.min} min</span>
+                ${tagsHtml}
+              </div>
+            </div>
+          </div>`;
+      });
+      document.getElementById('resultStops').innerHTML = html;
+      document.getElementById('resultSummary').innerHTML = `
+        <div class="sum-row"><span>Stops</span><span>${picks.length}</span></div>
+        <div class="sum-row"><span>Neighborhood</span><span>${S.area||'NYC'}</span></div>
+        <div class="sum-row"><span>Group</span><span>${S.size} ${S.size>1?'people':'person'}</span></div>
+        <div class="sum-row"><span>Per person</span><span>~$${total}</span></div>
+        <div class="sum-row"><span>Total</span><span>~$${total*S.size}</span></div>`;
+      document.getElementById('resultPanel').classList.add('visible');
+    }
+
+    function resetPlanner() {
+      Object.assign(S,{vibes:[],budget:25,area:'',size:2,outdoor:false,walking:false,intern:true});
+      step=1;
+      document.querySelectorAll('.choice-card,.area-chip').forEach(c=>c.classList.remove('selected'));
+      document.getElementById('budgetSlider').value=25;
+      document.getElementById('budgetNum').textContent='$25';
+      document.getElementById('sizeNum').textContent='2';
+      document.getElementById('tog-intern').classList.add('on');
+      ['outdoor','walking'].forEach(k=>document.getElementById('tog-'+k).classList.remove('on'));
+      document.getElementById('stepsContainer').style.display='';
+      document.getElementById('stepBar').style.display='';
+      document.querySelector('.step-labels').style.display='';
+      document.getElementById('stepNav').style.display='';
+      document.getElementById('resultPanel').classList.remove('visible');
+      document.querySelectorAll('.step-panel').forEach(p=>p.classList.remove('active','exit'));
+      document.getElementById('step-1').classList.add('active');
+      for(let i=1;i<=TOTAL;i++){
+        document.getElementById('dot-'+i).className='step-dot'+(i===1?' active':'');
+        document.getElementById('label-'+i).className='step-label'+(i===1?' active':'');
+        if(i<TOTAL)document.getElementById('line-'+i).className='step-line';
+      }
+      document.getElementById('backBtn').style.display='none';
+      document.getElementById('nextBtn').textContent='Continue →';
+    }
+  </script>
+</body>
+</html>

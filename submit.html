@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>afterfive — Submit a Spot</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;500;600;700;800&display=swap" />
+  <style>
+    :root {
+      --midnight: #080A14;
+      --surface:  #0D0F1F;
+      --surface2: #141728;
+      --border:   #1A1D2E;
+      --border2:  #2A2E44;
+      --lime:     #FCCC0A;
+      --lime-dim: rgba(252,204,10,0.10);
+      --text:     #E8ECF8;
+      --muted:    #7A80A0;
+      --subdued:  #3A3F58;
+      --amber:    #EE352C;
+      --green:    #00933C;
+      --blue:     #0039A6;
+      --purple:   #FF6319;
+      --urgency:  #EE352C;
+      --pad:      16px;
+      --r-card:   0px;
+      --r-btn:    4px;
+      --r-badge:  3px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--midnight); color: var(--text);
+      font-family: 'Syne', sans-serif; font-size: 14px;
+      line-height: 1.5; overflow-x: hidden;
+    }
+
+    /* ── NAV ── */
+    .nav {
+      position: sticky; top: 0; z-index: 200;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 var(--pad); height: 52px;
+      background: var(--midnight);
+      border-bottom: 3px solid var(--lime);
+    }
+    .nav-logo {
+      font-size: 16px; font-weight: 800; text-decoration: none;
+      letter-spacing: -0.3px; font-family: 'DM Mono', monospace; text-transform: uppercase;
+    }
+    .nav-logo .after { color: var(--text); }
+    .nav-logo .five  { color: var(--lime); }
+    .nav-links { display: none; list-style: none; gap: 2px; }
+    .nav-links a {
+      color: var(--muted); text-decoration: none; font-size: 11px;
+      font-weight: 600; padding: 6px 12px; letter-spacing: 0.07em;
+      text-transform: uppercase; transition: color 0.15s;
+    }
+    .nav-links a:hover  { color: var(--text); }
+    .nav-links a.active { color: var(--lime); }
+    .nav-cta {
+      display: none; background: var(--lime); color: var(--midnight); border: none;
+      border-radius: var(--r-btn); padding: 8px 16px;
+      font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700;
+      cursor: pointer; text-decoration: none; transition: opacity 0.15s;
+      white-space: nowrap; letter-spacing: 0.06em; text-transform: uppercase;
+    }
+    .nav-cta:hover { opacity: 0.85; }
+
+    .nav-stripe { display: flex; height: 4px; }
+    .nav-stripe span { flex: 1; }
+
+    .hamburger {
+      display: flex; flex-direction: column; gap: 5px;
+      background: none; border: none; cursor: pointer; padding: 4px;
+    }
+    .hamburger span {
+      display: block; width: 22px; height: 2px;
+      background: var(--text); border-radius: 0; transition: all 0.25s;
+    }
+    .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    .mobile-drawer {
+      display: none; position: fixed; inset: 0; z-index: 199;
+      background: var(--midnight); flex-direction: column;
+      padding: 72px var(--pad) var(--pad); gap: 0;
+      border-top: 3px solid var(--lime); margin-top: 52px;
+    }
+    .mobile-drawer.open { display: flex; }
+    .mobile-drawer a {
+      color: var(--text); text-decoration: none;
+      font-size: 22px; font-weight: 800; padding: 14px 0;
+      border-bottom: 1px solid var(--border); transition: color 0.15s;
+      display: flex; align-items: center; justify-content: space-between;
+      font-family: 'DM Mono', monospace; text-transform: uppercase; letter-spacing: -0.5px;
+    }
+    .mobile-drawer a::after { content: '→'; color: var(--subdued); font-size: 14px; }
+    .mobile-drawer a:hover { color: var(--lime); }
+    .mobile-drawer a.drawer-cta {
+      font-size: 13px; margin-top: 24px; background: var(--lime); color: var(--midnight);
+      border: none; border-radius: var(--r-btn); padding: 14px 28px;
+      text-align: center; font-weight: 700; justify-content: center; letter-spacing: 0.06em;
+    }
+    .mobile-drawer a.drawer-cta::after { display: none; }
+    .drawer-tag { margin-top: auto; font-size: 10px; color: var(--subdued); font-family: 'DM Mono', monospace; }
+
+    /* ── CONTENT WRAP ── */
+    .submit-wrap {
+      max-width: 580px;
+      margin: 0 auto;
+      padding: 28px var(--pad) 80px;
+    }
+
+    /* ── HERO ── */
+    .submit-hero { margin-bottom: 24px; }
+    .submit-eyebrow {
+      font-size: 9px; font-weight: 600; color: var(--lime);
+      letter-spacing: 0.18em; text-transform: uppercase;
+      font-family: 'DM Mono', monospace; margin-bottom: 10px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .submit-eyebrow::before {
+      content: ''; display: block; width: 16px; height: 2px; background: var(--lime);
+    }
+    .submit-hero h2 {
+      font-size: 24px; font-weight: 800; margin-bottom: 10px;
+      font-family: 'DM Mono', monospace; text-transform: uppercase;
+      letter-spacing: -0.5px; border-left: 4px solid var(--lime); padding-left: 14px;
+    }
+    .submit-hero p {
+      font-size: 13px; color: var(--muted); line-height: 1.65;
+      padding-left: 18px; border-left: 1px solid var(--border2);
+    }
+
+    /* ── TIPS BOX ── */
+    .tips-box {
+      background: var(--surface); border: 1px solid var(--border);
+      border-left: 3px solid var(--lime);
+      border-radius: var(--r-card); padding: 16px; margin-bottom: 24px;
+    }
+    .tips-box h4 {
+      font-size: 9px; font-weight: 800; color: var(--lime);
+      letter-spacing: 0.14em; text-transform: uppercase;
+      font-family: 'DM Mono', monospace; margin-bottom: 12px;
+    }
+    .tip-item {
+      display: flex; gap: 10px; font-size: 12px; color: var(--muted);
+      line-height: 1.55; margin-bottom: 8px;
+    }
+    .tip-item:last-child { margin-bottom: 0; }
+    .tip-dot { color: var(--lime); flex-shrink: 0; font-family: 'DM Mono', monospace; }
+
+    /* ── FORM ── */
+    .native-form { display: flex; flex-direction: column; gap: 14px; margin-bottom: 28px; }
+
+    .field-group { display: flex; flex-direction: column; gap: 6px; }
+    .field-label {
+      font-size: 9px; font-weight: 700; color: var(--subdued);
+      letter-spacing: 0.12em; text-transform: uppercase;
+      font-family: 'DM Mono', monospace;
+    }
+    .field-label .req { color: var(--lime); margin-left: 2px; }
+    .field-label .opt {
+      color: var(--subdued); font-weight: 400;
+      text-transform: none; letter-spacing: 0; font-size: 9px;
+    }
+
+    .field-input, .field-select, .field-textarea {
+      background: var(--surface2); border: 1px solid var(--border2);
+      border-radius: var(--r-btn); padding: 11px 14px;
+      color: var(--text); font-family: 'DM Mono', monospace;
+      font-size: 12px; outline: none;
+      transition: border-color 0.15s, border-left-color 0.15s; width: 100%;
+      -webkit-appearance: none;
+      border-left: 3px solid transparent;
+    }
+    .field-input:focus, .field-select:focus, .field-textarea:focus {
+      border-color: var(--border2);
+      border-left-color: var(--lime);
+    }
+    .field-input::placeholder, .field-textarea::placeholder { color: var(--subdued); }
+    .field-textarea { resize: vertical; min-height: 88px; line-height: 1.6; }
+
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+    /* ── CHIPS ── */
+    .cat-chips, .price-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+    .cat-chip, .price-chip-btn {
+      padding: 6px 12px; border-radius: var(--r-btn);
+      border: 1px solid var(--border2); background: transparent;
+      color: var(--muted); font-family: 'DM Mono', monospace;
+      font-size: 11px; font-weight: 500; cursor: pointer; transition: all 0.15s;
+      letter-spacing: 0.04em;
+    }
+    .cat-chip:hover, .price-chip-btn:hover { border-color: var(--muted); color: var(--text); }
+    .cat-chip.selected, .price-chip-btn.selected {
+      background: var(--lime); color: var(--midnight);
+      border-color: var(--lime); font-weight: 700;
+    }
+
+    /* ── SUBMIT BUTTON ── */
+    .submit-btn {
+      width: 100%; padding: 14px;
+      background: var(--lime); color: var(--midnight);
+      border: none; border-radius: var(--r-btn);
+      font-family: 'DM Mono', monospace; font-size: 13px; font-weight: 800;
+      cursor: pointer; transition: opacity 0.15s, transform 0.1s; margin-top: 4px;
+      text-transform: uppercase; letter-spacing: 0.08em;
+    }
+    .submit-btn:hover  { opacity: 0.88; }
+    .submit-btn:active { transform: scale(0.98); }
+
+    /* ── SUCCESS STATE ── */
+    .success-state {
+      display: none; text-align: center;
+      padding: 56px 20px; flex-direction: column;
+      align-items: center; gap: 14px;
+      border: 1px solid var(--border2); border-top: 3px solid var(--lime);
+      background: var(--surface);
+    }
+    .success-state.visible { display: flex; }
+    .success-icon {
+      width: 56px; height: 56px; border-radius: 50%;
+      background: var(--lime); color: var(--midnight);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; font-family: 'DM Mono', monospace; font-weight: 800;
+    }
+    .success-state h3 {
+      font-size: 18px; font-weight: 800;
+      font-family: 'DM Mono', monospace; text-transform: uppercase; letter-spacing: -0.3px;
+    }
+    .success-state p { font-size: 12px; color: var(--muted); max-width: 280px; line-height: 1.7; }
+    .btn-primary {
+      display: inline-flex; align-items: center; justify-content: center;
+      background: var(--lime); color: var(--midnight); border: none;
+      border-radius: var(--r-btn); padding: 12px 22px;
+      font-family: 'DM Mono', monospace; font-size: 12px; font-weight: 700;
+      cursor: pointer; text-decoration: none; transition: opacity 0.15s;
+      text-transform: uppercase; letter-spacing: 0.06em; margin-top: 8px;
+    }
+    .btn-primary:hover { opacity: 0.88; }
+    .btn-ghost {
+      display: inline-flex; align-items: center; justify-content: center;
+      background: transparent; color: var(--text); border: 1px solid var(--border2);
+      border-radius: var(--r-btn); padding: 12px 22px;
+      font-family: 'DM Mono', monospace; font-size: 12px; font-weight: 600;
+      cursor: pointer; text-decoration: none; transition: all 0.15s;
+      text-transform: uppercase; letter-spacing: 0.06em; margin-top: 4px;
+    }
+    .btn-ghost:hover { border-color: var(--muted); background: var(--surface2); }
+
+    /* ── OR DIVIDER ── */
+    .or-divider {
+      display: flex; align-items: center; gap: 12px;
+      color: var(--subdued); font-size: 10px; font-weight: 600;
+      font-family: 'DM Mono', monospace; letter-spacing: 0.12em;
+      text-transform: uppercase; margin: 8px 0;
+    }
+    .or-divider::before, .or-divider::after {
+      content: ''; flex: 1; height: 1px; background: var(--border);
+    }
+
+    /* ── GOOGLE FORM ── */
+    .gform-section {
+      background: var(--surface); border: 1px solid var(--border);
+      border-top: 3px solid var(--border2);
+      border-radius: var(--r-card); overflow: hidden;
+    }
+    .gform-header {
+      padding: 12px 16px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 10px;
+    }
+    .gform-header span {
+      font-size: 11px; color: var(--muted);
+      font-family: 'DM Mono', monospace; letter-spacing: 0.04em;
+    }
+    .gform-header strong { color: var(--text); }
+    .gform-iframe { width: 100%; border: none; min-height: 600px; background: var(--surface2); }
+
+    /* ── FOOTER ── */
+    .footer-stripe { display: flex; height: 4px; }
+    .footer-stripe span { flex: 1; }
+    footer {
+      border-top: 3px solid var(--lime); padding: 20px var(--pad);
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 12px; background: var(--surface);
+    }
+    .footer-logo {
+      font-size: 14px; font-weight: 800; text-decoration: none;
+      font-family: 'DM Mono', monospace; text-transform: uppercase; letter-spacing: -0.3px;
+    }
+    .footer-logo .after { color: var(--text); }
+    .footer-logo .five  { color: var(--lime); }
+    .footer-ig {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 11px; color: var(--muted); text-decoration: none;
+      font-family: 'DM Mono', monospace; transition: color 0.15s;
+    }
+    .footer-ig svg { width: 14px; height: 14px; }
+    .footer-ig:hover { color: var(--lime); }
+    footer p { font-size: 10px; color: var(--subdued); font-family: 'DM Mono', monospace; letter-spacing: 0.06em; }
+
+    /* ── TOAST ── */
+    .toast {
+      position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%);
+      background: var(--surface); border: 1px solid var(--lime);
+      border-radius: var(--r-btn); padding: 10px 20px;
+      font-size: 12px; font-weight: 700; color: var(--lime);
+      z-index: 1000; white-space: nowrap; pointer-events: none;
+      font-family: 'DM Mono', monospace; letter-spacing: 0.06em;
+      animation: toastIn 0.2s ease; transition: opacity 0.3s;
+    }
+    @keyframes toastIn {
+      from { opacity: 0; transform: translate(-50%, 8px); }
+      to   { opacity: 1; transform: translate(-50%, 0); }
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (min-width: 640px) {
+      .hamburger { display: none; }
+      .nav-links  { display: flex; }
+      .nav-cta    { display: inline-flex; }
+    }
+    @media (min-width: 900px) {
+      .nav { padding: 0 48px; }
+      .submit-wrap { padding-top: 40px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="nav">
+    <a class="nav-logo" href="index.html"><span class="after">after</span><span class="five">five</span></a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="explore.html">Explore</a></li>
+      <li><a href="ai.html">Plan Generator</a></li>
+      <li><a href="submit.html" class="active">Submit a Spot</a></li>
+      <li><a href="about.html">About</a></li>
+    </ul>
+    <a class="nav-cta" href="ai.html">✦ Build My Night</a>
+    <button class="hamburger" id="hamburgerBtn" aria-label="Open menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <div class="nav-stripe" aria-hidden="true">
+    <span style="background:#EE352C;"></span>
+    <span style="background:#00933C;"></span>
+    <span style="background:#FCCC0A;"></span>
+    <span style="background:#0039A6;"></span>
+    <span style="background:#FF6319;"></span>
+  </div>
+
+  <div class="mobile-drawer" id="mobileMenu">
+    <a href="index.html">Home</a>
+    <a href="explore.html">Explore</a>
+    <a href="ai.html">Plan Generator</a>
+    <a href="submit.html">Submit a Spot</a>
+    <a href="about.html">About</a>
+    <a class="drawer-cta" href="ai.html">✦ Build My Night</a>
+    <p class="drawer-tag">"Your NYC nights, sorted."</p>
+  </div>
+
+  <!-- ── CONTENT ── -->
+  <div class="submit-wrap">
+
+    <div class="submit-hero">
+      <p class="submit-eyebrow">Community</p>
+      <h2>Submit a Spot</h2>
+      <p>Found something great that's not on the list? Add it — every submission gets reviewed and the best ones go live for all interns.</p>
+    </div>
+
+    <div class="tips-box">
+      <h4>What makes a great submission</h4>
+      <div class="tip-item"><span class="tip-dot">✦</span> Be specific about price — "$14 for a cocktail" beats "mid-range"</div>
+      <div class="tip-item"><span class="tip-dot">✦</span> Intern perspective matters — why is it good for someone on a budget?</div>
+      <div class="tip-item"><span class="tip-dot">✦</span> Include the neighborhood, not just the name</div>
+      <div class="tip-item"><span class="tip-dot">✦</span> Note anything time-sensitive — happy hours, specials, seasonal stuff</div>
+    </div>
+
+    <div class="native-form" id="nativeForm">
+
+      <div class="field-group">
+        <label class="field-label">Spot name <span class="req">*</span></label>
+        <input class="field-input" id="fName" type="text" placeholder="e.g. Dudley's, St. Marks Yoga…" />
+      </div>
+
+      <div class="field-row">
+        <div class="field-group">
+          <label class="field-label">Neighborhood <span class="req">*</span></label>
+          <select class="field-select" id="fHood">
+            <option value="">Pick one…</option>
+            <option>Lower East Side</option><option>East Village</option>
+            <option>West Village</option><option>Greenwich Village</option>
+            <option>SoHo</option><option>NoHo</option><option>Nolita</option>
+            <option>Tribeca</option><option>Midtown</option><option>Midtown West</option>
+            <option>Upper East Side</option><option>Upper West Side</option>
+            <option>Williamsburg</option><option>Bushwick</option><option>DUMBO</option>
+            <option>Brooklyn Heights</option><option>Park Slope</option>
+            <option>Red Hook</option><option>Sunset Park</option>
+            <option>Astoria</option><option>Harlem</option><option>Flushing</option>
+            <option>Chelsea</option><option>Flatiron</option><option>Gramercy</option>
+            <option>Financial District</option><option>Other</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Approx. cost <span class="req">*</span></label>
+          <input class="field-input" id="fCost" type="text" placeholder="e.g. Free, $12, $30–50" />
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Category <span class="req">*</span></label>
+        <div class="cat-chips" id="catChips">
+          <button class="cat-chip" data-val="Food"     onclick="selectChip(this,'cat')">🍜 Food</button>
+          <button class="cat-chip" data-val="Drinks"   onclick="selectChip(this,'cat')">🍹 Drinks</button>
+          <button class="cat-chip" data-val="Coffee"   onclick="selectChip(this,'cat')">☕ Coffee</button>
+          <button class="cat-chip" data-val="Workout"  onclick="selectChip(this,'cat')">💪 Workout</button>
+          <button class="cat-chip" data-val="Activity" onclick="selectChip(this,'cat')">🗺️ Activity</button>
+          <button class="cat-chip" data-val="Event"    onclick="selectChip(this,'cat')">🎵 Event</button>
+          <button class="cat-chip" data-val="Spa"      onclick="selectChip(this,'cat')">🧖 Spa</button>
+          <button class="cat-chip" data-val="Run Club" onclick="selectChip(this,'cat')">🏃 Run Club</button>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Price range</label>
+        <div class="price-chips" id="priceChips">
+          <button class="price-chip-btn" data-val="Free"      onclick="selectChip(this,'price')">Free</button>
+          <button class="price-chip-btn" data-val="Under $20" onclick="selectChip(this,'price')">Under $20</button>
+          <button class="price-chip-btn" data-val="$20–50"    onclick="selectChip(this,'price')">$20–50</button>
+          <button class="price-chip-btn" data-val="$50+"      onclick="selectChip(this,'price')">$50+</button>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Why is it good for interns? <span class="req">*</span></label>
+        <textarea class="field-textarea" id="fDesc" placeholder="2–3 sentences. What's great about it? Any tips, hidden deals, or things to know?"></textarea>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Best time to go</label>
+        <input class="field-input" id="fTime" type="text" placeholder="e.g. Weekday evenings, Fri after 5, Sat morning…" />
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Your name / handle <span class="opt">(optional — for credit)</span></label>
+        <input class="field-input" id="fHandle" type="text" placeholder="@yourhandle or first name" />
+      </div>
+
+      <button class="submit-btn" onclick="submitSpot()">Submit spot →</button>
+
+    </div>
+
+    <!-- SUCCESS -->
+    <div class="success-state" id="successState">
+      <div class="success-icon">✦</div>
+      <h3>Spot submitted!</h3>
+      <p>Thanks — we'll review it and add it to the site if it's a great fit for interns.</p>
+      <a class="btn-primary" href="explore.html">Back to Explore →</a>
+      <button class="btn-ghost" onclick="resetForm()">Submit another</button>
+    </div>
+
+    <div class="or-divider" id="orDiv">or use the Google Form</div>
+
+    <div class="gform-section" id="gformSection">
+      <div class="gform-header">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--lime)" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        <span><strong>Google Form backup</strong></span>
+      </div>
+      <iframe
+        class="gform-iframe"
+        src="https://docs.google.com/forms/d/e/1FAIpQLSdznoadCuw3qUdb9FCjUMmdglTeOKjDlhHE1H8y9vfcSoft7g/viewform?embedded=true"
+        frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
+    </div>
+
+  </div>
+
+  <div class="footer-stripe" aria-hidden="true">
+    <span style="background:#EE352C;"></span>
+    <span style="background:#00933C;"></span>
+    <span style="background:#FCCC0A;"></span>
+    <span style="background:#0039A6;"></span>
+    <span style="background:#FF6319;"></span>
+  </div>
+  <footer>
+    <a class="footer-logo" href="index.html"><span class="after">after</span><span class="five">five</span></a>
+    <a class="footer-ig" href="https://instagram.com/afterfivenyc" target="_blank">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.5" fill="currentColor"/></svg>
+      @afterfivenyc
+    </a>
+    <p>"Your NYC nights, sorted."</p>
+  </footer>
+
+  <script>
+    const hamburgerBtn = document.getElementById('hamburgerBtn');
+    const mobileMenu   = document.getElementById('mobileMenu');
+    hamburgerBtn.addEventListener('click', () => {
+      hamburgerBtn.classList.toggle('open');
+      mobileMenu.classList.toggle('open');
+      document.body.style.overflow = mobileMenu.classList.contains('open') ? 'hidden' : '';
+    });
+    mobileMenu.querySelectorAll('a').forEach(a => {
+      a.addEventListener('click', () => {
+        hamburgerBtn.classList.remove('open');
+        mobileMenu.classList.remove('open');
+        document.body.style.overflow = '';
+      });
+    });
+
+    function showToast(msg) {
+      const existing = document.querySelector('.toast');
+      if (existing) existing.remove();
+      const t = document.createElement('div');
+      t.className = 'toast'; t.textContent = msg;
+      document.body.appendChild(t);
+      setTimeout(() => t.style.opacity = '0', 2000);
+      setTimeout(() => t.remove(), 2400);
+    }
+
+    let selectedCat   = '';
+    let selectedPrice = '';
+
+    function selectChip(el, group) {
+      const parent = el.closest(group === 'cat' ? '#catChips' : '#priceChips');
+      parent.querySelectorAll('button').forEach(b => b.classList.remove('selected'));
+      el.classList.add('selected');
+      if (group === 'cat')   selectedCat   = el.dataset.val;
+      if (group === 'price') selectedPrice = el.dataset.val;
+    }
+
+    function submitSpot() {
+      const name = document.getElementById('fName').value.trim();
+      const hood = document.getElementById('fHood').value;
+      const desc = document.getElementById('fDesc').value.trim();
+      if (!name)        { showToast('Add the spot name!'); return; }
+      if (!hood)        { showToast('Pick a neighborhood!'); return; }
+      if (!selectedCat) { showToast('Pick a category!'); return; }
+      if (!desc)        { showToast("Tell us why it's great!"); return; }
+
+      const cost   = document.getElementById('fCost').value.trim()   || 'Not specified';
+      const time   = document.getElementById('fTime').value.trim()   || 'Not specified';
+      const handle = document.getElementById('fHandle').value.trim() || 'Anonymous';
+      const subject = encodeURIComponent(`after5nyc submission: ${name}`);
+      const body    = encodeURIComponent(
+        `SPOT SUBMISSION\n\nName: ${name}\nNeighborhood: ${hood}\nCategory: ${selectedCat}\n` +
+        `Price: ${selectedPrice || cost}\nBest time: ${time}\nSubmitted by: ${handle}\n\nWhy it's great:\n${desc}`
+      );
+      window.location.href = `mailto:isabellamgorczowski@gmail.com?subject=${subject}&body=${body}`;
+
+      setTimeout(() => {
+        document.getElementById('nativeForm').style.display   = 'none';
+        document.getElementById('orDiv').style.display        = 'none';
+        document.getElementById('gformSection').style.display = 'none';
+        document.getElementById('successState').classList.add('visible');
+      }, 500);
+    }
+
+    function resetForm() {
+      ['fName','fCost','fDesc','fTime','fHandle'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('fHood').value = '';
+      document.querySelectorAll('.cat-chip, .price-chip-btn').forEach(b => b.classList.remove('selected'));
+      selectedCat = ''; selectedPrice = '';
+      document.getElementById('nativeForm').style.display   = '';
+      document.getElementById('orDiv').style.display        = '';
+      document.getElementById('gformSection').style.display = '';
+      document.getElementById('successState').classList.remove('visible');
+    }
+  </script>
+</body>
+</html>
