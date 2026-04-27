@@ -4,7 +4,7 @@
 > curated events, food, drinks, 
 > and workouts on any budget.
 
-**Live site:** [pages.github.coecis.cornell.edu/img43/after5nyc](https://pages.github.coecis.cornell.edu/img43/after5nyc/)
+afterfivenyc.com
 
 ---
 
