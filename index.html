@@ -720,7 +720,24 @@
 </head>
 <body>
 
-  <!-- TICKER -->
+  <!-- ── NAV ── -->
+  <nav class="nav" id="mainNav">
+    <a class="nav-logo" href="index.html">
+      <span class="after">after</span><span class="five">five</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="explore.html">Explore</a></li>
+      <li><a href="ai.html">Plan Generator</a></li>
+      <li><a href="submit.html">Submit a Spot</a></li>
+      <li><a href="about.html">About</a></li>
+    </ul>
+    <a class="nav-cta" href="ai.html">✦ Build My Night</a>
+    <button class="hamburger" id="hamburgerBtn" aria-label="Open menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+    <!-- TICKER -->
 <div class="ticker-wrap">
   <div class="ticker-track" id="tickerTrack">
     <span class="ticker-item"><span class="ticker-dot" style="background:#EE352C"></span>500+ curated NYC spots</span>
@@ -741,22 +758,6 @@
     <span class="ticker-item"><span class="ticker-dot" style="background:#FCCC0A"></span>Build your plan in 60 seconds ✦</span>
   </div>
 </div>
-  <!-- ── NAV ── -->
-  <nav class="nav" id="mainNav">
-    <a class="nav-logo" href="index.html">
-      <span class="after">after</span><span class="five">five</span>
-    </a>
-    <ul class="nav-links">
-      <li><a href="explore.html">Explore</a></li>
-      <li><a href="ai.html">Plan Generator</a></li>
-      <li><a href="submit.html">Submit a Spot</a></li>
-      <li><a href="about.html">About</a></li>
-    </ul>
-    <a class="nav-cta" href="ai.html">✦ Build My Night</a>
-    <button class="hamburger" id="hamburgerBtn" aria-label="Open menu">
-      <span></span><span></span><span></span>
-    </button>
-  </nav>
 
   <!-- MTA stripe under nav -->
   <div class="nav-stripe" aria-hidden="true">
@@ -1020,40 +1021,57 @@
   </footer>
 
   <script>
-    const btn  = document.getElementById('hamburgerBtn');
-    const menu = document.getElementById('mobileMenu');
-    if (btn && menu) {
-      btn.addEventListener('click', () => {
-        const isOpen = menu.classList.toggle('open');
-        btn.classList.toggle('open', isOpen);
-        document.body.style.overflow = isOpen ? 'hidden' : '';
-      });
-      menu.querySelectorAll('a').forEach(a => {
-        a.addEventListener('click', () => {
-          btn.classList.remove('open');
-          menu.classList.remove('open');
-          document.body.style.overflow = '';
-        });
-      });
-    }
-// ── SCROLL REVEAL ──
-const revealEls = document.querySelectorAll('.reveal');
-const revealObs = new IntersectionObserver(entries => {
-  entries.forEach((e, i) => {
-    if (e.isIntersecting) {
-      setTimeout(() => e.target.classList.add('visible'), i * 80);
-      revealObs.unobserve(e.target);
-    }
+// ── HAMBURGER ──
+const btn  = document.getElementById('hamburgerBtn');
+const menu = document.getElementById('mobileMenu');
+if (btn && menu) {
+  btn.addEventListener('click', () => {
+    const isOpen = menu.classList.toggle('open');
+    btn.classList.toggle('open', isOpen);
+    document.body.style.overflow = isOpen ? 'hidden' : '';
   });
-}, { threshold: 0.1 });
-revealEls.forEach(el => revealObs.observe(el));
+  menu.querySelectorAll('a').forEach(a => {
+    a.addEventListener('click', () => {
+      btn.classList.remove('open');
+      menu.classList.remove('open');
+      document.body.style.overflow = '';
+    });
+  });
+}
 
-// ── ADD REVEAL TO EXISTING SECTIONS ──
-document.querySelectorAll('.hero-actions, .plans-banner, .feed .card, .stat-bar, .steps-grid .step-item, .features-grid .feature-card, .testimonials-grid .testimonial-card, .cta-section').forEach((el, i) => {
+// ── TOAST (inline — no shared.js needed) ──
+function showToast(msg) {
+  const existing = document.querySelector('.toast');
+  if (existing) existing.remove();
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.textContent = msg;
+  t.style.cssText = 'position:fixed;bottom:32px;left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--lime);border-radius:100px;padding:10px 20px;font-size:13px;font-weight:600;color:var(--lime);z-index:1000;white-space:nowrap;pointer-events:none;font-family:"DM Mono",monospace;';
+  document.body.appendChild(t);
+  setTimeout(() => t.style.opacity = '0', 2000);
+  setTimeout(() => t.remove(), 2400);
+}
+
+// ── SCROLL REVEAL — add classes first, then observe ──
+const revealTargets = document.querySelectorAll(
+  '.hero-actions, .plans-banner, .stat-bar, .steps-grid .step-item, .features-grid .feature-card, .testimonials-grid .testimonial-card, .cta-section, .compare-section'
+);
+revealTargets.forEach((el, i) => {
   el.classList.add('reveal');
   if (i % 3 === 1) el.classList.add('reveal-delay-1');
   if (i % 3 === 2) el.classList.add('reveal-delay-2');
 });
+
+// observe AFTER adding classes
+const revealObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+      revealObs.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.08 });
+document.querySelectorAll('.reveal').forEach(el => revealObs.observe(el));
 
 // ── ANIMATED STAT COUNTERS ──
 function animateCount(el, target, suffix) {
@@ -1063,21 +1081,12 @@ function animateCount(el, target, suffix) {
     const p = Math.min((now - start) / dur, 1);
     const eased = 1 - Math.pow(1 - p, 4);
     const val = Math.round(eased * target);
-    el.textContent = target >= 1000
-      ? (val / 1000).toFixed(1) + 'k' + (suffix || '')
-      : val + (suffix || '');
+    el.textContent = val + (suffix || '');
     if (p < 1) requestAnimationFrame(step);
-    else el.textContent = target >= 1000 ? (target/1000).toFixed(1) + 'k' + (suffix||'') : target + (suffix||'');
+    else el.textContent = target + (suffix || '');
   }
   requestAnimationFrame(step);
 }
-
-const statTargets = {
-  '130+': { n: 130, s: '+' },
-  '$0':   null,
-  '150+': { n: 150, s: '+' },
-  '60s':  null,
-};
 
 const statBar = document.querySelector('.stat-bar');
 if (statBar) {
@@ -1085,12 +1094,14 @@ if (statBar) {
     if (entries[0].isIntersecting) {
       document.querySelectorAll('.stat-num').forEach(el => {
         const raw = el.textContent.trim();
-        const cfg = statTargets[raw];
-        if (cfg) animateCount(el, cfg.n, cfg.s);
+        if (raw === '130+') animateCount(el, 130, '+');
+        if (raw === '150+') animateCount(el, 150, '+');
+        if (raw === '500+') animateCount(el, 500, '+');
+        if (raw === '2400+') animateCount(el, 2400, '+');
       });
       statObs.disconnect();
     }
-  }, { threshold: 0.4 });
+  }, { threshold: 0.3 });
   statObs.observe(statBar);
 }
 
@@ -1100,30 +1111,37 @@ document.querySelectorAll('.mta-dot').forEach((dot, i) => {
   dot.style.animationDelay = (0.5 + i * 0.07) + 's';
 });
 
-// ── TYPEWRITER ON HERO H1 ──
-const h1 = document.querySelector('.hero h1');
-if (h1) {
-  const lines = h1.innerHTML.split('<br>');
-  if (lines.length >= 2) {
-    const secondLine = lines[1].replace(/<[^>]+>/g, '').trim();
-    const before = lines[0] + '<br>';
+// ── TYPEWRITER ON HERO TITLE ──
+// FIX: your heading is .hero-title not h1
+const heroTitle = document.querySelector('.hero-title');
+if (heroTitle) {
+  const html = heroTitle.innerHTML;
+  const brIdx = html.indexOf('<br>');
+  if (brIdx !== -1) {
+    const firstLine = html.slice(0, brIdx);
+    const rest = html.slice(brIdx + 4); // after <br>
+    const secondLine = rest.replace(/<[^>]+>/g, '').trim();
     let i = 0;
-    h1.innerHTML = before + '<span id="twTarget"></span><span class="typewriter-cursor"></span>';
+    heroTitle.innerHTML = firstLine + '<br><span id="twTarget"></span><span class="typewriter-cursor"></span>';
     const twEl = document.getElementById('twTarget');
     function type() {
       if (i <= secondLine.length) {
         twEl.textContent = secondLine.slice(0, i);
         i++;
-        setTimeout(type, i === 1 ? 600 : 55);
+        setTimeout(type, i === 1 ? 700 : 55);
+      } else {
+        // remove cursor blink after done, keep it static
+        document.querySelector('.typewriter-cursor').style.animation = 'none';
+        document.querySelector('.typewriter-cursor').style.opacity = '1';
       }
     }
-    setTimeout(type, 500);
+    setTimeout(type, 400);
   }
 }
 
 // ── JOIN BUTTON FEEDBACK ──
-document.querySelectorAll('.btn-join').forEach(btn => {
-  btn.addEventListener('click', function(e) {
+document.querySelectorAll('.btn-join').forEach(b => {
+  b.addEventListener('click', function(e) {
     e.stopPropagation();
     if (this.classList.contains('joined')) return;
     this.classList.add('joined');
