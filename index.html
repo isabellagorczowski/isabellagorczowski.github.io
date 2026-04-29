@@ -521,10 +521,226 @@
       footer { flex-direction: row; align-items: center; padding: 24px var(--pad-lg); }
       .footer-bottom { margin-left: auto; }
     }
+
+  /* ── SCROLL REVEALS ── */
+  .reveal {
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity 0.6s cubic-bezier(0.16,1,0.3,1), transform 0.6s cubic-bezier(0.16,1,0.3,1);
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+  .reveal-delay-1 { transition-delay: 0.1s; }
+  .reveal-delay-2 { transition-delay: 0.2s; }
+  .reveal-delay-3 { transition-delay: 0.3s; }
+  .reveal-delay-4 { transition-delay: 0.4s; }
+
+  /* ── ANIMATED COUNTER ── */
+  .stat-num { transition: color 0.3s; }
+  .stat-num.popped { color: var(--lime); }
+
+  /* ── TICKER ── */
+  .ticker-wrap {
+    overflow: hidden;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    padding: 10px 0;
+    margin-bottom: 0;
+  }
+  .ticker-track {
+    display: flex;
+    white-space: nowrap;
+    animation: ticker 30s linear infinite;
+  }
+  .ticker-track:hover { animation-play-state: paused; }
+  @keyframes ticker {
+    0%   { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+  .ticker-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 32px;
+    font-size: 11px;
+    font-family: 'DM Mono', monospace;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    flex-shrink: 0;
+  }
+  .ticker-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* ── HERO HEADLINE TYPEWRITER ── */
+  .typewriter-cursor {
+    display: inline-block;
+    width: 3px;
+    height: 0.85em;
+    background: var(--lime);
+    margin-left: 4px;
+    vertical-align: middle;
+    animation: blink 1s step-end infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+  /* ── CARD HOVER LIFT ── */
+  .card {
+    transition: border-color 0.15s, transform 0.2s cubic-bezier(0.16,1,0.3,1) !important;
+  }
+  .card:hover { transform: translateY(-4px) !important; }
+
+  /* ── LIVE PULSE DOT ── */
+  .live-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 10px;
+    font-family: 'DM Mono', monospace;
+    color: var(--lime);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 18px;
+  }
+  .live-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: #00933C;
+    animation: livepulse 1.8s ease infinite;
+    flex-shrink: 0;
+  }
+  @keyframes livepulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.8)} }
+
+  /* ── WITHOUT / WITH SECTION ── */
+  .compare-section {
+    padding: 72px var(--pad-sm);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  .compare-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    margin-top: 32px;
+  }
+  .compare-col {
+    background: var(--surface);
+    padding: 28px 24px;
+  }
+  .compare-col-label {
+    font-size: 10px;
+    font-family: 'DM Mono', monospace;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .compare-col-label.bad  { color: #EE352C; }
+  .compare-col-label.good { color: #00933C; }
+  .compare-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 14px;
+    line-height: 1.5;
+    font-family: 'Syne', sans-serif;
+  }
+  .compare-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+
+  /* ── SOCIAL PROOF ROW ── */
+  .proof-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 28px;
+    flex-wrap: wrap;
+  }
+  .proof-avatars { display: flex; }
+  .proof-av {
+    width: 28px; height: 28px; border-radius: 50%;
+    border: 2px solid var(--midnight);
+    background: var(--surface2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px;
+    margin-left: -7px;
+  }
+  .proof-av:first-child { margin-left: 0; }
+  .proof-text {
+    font-size: 12px;
+    color: var(--muted);
+    font-family: 'Syne', sans-serif;
+  }
+  .proof-text strong { color: var(--lime); }
+
+  /* ── MTA DOTS STAGGER ── */
+  .mta-dot-animated {
+    opacity: 0;
+    transform: scale(0.5);
+    animation: dotpop 0.4s cubic-bezier(0.16,1,0.3,1) forwards;
+  }
+  @keyframes dotpop {
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  /* ── BUTTON SHIMMER ── */
+  .btn-primary { position: relative; overflow: hidden; }
+  .btn-primary::after {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 60%; height: 100%;
+    background: rgba(255,255,255,0.2);
+    transform: skewX(-20deg);
+    animation: shimmer 3s ease infinite;
+  }
+  @keyframes shimmer {
+    0%   { left: -100%; }
+    40%  { left: 150%; }
+    100% { left: 150%; }
+  }
+
+  @media (min-width: 640px) {
+    .compare-section { padding-left: var(--pad-md); padding-right: var(--pad-md); }
+  }
+  @media (min-width: 900px) {
+    .compare-section { padding-left: var(--pad-lg); padding-right: var(--pad-lg); }
+  }
+
   </style>
 </head>
 <body>
 
+  <!-- TICKER -->
+<div class="ticker-wrap">
+  <div class="ticker-track" id="tickerTrack">
+    <span class="ticker-item"><span class="ticker-dot" style="background:#EE352C"></span>500+ curated NYC spots</span>
+    <span class="ticker-item"><span class="ticker-dot" style="background:#00933C"></span>Piano's Rooftop — 22 interns tonight</span>
+    <span class="ticker-item"><span class="ticker-dot" style="background:#FCCC0A"></span>MoMA Free Fridays 5:30 PM</span>
+    <span class="ticker-item"><span class="ticker-dot" style="background:#0039A6"></span>Please Don't Tell — 8 interns going</span>
+    <span class="ticker-item"><span class="ticker-dot" style="background:#FF6319"></span>$0 minimum budget · always free to use</span>
+    <span class="ticker-item"><span class="ticker-dot" style="background:#EE352C"></span>New: Dante, Cervo's, Bar Goto added</span>
+    <span class="ticker-item"><span class="ticker-dot" style="background:#00933C"></span>Xi'an Famous Foods — 12 going tonight</span>
+    <span class="ticker-item"><span class="ticker-dot" style="background:#FCCC0A"></span>Build your plan in 60 seconds ✦</span>
+    <span class="ticker-item"><span class="ticker-dot" style="background:#EE352C"></span>500+ curated NYC spots</span>
+    <span class="ticker-item"><span class="ticker-dot" style="background:#00933C"></span>Piano's Rooftop — 22 interns tonight</span>
+    <span class="ticker-item"><span class="ticker-dot" style="background:#FCCC0A"></span>MoMA Free Fridays 5:30 PM</span>
+    <span class="ticker-item"><span class="ticker-dot" style="background:#0039A6"></span>Please Don't Tell — 8 interns going</span>
+    <span class="ticker-item"><span class="ticker-dot" style="background:#FF6319"></span>$0 minimum budget · always free to use</span>
+    <span class="ticker-item"><span class="ticker-dot" style="background:#EE352C"></span>New: Dante, Cervo's, Bar Goto added</span>
+    <span class="ticker-item"><span class="ticker-dot" style="background:#00933C"></span>Xi'an Famous Foods — 12 going tonight</span>
+    <span class="ticker-item"><span class="ticker-dot" style="background:#FCCC0A"></span>Build your plan in 60 seconds ✦</span>
+  </div>
+</div>
   <!-- ── NAV ── -->
   <nav class="nav" id="mainNav">
     <a class="nav-logo" href="index.html">
@@ -667,7 +883,7 @@
       <div class="feature-card">
         <div class="feature-dot" style="background:#EE352C;">E</div>
         <h4>Explore by vibe</h4>
-        <p>Filter 130+ curated spots by category, price, and neighborhood. Every pick is intern-tested.</p>
+        <p>Filter 350+ curated spots by category, price, and neighborhood. Every pick is intern-tested.</p>
       </div>
       <div class="feature-card">
         <div class="feature-dot" style="background:#FCCC0A; color:#080A14;">N</div>
@@ -696,6 +912,32 @@
       </div>
     </div>
   </section>
+
+  <!-- WITHOUT / WITH -->
+<section class="compare-section reveal">
+  <p class="hero-label" style="margin-bottom:10px;">The difference</p>
+  <h2 style="font-size:clamp(22px,5vw,36px);font-weight:800;letter-spacing:-1px;line-height:1.1;">
+    Friday at 5 PM.<br>Two very different nights.
+  </h2>
+  <div class="compare-grid">
+    <div class="compare-col">
+      <p class="compare-col-label bad">✕ Without afterfive</p>
+      <div class="compare-item"><span class="compare-icon">😵</span><span>"What does everyone want to do tonight?" — no replies for 40 minutes</span></div>
+      <div class="compare-item"><span class="compare-icon">📱</span><span>Scrolling Yelp, Google Maps, and three Reddit threads simultaneously</span></div>
+      <div class="compare-item"><span class="compare-icon">💸</span><span>End up at the same overpriced Midtown bar because nobody could decide</span></div>
+      <div class="compare-item"><span class="compare-icon">😴</span><span>Home by 9 PM after an hour of "idk, what do you want to do?"</span></div>
+      <div class="compare-item"><span class="compare-icon">🗺️</span><span>Never actually explored the city. Just the two-block radius near the office.</span></div>
+    </div>
+    <div class="compare-col" style="background:var(--surface2);">
+      <p class="compare-col-label good">✦ With afterfive</p>
+      <div class="compare-item" style="color:var(--text)"><span class="compare-icon">⚡</span><span>Full night plan — dinner, drinks, and a stop — built in 60 seconds</span></div>
+      <div class="compare-item" style="color:var(--text)"><span class="compare-icon">💰</span><span>Filtered to your exact budget. Free nights to splurge nights covered.</span></div>
+      <div class="compare-item" style="color:var(--text)"><span class="compare-icon">📍</span><span>Real spots in your neighborhood with real prices and real descriptions</span></div>
+      <div class="compare-item" style="color:var(--text)"><span class="compare-icon">🫶</span><span>Invite your crew, see who's going, coordinate in one place</span></div>
+      <div class="compare-item" style="color:var(--text)"><span class="compare-icon">🗽</span><span>Actually explored NYC. Piano's rooftop, Cervo's, the Brooklyn Bridge at sunset.</span></div>
+    </div>
+  </div>
+</section>
 
   <!-- ── TESTIMONIALS ── -->
   <section class="testimonials-section">
@@ -794,7 +1036,120 @@
         });
       });
     }
+// ── SCROLL REVEAL ──
+const revealEls = document.querySelectorAll('.reveal');
+const revealObs = new IntersectionObserver(entries => {
+  entries.forEach((e, i) => {
+    if (e.isIntersecting) {
+      setTimeout(() => e.target.classList.add('visible'), i * 80);
+      revealObs.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.1 });
+revealEls.forEach(el => revealObs.observe(el));
+
+// ── ADD REVEAL TO EXISTING SECTIONS ──
+document.querySelectorAll('.hero-actions, .plans-banner, .feed .card, .stat-bar, .steps-grid .step-item, .features-grid .feature-card, .testimonials-grid .testimonial-card, .cta-section').forEach((el, i) => {
+  el.classList.add('reveal');
+  if (i % 3 === 1) el.classList.add('reveal-delay-1');
+  if (i % 3 === 2) el.classList.add('reveal-delay-2');
+});
+
+// ── ANIMATED STAT COUNTERS ──
+function animateCount(el, target, suffix) {
+  const dur = 1400;
+  const start = performance.now();
+  function step(now) {
+    const p = Math.min((now - start) / dur, 1);
+    const eased = 1 - Math.pow(1 - p, 4);
+    const val = Math.round(eased * target);
+    el.textContent = target >= 1000
+      ? (val / 1000).toFixed(1) + 'k' + (suffix || '')
+      : val + (suffix || '');
+    if (p < 1) requestAnimationFrame(step);
+    else el.textContent = target >= 1000 ? (target/1000).toFixed(1) + 'k' + (suffix||'') : target + (suffix||'');
+  }
+  requestAnimationFrame(step);
+}
+
+const statTargets = {
+  '130+': { n: 130, s: '+' },
+  '$0':   null,
+  '150+': { n: 150, s: '+' },
+  '60s':  null,
+};
+
+const statBar = document.querySelector('.stat-bar');
+if (statBar) {
+  const statObs = new IntersectionObserver(entries => {
+    if (entries[0].isIntersecting) {
+      document.querySelectorAll('.stat-num').forEach(el => {
+        const raw = el.textContent.trim();
+        const cfg = statTargets[raw];
+        if (cfg) animateCount(el, cfg.n, cfg.s);
+      });
+      statObs.disconnect();
+    }
+  }, { threshold: 0.4 });
+  statObs.observe(statBar);
+}
+
+// ── STAGGERED MTA DOTS ──
+document.querySelectorAll('.mta-dot').forEach((dot, i) => {
+  dot.classList.add('mta-dot-animated');
+  dot.style.animationDelay = (0.5 + i * 0.07) + 's';
+});
+
+// ── TYPEWRITER ON HERO H1 ──
+const h1 = document.querySelector('.hero h1');
+if (h1) {
+  const lines = h1.innerHTML.split('<br>');
+  if (lines.length >= 2) {
+    const secondLine = lines[1].replace(/<[^>]+>/g, '').trim();
+    const before = lines[0] + '<br>';
+    let i = 0;
+    h1.innerHTML = before + '<span id="twTarget"></span><span class="typewriter-cursor"></span>';
+    const twEl = document.getElementById('twTarget');
+    function type() {
+      if (i <= secondLine.length) {
+        twEl.textContent = secondLine.slice(0, i);
+        i++;
+        setTimeout(type, i === 1 ? 600 : 55);
+      }
+    }
+    setTimeout(type, 500);
+  }
+}
+
+// ── JOIN BUTTON FEEDBACK ──
+document.querySelectorAll('.btn-join').forEach(btn => {
+  btn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    if (this.classList.contains('joined')) return;
+    this.classList.add('joined');
+    this.textContent = 'Joined ✓';
+    const strong = this.closest('.card-footer')?.querySelector('.going strong');
+    if (strong) strong.textContent = (parseInt(strong.textContent) + 1) + ' interns';
+    showToast('You\'re in! 🎉');
+  });
+});
+
+// ── ACTIVE NAV ON SCROLL ──
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('.nav-links a');
+if (sections.length && navLinks.length) {
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(s => {
+      if (window.scrollY >= s.offsetTop - 80) current = s.id;
+    });
+    navLinks.forEach(a => {
+      a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+    });
+  }, { passive: true });
+}
   </script>
+
 
 </body>
 </html>
