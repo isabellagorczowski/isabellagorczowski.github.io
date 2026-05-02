@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>afterfive — Friends</title>
+  <title>afterfive — Sign In</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;500;600;700;800&display=swap" />
@@ -24,7 +24,7 @@
       --amber:    #EE352C;
       --green:    #00933C;
       --blue:     #0039A6;
-      --orange:   #FF6319;
+      --purple:   #FF6319;
       --pad-sm:   20px;
       --r-card:   4px;
       --r-btn:    4px;
@@ -33,639 +33,537 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      background: var(--midnight); color: var(--text);
-      font-family: 'Syne', sans-serif; font-size: 15px;
-      line-height: 1.6; overflow-x: hidden; min-height: 100dvh;
-      display: flex; flex-direction: column;
-      padding-bottom: 80px;
+      background: var(--midnight);
+      color: var(--text);
+      font-family: 'Syne', sans-serif;
+      font-size: 15px;
+      line-height: 1.6;
+      overflow-x: hidden;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
     }
 
-    /* ── NAV ── */
     .nav {
       position: fixed; top: 0; left: 0; right: 0; z-index: 200;
       display: flex; align-items: center; justify-content: space-between;
-      padding: 0 var(--pad-sm); height: 56px;
-      background: var(--midnight); border-bottom: 3px solid var(--lime);
+      padding: 0 var(--pad-sm);
+      height: 56px;
+      background: var(--midnight);
+      border-bottom: 3px solid var(--lime);
     }
-    .nav-stripe { position: fixed; top: 56px; left: 0; right: 0; z-index: 199; display: flex; height: 4px; }
+    .nav-stripe {
+      position: fixed; top: 56px; left: 0; right: 0; z-index: 199;
+      display: flex; height: 4px;
+    }
     .nav-stripe span { flex: 1; }
     .nav-logo {
       font-size: 17px; font-weight: 800; text-decoration: none;
-      letter-spacing: -0.5px; font-family: 'DM Mono', monospace; text-transform: uppercase;
+      letter-spacing: -0.5px; font-family: 'DM Mono', monospace;
+      text-transform: uppercase;
     }
     .nav-logo .after { color: var(--text); }
     .nav-logo .five  { color: var(--lime); }
-    .nav-links { display: none; list-style: none; gap: 2px; }
-    .nav-links a {
-      color: var(--muted); text-decoration: none; font-size: 12px;
-      font-weight: 600; padding: 6px 12px;
-      letter-spacing: 0.06em; text-transform: uppercase; transition: color 0.15s;
-    }
-    .nav-links a:hover { color: var(--text); }
-    .nav-links a.active { color: var(--lime); }
-    .hamburger { display: flex; flex-direction: column; gap: 5px; background: none; border: none; cursor: pointer; padding: 4px; }
-    .hamburger span { display: block; width: 22px; height: 2px; background: var(--text); border-radius: 0; transition: all 0.25s; }
-    .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
-    .hamburger.open span:nth-child(2) { opacity: 0; }
-    .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
-    .mobile-menu {
-      display: none; position: fixed; inset: 0; z-index: 199;
-      background: var(--midnight); flex-direction: column;
-      padding: 80px var(--pad-sm) var(--pad-sm); gap: 0;
-      border-top: 3px solid var(--lime); margin-top: 56px;
-    }
-    .mobile-menu.open { display: flex; }
-    .mobile-menu a {
-      color: var(--text); text-decoration: none; font-size: 24px; font-weight: 800;
-      padding: 16px 0; border-bottom: 1px solid var(--border);
-      transition: color 0.15s; display: flex; align-items: center; justify-content: space-between;
-      letter-spacing: -0.5px; font-family: 'DM Mono', monospace; text-transform: uppercase;
-    }
-    .mobile-menu a::after { content: '→'; color: var(--subdued); font-size: 16px; }
-    .mobile-menu a:hover { color: var(--lime); }
 
-    /* ── BOTTOM NAV ── */
-    .bottom-nav {
-      position: fixed; bottom: 0; left: 0; right: 0;
-      background: var(--midnight); border-top: 3px solid var(--lime);
-      display: flex; justify-content: space-around; align-items: center;
-      padding: 10px 0 16px; z-index: 300;
+    .auth-wrap {
+      flex: 1;
+      display: flex; align-items: center; justify-content: center;
+      padding: 100px var(--pad-sm) 60px;
+      position: relative; overflow: hidden;
     }
-    .bottom-nav-item {
-      display: flex; flex-direction: column; align-items: center;
-      gap: 3px; color: var(--subdued); text-decoration: none;
-      font-family: 'DM Mono', monospace; font-size: 9px;
-      font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase;
-      transition: color 0.15s; padding: 4px 12px;
-    }
-    .bottom-nav-item.active { color: var(--lime); }
-    .bottom-nav-item svg { width: 20px; height: 20px; }
-
-    /* ── PAGE HEADER ── */
-    .page-header {
-      margin-top: 76px; padding: 28px var(--pad-sm) 20px;
-      border-bottom: 1px solid var(--border);
-      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;
-    }
-    .page-header-left p {
-      font-size: 9px; color: var(--lime); font-family: 'DM Mono', monospace;
-      letter-spacing: 0.18em; text-transform: uppercase;
-      display: flex; align-items: center; gap: 8px; margin-bottom: 6px;
-    }
-    .page-header-left p::before { content: ''; display: block; width: 16px; height: 2px; background: var(--lime); }
-    .page-header-left h2 { font-size: 24px; font-weight: 800; letter-spacing: -0.5px; }
-
-    /* ── BUTTONS ── */
-    .btn-primary {
-      background: var(--lime); color: var(--midnight);
-      border: none; border-radius: var(--r-btn);
-      padding: 10px 20px; font-family: 'Syne', sans-serif;
-      font-size: 12px; font-weight: 700; cursor: pointer;
-      letter-spacing: 0.06em; text-transform: uppercase;
-      transition: opacity 0.15s; white-space: nowrap;
-    }
-    .btn-primary:hover { opacity: 0.88; }
-    .btn-ghost {
-      background: transparent; color: var(--text);
-      border: 1px solid var(--border2); border-radius: var(--r-btn);
-      padding: 8px 16px; font-family: 'DM Mono', monospace;
-      font-size: 11px; font-weight: 500; cursor: pointer;
-      letter-spacing: 0.06em; text-transform: uppercase;
-      transition: border-color 0.15s, background 0.15s; white-space: nowrap;
-    }
-    .btn-ghost:hover { border-color: var(--muted); background: var(--surface2); }
-    .btn-sm { padding: 6px 14px !important; font-size: 10px !important; }
-
-    /* ── SEARCH ── */
-    .search-wrap {
-      padding: 16px var(--pad-sm); border-bottom: 1px solid var(--border);
-      position: relative;
-    }
-    .search-input {
-      width: 100%; background: var(--surface2);
-      border: 1px solid var(--border2); border-radius: var(--r-card);
-      padding: 11px 14px 11px 40px; color: var(--text);
-      font-family: 'Syne', sans-serif; font-size: 13px;
-      outline: none; transition: border-color 0.15s;
-    }
-    .search-input:focus { border-color: var(--lime); }
-    .search-input::placeholder { color: var(--subdued); }
-    .search-icon {
-      position: absolute; left: calc(var(--pad-sm) + 13px); top: 50%;
-      transform: translateY(-50%); color: var(--subdued); pointer-events: none;
-    }
-    .search-icon svg { width: 16px; height: 16px; }
-
-    /* ── TABS ── */
-    .friend-tabs {
-      display: flex; border-bottom: 1px solid var(--border2);
-      padding: 0 var(--pad-sm);
-    }
-    .friend-tab {
-      padding: 12px 0; margin-right: 24px; border: none;
-      background: none; color: var(--muted);
-      font-family: 'DM Mono', monospace; font-size: 11px;
-      font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase;
-      cursor: pointer; border-bottom: 2px solid transparent;
-      margin-bottom: -1px; transition: color 0.15s;
-      display: flex; align-items: center; gap: 7px;
-    }
-    .friend-tab:hover { color: var(--text); }
-    .friend-tab.active { color: var(--lime); border-bottom-color: var(--lime); }
-    .tab-badge {
-      background: var(--amber); color: #fff;
-      font-size: 9px; font-weight: 700; padding: 1px 6px;
-      border-radius: 100px; font-family: 'DM Mono', monospace;
+    .auth-wrap::before {
+      content: '';
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 48px 48px;
+      opacity: 0.35;
+      pointer-events: none;
     }
 
-    /* ── FRIEND LIST ── */
-    .friends-list { padding: var(--pad-sm); display: flex; flex-direction: column; gap: 10px; flex: 1; }
+    .auth-container {
+      width: 100%; max-width: 420px;
+      position: relative; z-index: 1;
+    }
 
-    .section-label {
-      font-size: 9px; font-weight: 500; color: var(--subdued);
-      letter-spacing: 0.12em; text-transform: uppercase;
-      font-family: 'DM Mono', monospace; margin-top: 8px; margin-bottom: 2px;
+    .auth-logo { margin-bottom: 28px; }
+    .auth-logo a {
+      font-size: 22px; font-weight: 800; text-decoration: none;
+      letter-spacing: -0.5px; font-family: 'DM Mono', monospace;
+      text-transform: uppercase; display: inline-block; margin-bottom: 8px;
+    }
+    .auth-logo .after { color: var(--text); }
+    .auth-logo .five  { color: var(--lime); }
+    .auth-logo p {
+      font-size: 10px; color: var(--muted);
+      font-family: 'DM Mono', monospace;
+      letter-spacing: 0.14em; text-transform: uppercase;
       display: flex; align-items: center; gap: 8px;
     }
-    .section-label::before { content: ''; display: block; width: 12px; height: 1px; background: var(--subdued); }
-
-    /* ── FRIEND CARD ── */
-    .friend-card {
-      background: var(--surface); border: 1px solid var(--border);
-      border-left: 3px solid var(--border2);
-      border-radius: var(--r-card); padding: 14px;
-      display: flex; align-items: center; gap: 12px;
-      transition: border-color 0.15s;
+    .auth-logo p::before {
+      content: ''; display: block; width: 16px; height: 2px; background: var(--lime);
     }
-    .friend-card:hover { border-color: var(--border2); }
-    .friend-card.pending { border-left-color: var(--amber); }
-    .friend-card.accepted { border-left-color: var(--green); }
 
-    .avatar {
-      width: 42px; height: 42px; border-radius: 50%;
-      background: var(--surface2); border: 2px solid var(--border2);
+    .mta-lines { display: flex; gap: 6px; margin-bottom: 24px; }
+    .mta-dot {
+      width: 24px; height: 24px; border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
-      font-size: 18px; flex-shrink: 0; font-family: 'DM Mono', monospace;
-      font-weight: 700; color: var(--lime); font-size: 14px;
+      font-size: 10px; font-weight: 800;
+      font-family: 'DM Mono', monospace; color: #fff;
+      transition: opacity 0.3s, transform 0.3s;
     }
 
-    .friend-info { flex: 1; min-width: 0; }
-    .friend-name { font-size: 14px; font-weight: 700; margin-bottom: 2px; }
-    .friend-meta { font-size: 10px; color: var(--muted); font-family: 'DM Mono', monospace; letter-spacing: 0.04em; }
-
-    .friend-actions { display: flex; gap: 6px; flex-shrink: 0; }
-
-    /* ── STATUS BADGE ── */
-    .status-badge {
-      font-size: 9px; font-weight: 600; padding: 3px 9px;
-      border-radius: 100px; font-family: 'DM Mono', monospace;
-      letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap;
+    .auth-card {
+      background: var(--surface);
+      border: 1px solid var(--border2);
+      border-top: 3px solid var(--lime);
+      border-radius: var(--r-card);
+      padding: 28px;
     }
-    .s-pending  { background: rgba(238,53,44,0.12);  color: var(--amber); }
-    .s-accepted { background: rgba(0,147,60,0.12);   color: var(--green); }
 
-    /* ── SEARCH RESULTS ── */
-    .search-results {
-      display: none; padding: var(--pad-sm);
-      flex-direction: column; gap: 10px;
+    .auth-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border2);
+      margin-bottom: 28px;
     }
-    .search-results.show { display: flex; }
+    .auth-tab {
+      flex: 1; padding: 10px 0; border: none;
+      background: none; color: var(--muted);
+      font-family: 'DM Mono', monospace;
+      font-size: 11px; font-weight: 500;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      cursor: pointer; transition: color 0.15s;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+    }
+    .auth-tab:hover { color: var(--text); }
+    .auth-tab.active { color: var(--lime); border-bottom-color: var(--lime); }
 
-    .search-result-card {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: var(--r-card); padding: 14px;
-      display: flex; align-items: center; gap: 12px;
-      transition: border-color 0.15s;
+    .form-group { margin-bottom: 16px; }
+    .form-label {
+      font-size: 9px; font-weight: 500; color: var(--muted);
+      letter-spacing: 0.14em; text-transform: uppercase;
+      font-family: 'DM Mono', monospace;
+      display: block; margin-bottom: 7px;
     }
-    .search-result-card:hover { border-color: var(--border2); }
+    .input-wrap { position: relative; }
+    .form-input {
+      width: 100%; background: var(--surface2);
+      border: 1px solid var(--border2); border-radius: var(--r-card);
+      padding: 11px 14px 11px 38px; color: var(--text);
+      font-family: 'Syne', sans-serif; font-size: 13px;
+      outline: none; transition: border-color 0.15s; -webkit-appearance: none;
+    }
+    .form-input:focus { border-color: var(--lime); }
+    .form-input::placeholder { color: var(--subdued); }
+    .input-icon {
+      position: absolute; left: 12px; top: 50%;
+      transform: translateY(-50%); font-size: 14px; pointer-events: none;
+    }
 
-    /* ── EMPTY STATE ── */
-    .empty-state {
-      text-align: center; padding: 48px 20px; color: var(--subdued);
-    }
-    .empty-state .icon { font-size: 36px; margin-bottom: 14px; opacity: 0.4; display: block; }
-    .empty-state p { font-size: 13px; color: var(--muted); line-height: 1.7; }
-    .empty-state .hint { font-size: 11px; font-family: 'DM Mono', monospace; margin-top: 8px; }
+    .domain-hint { display: none; font-size: 10px; margin-top: 5px; font-family: 'DM Mono', monospace; letter-spacing: 0.04em; }
+    .domain-hint.show  { display: block; }
+    .domain-hint.valid { color: var(--green); }
+    .domain-hint.warn  { color: var(--purple); }
 
-    /* ── LOADING ── */
-    .loading-state {
-      display: flex; align-items: center; justify-content: center;
-      padding: 40px; gap: 10px; color: var(--muted);
-      font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.08em;
-    }
-    .loading-dot {
-      width: 6px; height: 6px; border-radius: 50%; background: var(--lime);
-      animation: loadpulse 1s ease-in-out infinite;
-    }
-    .loading-dot:nth-child(2) { animation-delay: 0.2s; }
-    .loading-dot:nth-child(3) { animation-delay: 0.4s; }
-    @keyframes loadpulse { 0%,100%{opacity:0.2} 50%{opacity:1} }
+    .strength-wrap { margin-top: 7px; display: none; }
+    .strength-wrap.show { display: block; }
+    .strength-bar { height: 3px; background: var(--border2); overflow: hidden; }
+    .strength-fill { height: 100%; width: 0%; transition: width 0.3s, background 0.3s; }
+    .strength-label { font-size: 9px; color: var(--subdued); font-family: 'DM Mono', monospace; letter-spacing: 0.08em; margin-top: 4px; text-transform: uppercase; }
 
-    /* ── TOAST ── */
-    .toast {
-      position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%);
-      background: var(--surface); border: 1px solid var(--lime); border-radius: 4px;
-      padding: 10px 20px; font-size: 12px; font-weight: 600; color: var(--lime);
-      z-index: 1000; white-space: nowrap; pointer-events: none;
-      font-family: 'DM Mono', monospace; letter-spacing: 0.06em;
-      animation: toastIn 0.2s ease; transition: opacity 0.3s;
+    .btn-submit {
+      width: 100%; padding: 13px; border-radius: var(--r-btn);
+      background: var(--lime); border: none; color: var(--midnight);
+      font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700;
+      letter-spacing: 0.06em; text-transform: uppercase;
+      cursor: pointer; transition: opacity 0.15s, transform 0.1s;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      margin-top: 4px;
     }
-    @keyframes toastIn { from{opacity:0;transform:translate(-50%,10px)} to{opacity:1;transform:translate(-50%,0)} }
+    .btn-submit:hover  { opacity: 0.88; }
+    .btn-submit:active { transform: scale(0.98); }
+    .btn-submit:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
 
-    /* ── FOOTER ── */
+    .auth-divider { display: none; align-items: center; gap: 12px; margin: 16px 0; }
+    .auth-divider.show { display: flex; }
+    .auth-divider::before, .auth-divider::after { content: ''; flex: 1; height: 1px; background: var(--border2); }
+    .auth-divider span { font-size: 9px; color: var(--subdued); font-family: 'DM Mono', monospace; letter-spacing: 0.1em; text-transform: uppercase; }
+
+    .btn-google {
+      display: none; width: 100%; padding: 11px; border-radius: var(--r-btn);
+      background: var(--surface2); border: 1px solid var(--border2); color: var(--text);
+      font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 500;
+      letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer;
+      align-items: center; justify-content: center; gap: 10px;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .btn-google.show { display: flex; }
+    .btn-google:hover { border-color: var(--muted); background: var(--border); }
+    .btn-google svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+    .auth-banner {
+      display: none; padding: 11px 14px; border-radius: var(--r-card);
+      font-size: 12px; font-weight: 600; line-height: 1.5;
+      margin-bottom: 16px; font-family: 'DM Mono', monospace; border-left: 3px solid;
+    }
+    .auth-banner.show    { display: block; }
+    .auth-banner.error   { background: rgba(238,53,44,0.08); color: var(--amber); border-color: var(--amber); }
+    .auth-banner.success { background: rgba(252,204,10,0.08); color: var(--lime);  border-color: var(--lime); }
+
+    .forgot-link {
+      font-size: 10px; color: var(--subdued); font-family: 'DM Mono', monospace;
+      text-decoration: none; letter-spacing: 0.06em; text-transform: uppercase;
+      display: block; text-align: right; margin-top: 6px; transition: color 0.15s;
+    }
+    .forgot-link:hover { color: var(--lime); }
+
+    .auth-terms {
+      display: none; font-size: 10px; color: var(--subdued); text-align: center;
+      line-height: 1.7; font-family: 'DM Mono', monospace; margin-top: 12px; letter-spacing: 0.02em;
+    }
+    .auth-terms.show { display: block; }
+
+    .spinner {
+      width: 14px; height: 14px; border: 2px solid rgba(8,10,20,0.25);
+      border-top-color: var(--midnight); border-radius: 50%;
+      animation: spin 0.6s linear infinite; display: none;
+    }
+    .spinner.show { display: block; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .verify-screen { display: none; text-align: center; padding: 8px 0; }
+    .verify-screen.show { display: block; }
+    .verify-icon { font-size: 44px; margin-bottom: 16px; display: block; }
+    .verify-screen h3 { font-size: 17px; font-weight: 800; margin-bottom: 8px; letter-spacing: -0.3px; }
+    .verify-screen p { font-size: 13px; color: var(--muted); line-height: 1.7; margin-bottom: 14px; }
+    .verify-email {
+      background: var(--surface2); border: 1px solid var(--border2);
+      border-left: 3px solid var(--lime); padding: 10px 14px;
+      font-family: 'DM Mono', monospace; font-size: 12px; color: var(--lime);
+      margin-bottom: 20px; text-align: left;
+    }
+    .btn-back {
+      width: 100%; padding: 12px; background: transparent;
+      border: 1px solid var(--border2); border-radius: var(--r-btn); color: var(--text);
+      font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 500;
+      letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .btn-back:hover { border-color: var(--muted); background: var(--surface2); }
+
+    .signup-only { display: none; }
+    .signup-only.show { display: block; }
+
     footer {
       border-top: 3px solid var(--lime); padding: 18px var(--pad-sm);
       background: var(--surface);
       display: flex; align-items: center; justify-content: space-between;
     }
+    .footer-stripe { display: flex; height: 4px; }
+    .footer-stripe span { flex: 1; }
     .footer-logo {
       font-size: 12px; font-weight: 800; text-decoration: none;
-      font-family: 'DM Mono', monospace; text-transform: uppercase;
+      font-family: 'DM Mono', monospace; text-transform: uppercase; letter-spacing: -0.3px;
     }
     .footer-logo .after { color: var(--text); }
     .footer-logo .five  { color: var(--lime); }
-    footer p { font-size: 10px; color: var(--subdued); font-family: 'DM Mono', monospace; }
+    footer p { font-size: 10px; color: var(--subdued); font-family: 'DM Mono', monospace; letter-spacing: 0.06em; }
 
-    /* ── RESPONSIVE ── */
-    @media (min-width: 640px) {
-      .hamburger { display: none; }
-      .nav-links  { display: flex; }
-      .bottom-nav { display: none; }
-      body { padding-bottom: 0; }
+    .arrival-dot {
+      display: inline-block; width: 6px; height: 6px; border-radius: 50%;
+      background: var(--lime); margin-right: 6px; vertical-align: middle;
+      animation: blink 1.4s ease-in-out infinite;
     }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.15} }
+
     @media (min-width: 900px) {
       .nav { padding: 0 80px; }
-      .page-header, .search-wrap, .friend-tabs, .friends-list, .search-results { padding-left: 80px; padding-right: 80px; }
       footer { padding: 18px 80px; }
     }
   </style>
 </head>
 <body>
 
-  <!-- NAV -->
   <nav class="nav">
-    <a class="nav-logo" href="index.html"><span class="after">after</span><span class="five">five</span></a>
-    <ul class="nav-links">
-      <li><a href="index.html">Home</a></li>
-      <li><a href="explore.html">Explore</a></li>
-      <li><a href="plans.html">Plans</a></li>
-      <li><a href="friends.html" class="active">Friends</a></li>
-      <li><a href="ai.html">Plan Gen</a></li>
-      <li><a href="map.html">Map</a></li>
-    </ul>
-    <button class="hamburger" id="hamburgerBtn"><span></span><span></span><span></span></button>
+    <a class="nav-logo" href="index.html">
+      <span class="after">after</span><span class="five">five</span>
+    </a>
   </nav>
   <div class="nav-stripe" aria-hidden="true">
-    <span style="background:#EE352C;"></span><span style="background:#00933C;"></span>
-    <span style="background:#FCCC0A;"></span><span style="background:#0039A6;"></span>
+    <span style="background:#EE352C;"></span>
+    <span style="background:#00933C;"></span>
+    <span style="background:#FCCC0A;"></span>
+    <span style="background:#0039A6;"></span>
     <span style="background:#FF6319;"></span>
   </div>
-  <div class="mobile-menu" id="mobileMenu">
-    <a href="index.html">Home</a><a href="explore.html">Explore</a>
-    <a href="plans.html">Plans</a><a href="friends.html">Friends</a>
-    <a href="ai.html">Plan Gen</a><a href="map.html">Map</a>
-  </div>
 
-  <!-- BOTTOM NAV -->
-  <nav class="bottom-nav">
-    <a class="bottom-nav-item" href="index.html">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-      Home
-    </a>
-    <a class="bottom-nav-item" href="map.html">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/></svg>
-      Map
-    </a>
-    <a class="bottom-nav-item" href="ai.html">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/></svg>
-      Plan
-    </a>
-    <a class="bottom-nav-item" href="plans.html">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-      Plans
-    </a>
-    <a class="bottom-nav-item active" href="friends.html">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
-      Friends
-    </a>
-  </nav>
+  <div class="auth-wrap">
+    <div class="auth-container">
 
-  <!-- PAGE HEADER -->
-  <div class="page-header">
-    <div class="page-header-left">
-      <p>Social</p>
-      <h2>Friends</h2>
-    </div>
-    <button class="btn-primary" onclick="focusSearch()">+ Find Friends</button>
-  </div>
+      <div class="auth-logo">
+        <a href="index.html"><span class="after">after</span><span class="five">five</span></a>
+        <p>Your NYC nights, sorted</p>
+      </div>
 
-  <!-- SEARCH -->
-  <div class="search-wrap">
-    <span class="search-icon">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-      </svg>
-    </span>
-    <input class="search-input" id="searchInput" type="text"
-      placeholder="Search by name or company…"
-      oninput="handleSearch(this.value)" />
-  </div>
+      <div class="mta-lines" aria-hidden="true">
+        <div class="mta-dot" style="background:#EE352C;">1</div>
+        <div class="mta-dot" style="background:#EE352C;">2</div>
+        <div class="mta-dot" style="background:#EE352C;">3</div>
+        <div class="mta-dot" style="background:#00933C;">4</div>
+        <div class="mta-dot" style="background:#00933C;">5</div>
+        <div class="mta-dot" style="background:#00933C;">6</div>
+        <div class="mta-dot" style="background:#FCCC0A;color:#000;">N</div>
+        <div class="mta-dot" style="background:#FCCC0A;color:#000;">Q</div>
+        <div class="mta-dot" style="background:#FCCC0A;color:#000;">R</div>
+        <div class="mta-dot" style="background:#0039A6;">A</div>
+        <div class="mta-dot" style="background:#0039A6;">C</div>
+        <div class="mta-dot" style="background:#FF6319;">B</div>
+        <div class="mta-dot" style="background:#FF6319;">D</div>
+      </div>
 
-  <!-- TABS -->
-  <div class="friend-tabs">
-    <button class="friend-tab active" onclick="switchTab('friends', this)">
-      Friends <span id="friendsCount" class="tab-badge" style="display:none;"></span>
-    </button>
-    <button class="friend-tab" onclick="switchTab('pending', this)">
-      Requests <span id="pendingCount" class="tab-badge" style="display:none;"></span>
-    </button>
-  </div>
+      <div class="auth-card">
 
-  <!-- SEARCH RESULTS (shown while typing) -->
-  <div class="search-results" id="searchResults">
-    <p class="section-label">Search results</p>
-    <div id="searchResultsList"></div>
-  </div>
+        <div class="auth-tabs" id="tabsRow">
+          <button class="auth-tab active" id="tabLogin"  onclick="switchTab('login')">Sign in</button>
+          <button class="auth-tab"        id="tabSignup" onclick="switchTab('signup')">Create account</button>
+        </div>
 
-  <!-- FRIENDS LIST -->
-  <div class="friends-list" id="friendsList">
-    <div class="loading-state" id="loadingState">
-      <div class="loading-dot"></div>
-      <div class="loading-dot"></div>
-      <div class="loading-dot"></div>
+        <div class="verify-screen" id="verifyScreen">
+          <span class="verify-icon">📬</span>
+          <h3>Check your inbox</h3>
+          <p>We sent a confirmation link to:</p>
+          <div class="verify-email" id="verifyEmailDisplay"></div>
+          <p>Click the link to activate your account, then come back to sign in.</p>
+          <button class="btn-back" onclick="switchTab('login')">← Back to sign in</button>
+        </div>
+
+        <div id="mainForm">
+
+          <div class="auth-banner" id="authBanner"></div>
+
+          <!-- NAME -->
+          <div class="form-group signup-only" id="nameGroup">
+            <label class="form-label">Full name</label>
+            <div class="input-wrap">
+              <span class="input-icon">👤</span>
+              <input class="form-input" id="inputName" type="text" placeholder="Jane Smith" autocomplete="name" />
+            </div>
+          </div>
+
+          <!-- EMAIL -->
+          <div class="form-group">
+            <label class="form-label">Work or school email</label>
+            <div class="input-wrap">
+              <span class="input-icon">✉️</span>
+              <input class="form-input" id="inputEmail" type="email"
+                placeholder="you@company.com or you@school.edu"
+                autocomplete="email" oninput="checkEmail(this.value)" />
+            </div>
+            <p class="domain-hint" id="domainHint"></p>
+          </div>
+
+          <!-- PASSWORD -->
+          <div class="form-group">
+            <label class="form-label">Password</label>
+            <div class="input-wrap">
+              <span class="input-icon">🔒</span>
+              <input class="form-input" id="inputPassword" type="password"
+                placeholder="Min 8 characters"
+                autocomplete="current-password"
+                oninput="checkStrength(this.value)" />
+            </div>
+            <div class="strength-wrap signup-only" id="strengthWrap">
+              <div class="strength-bar">
+                <div class="strength-fill" id="strengthFill"></div>
+              </div>
+              <p class="strength-label" id="strengthLabel"></p>
+            </div>
+            <a class="forgot-link" id="forgotLink" href="#" onclick="handleForgot(event)">Forgot password?</a>
+          </div>
+
+          <!-- COMPANY -->
+          <div class="form-group signup-only" id="companyGroup">
+            <label class="form-label">Company or school</label>
+            <div class="input-wrap">
+              <span class="input-icon">🏢</span>
+              <input class="form-input" id="inputCompany" type="text" placeholder="Goldman Sachs, NYU, Columbia…" />
+            </div>
+          </div>
+
+          <button class="btn-submit" id="submitBtn" onclick="handleSubmit()">
+            <span id="submitText">Sign in →</span>
+            <div class="spinner" id="submitSpinner"></div>
+          </button>
+
+          <div class="auth-divider" id="orDivider"><span>or</span></div>
+
+          <button class="btn-google" id="googleBtn" onclick="handleGoogle()">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+              <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+              <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+              <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+            </svg>
+            Continue with Google
+          </button>
+
+          <p class="auth-terms" id="termsText">
+            By creating an account you agree that afterfive may use your email to send plan invites and updates. No spam, ever.
+          </p>
+
+        </div>
+      </div>
     </div>
   </div>
 
   <footer>
     <a class="footer-logo" href="index.html"><span class="after">after</span><span class="five">five</span></a>
-    <p>"Your NYC nights, sorted."</p>
+    <p><span class="arrival-dot"></span>Free · NYC interns only</p>
   </footer>
 
   <script>
-  // ── SUPABASE ──
-  const SUPABASE_URL  = 'https://kurizbyorntmmdqfviac.supabase.co';
-  const SUPABASE_ANON = 'sb_publishable_b8N7U5X4--k8b1VRLiqcew_sRtymSlZ';
+  // ── SUPABASE INIT ──
+  // Replace with your values from: supabase.com → Settings → API Keys
+  const SUPABASE_URL  = 'YOUR_SUPABASE_URL';
+  const SUPABASE_ANON = 'YOUR_PUBLISHABLE_KEY';
   const { createClient } = supabase;
   const sb = createClient(SUPABASE_URL, SUPABASE_ANON);
 
-  let currentUser = null;
-  let currentTab  = 'friends';
-  let searchTimer = null;
+  let mode = 'login';
 
-  // ── INIT ──
+  function switchTab(tab) {
+    mode = tab;
+    const isSignup = tab === 'signup';
+    document.getElementById('tabLogin').classList.toggle('active',  !isSignup);
+    document.getElementById('tabSignup').classList.toggle('active',  isSignup);
+    document.querySelectorAll('.signup-only').forEach(el => el.classList.toggle('show', isSignup));
+    document.getElementById('strengthWrap').classList.toggle('show', isSignup);
+    document.getElementById('forgotLink').style.display = isSignup ? 'none' : 'block';
+    document.getElementById('orDivider').classList.toggle('show', isSignup);
+    document.getElementById('googleBtn').classList.toggle('show', isSignup);
+    document.getElementById('termsText').classList.toggle('show', isSignup);
+    document.getElementById('submitText').textContent = isSignup ? 'Create account →' : 'Sign in →';
+    document.getElementById('inputPassword').autocomplete = isSignup ? 'new-password' : 'current-password';
+    document.getElementById('mainForm').style.display = '';
+    document.getElementById('verifyScreen').classList.remove('show');
+    document.getElementById('tabsRow').style.display = '';
+    hideBanner();
+  }
+
+  const EDU      = ['.edu','.ac.uk','.ac.','.edu.'];
+  const PERSONAL = ['gmail.com','yahoo.com','hotmail.com','outlook.com','icloud.com','me.com'];
+
+  function checkEmail(val) {
+    if (mode !== 'signup') return;
+    const hint = document.getElementById('domainHint');
+    if (!val.includes('@')) { hint.className = 'domain-hint'; return; }
+    const domain = val.split('@')[1] || '';
+    const isEdu  = EDU.some(d => domain.includes(d));
+    const isPers = PERSONAL.includes(domain);
+    hint.classList.add('show');
+    if (isEdu)       { hint.textContent = '✓ School email — eligible for intern-verified badge'; hint.className = 'domain-hint show valid'; }
+    else if (!isPers){ hint.textContent = '✓ Work email detected'; hint.className = 'domain-hint show valid'; }
+    else             { hint.textContent = '⚠ Use a work or .edu email to unlock all features'; hint.className = 'domain-hint show warn'; }
+  }
+
+  const STR_LABELS = ['','Weak','Fair','Good','Strong','Very strong'];
+  const STR_COLORS = ['','#EE352C','#FF6319','#FCCC0A','#00933C','#00933C'];
+
+  function checkStrength(val) {
+    if (mode !== 'signup') return;
+    let s = 0;
+    if (val.length >= 8)          s++;
+    if (val.length >= 12)         s++;
+    if (/[A-Z]/.test(val))        s++;
+    if (/[0-9]/.test(val))        s++;
+    if (/[^A-Za-z0-9]/.test(val)) s++;
+    document.getElementById('strengthFill').style.width      = (s/5*100) + '%';
+    document.getElementById('strengthFill').style.background = STR_COLORS[s] || '#EE352C';
+    document.getElementById('strengthLabel').textContent     = STR_LABELS[s] || '';
+  }
+
+  function showBanner(msg, type) {
+    const b = document.getElementById('authBanner');
+    b.textContent = msg; b.className = `auth-banner show ${type}`;
+  }
+  function hideBanner() { document.getElementById('authBanner').className = 'auth-banner'; }
+
+  function setLoading(on) {
+    document.getElementById('submitBtn').disabled = on;
+    document.getElementById('submitText').style.display = on ? 'none' : '';
+    document.getElementById('submitSpinner').classList.toggle('show', on);
+  }
+
+  async function handleSubmit() {
+    hideBanner();
+    const email   = document.getElementById('inputEmail').value.trim();
+    const password = document.getElementById('inputPassword').value;
+    const name    = document.getElementById('inputName').value.trim();
+    const company = document.getElementById('inputCompany').value.trim();
+    if (!email || !password) { showBanner('Please fill in all fields.', 'error'); return; }
+    if (password.length < 8) { showBanner('Password must be at least 8 characters.', 'error'); return; }
+    setLoading(true);
+
+    if (mode === 'signup') {
+      const { error } = await sb.auth.signUp({ email, password, options: { data: { full_name: name, company } } });
+      setLoading(false);
+      if (error) { showBanner(error.message, 'error'); return; }
+      document.getElementById('verifyEmailDisplay').textContent = email;
+      document.getElementById('mainForm').style.display = 'none';
+      document.getElementById('verifyScreen').classList.add('show');
+      document.getElementById('tabsRow').style.display = 'none';
+    } else {
+      const { error } = await sb.auth.signInWithPassword({ email, password });
+      setLoading(false);
+      if (error) { showBanner(error.message === 'Invalid login credentials' ? 'Wrong email or password. Try again.' : error.message, 'error'); return; }
+      showToast('Welcome back! 🎉');
+      setTimeout(() => window.location.href = 'index.html', 800);
+    }
+  }
+
+  async function handleGoogle() {
+    const { error } = await sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin + '/index.html' } });
+    if (error) showBanner(error.message, 'error');
+  }
+
+  async function handleForgot(e) {
+    e.preventDefault();
+    const email = document.getElementById('inputEmail').value.trim();
+    if (!email) { showBanner('Enter your email above first.', 'error'); return; }
+    setLoading(true);
+    const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: window.location.origin + '/auth.html' });
+    setLoading(false);
+    if (error) { showBanner(error.message, 'error'); return; }
+    showBanner('Reset link sent — check your inbox.', 'success');
+  }
+
+  document.addEventListener('keydown', e => { if (e.key === 'Enter') handleSubmit(); });
+
   (async () => {
     const { data: { session } } = await sb.auth.getSession();
-    if (!session) { window.location.href = 'auth.html'; return; }
-    currentUser = session.user;
-    await loadTab('friends');
+    if (session) window.location.href = 'index.html';
   })();
 
-  // ── TAB SWITCH ──
-  function switchTab(tab, el) {
-    currentTab = tab;
-    document.querySelectorAll('.friend-tab').forEach(t => t.classList.remove('active'));
-    el.classList.add('active');
-    hideSearch();
-    loadTab(tab);
-  }
-
-  async function loadTab(tab) {
-    const list = document.getElementById('friendsList');
-    list.innerHTML = `<div class="loading-state"><div class="loading-dot"></div><div class="loading-dot"></div><div class="loading-dot"></div></div>`;
-
-    if (tab === 'friends') await loadFriends();
-    else await loadPendingRequests();
-  }
-
-  // ── LOAD ACCEPTED FRIENDS ──
-  async function loadFriends() {
-    const list = document.getElementById('friendsList');
-
-    const { data, error } = await sb
-      .from('friendships')
-      .select(`
-        id, sender_id, receiver_id, status,
-        sender:profiles!friendships_sender_id_fkey(id, full_name, company),
-        receiver:profiles!friendships_receiver_id_fkey(id, full_name, company)
-      `)
-      .eq('status', 'accepted')
-      .or(`sender_id.eq.${currentUser.id},receiver_id.eq.${currentUser.id}`);
-
-    if (error || !data || data.length === 0) {
-      list.innerHTML = `
-        <div class="empty-state">
-          <span class="icon">🗺️</span>
-          <p>No friends yet — search above to find other interns.</p>
-          <p class="hint">SEARCH BY NAME OR COMPANY TO GET STARTED</p>
-        </div>`;
-      return;
-    }
-
-    // update badge
-    const badge = document.getElementById('friendsCount');
-    badge.textContent = data.length;
-    badge.style.display = '';
-
-    list.innerHTML = `<p class="section-label">${data.length} connection${data.length !== 1 ? 's' : ''}</p>`;
-
-    data.forEach(f => {
-      const friend = f.sender_id === currentUser.id ? f.receiver : f.sender;
-      if (!friend) return;
-      const initials = (friend.full_name || '?').split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
-      const card = document.createElement('div');
-      card.className = 'friend-card accepted';
-      card.innerHTML = `
-        <div class="avatar">${initials}</div>
-        <div class="friend-info">
-          <p class="friend-name">${friend.full_name || 'Unknown'}</p>
-          <p class="friend-meta">${friend.company || 'No company listed'}</p>
-        </div>
-        <div class="friend-actions">
-          <span class="status-badge s-accepted">Connected</span>
-        </div>`;
-      list.appendChild(card);
-    });
-  }
-
-  // ── LOAD PENDING REQUESTS ──
-  async function loadPendingRequests() {
-    const list = document.getElementById('friendsList');
-
-    const { data, error } = await sb
-      .from('friendships')
-      .select(`
-        id, sender_id, status,
-        sender:profiles!friendships_sender_id_fkey(id, full_name, company)
-      `)
-      .eq('receiver_id', currentUser.id)
-      .eq('status', 'pending');
-
-    if (error || !data || data.length === 0) {
-      list.innerHTML = `
-        <div class="empty-state">
-          <span class="icon">📬</span>
-          <p>No pending requests.</p>
-          <p class="hint">WHEN SOMEONE ADDS YOU, THEY'LL APPEAR HERE</p>
-        </div>`;
-      return;
-    }
-
-    // update badge
-    const badge = document.getElementById('pendingCount');
-    badge.textContent = data.length;
-    badge.style.display = '';
-
-    list.innerHTML = `<p class="section-label">${data.length} pending request${data.length !== 1 ? 's' : ''}</p>`;
-
-    data.forEach(f => {
-      const sender = f.sender;
-      if (!sender) return;
-      const initials = (sender.full_name || '?').split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
-      const card = document.createElement('div');
-      card.className = 'friend-card pending';
-      card.innerHTML = `
-        <div class="avatar">${initials}</div>
-        <div class="friend-info">
-          <p class="friend-name">${sender.full_name || 'Unknown'}</p>
-          <p class="friend-meta">${sender.company || 'No company listed'}</p>
-        </div>
-        <div class="friend-actions">
-          <button class="btn-primary btn-sm" onclick="acceptRequest('${f.id}', this)">Accept</button>
-          <button class="btn-ghost btn-sm" onclick="declineRequest('${f.id}', this)">Decline</button>
-        </div>`;
-      list.appendChild(card);
-    });
-  }
-
-  // ── ACCEPT / DECLINE ──
-  async function acceptRequest(id, btn) {
-    btn.disabled = true; btn.textContent = '…';
-    const { error } = await sb.from('friendships').update({ status: 'accepted' }).eq('id', id);
-    if (error) { showToast('Something went wrong.'); return; }
-    showToast('Friend request accepted! 🎉');
-    loadTab('pending');
-    // refresh badge
-    const badge = document.getElementById('friendsCount');
-    const current = parseInt(badge.textContent || '0') + 1;
-    badge.textContent = current; badge.style.display = '';
-  }
-
-  async function declineRequest(id, btn) {
-    btn.disabled = true;
-    const { error } = await sb.from('friendships').update({ status: 'declined' }).eq('id', id);
-    if (error) { showToast('Something went wrong.'); return; }
-    showToast('Request declined.');
-    loadTab('pending');
-  }
-
-  // ── SEARCH ──
-  function handleSearch(val) {
-    clearTimeout(searchTimer);
-    if (!val.trim()) { hideSearch(); return; }
-    searchTimer = setTimeout(() => searchUsers(val.trim()), 300);
-  }
-
-  async function searchUsers(query) {
-    const resultsDiv  = document.getElementById('searchResults');
-    const resultsList = document.getElementById('searchResultsList');
-    resultsDiv.classList.add('show');
-    resultsList.innerHTML = `<div class="loading-state" style="padding:16px 0;"><div class="loading-dot"></div><div class="loading-dot"></div><div class="loading-dot"></div></div>`;
-
-    const { data, error } = await sb
-      .from('profiles')
-      .select('id, full_name, company')
-      .neq('id', currentUser.id)
-      .or(`full_name.ilike.%${query}%,company.ilike.%${query}%`)
-      .limit(8);
-
-    if (error || !data || data.length === 0) {
-      resultsList.innerHTML = `<div class="empty-state" style="padding:20px 0;"><p>No users found for "${query}"</p></div>`;
-      return;
-    }
-
-    // Get existing friendships to check status
-    const { data: existing } = await sb
-      .from('friendships')
-      .select('sender_id, receiver_id, status')
-      .or(`sender_id.eq.${currentUser.id},receiver_id.eq.${currentUser.id}`);
-
-    const friendMap = {};
-    (existing || []).forEach(f => {
-      const otherId = f.sender_id === currentUser.id ? f.receiver_id : f.sender_id;
-      friendMap[otherId] = f.status;
-    });
-
-    resultsList.innerHTML = '';
-    data.forEach(user => {
-      const initials = (user.full_name || '?').split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
-      const status   = friendMap[user.id];
-      let actionHtml = '';
-      if (status === 'accepted')     actionHtml = `<span class="status-badge s-accepted">Connected</span>`;
-      else if (status === 'pending') actionHtml = `<span class="status-badge s-pending">Pending</span>`;
-      else actionHtml = `<button class="btn-primary btn-sm" onclick="sendRequest('${user.id}', this)">+ Add</button>`;
-
-      const card = document.createElement('div');
-      card.className = 'search-result-card';
-      card.innerHTML = `
-        <div class="avatar">${initials}</div>
-        <div class="friend-info">
-          <p class="friend-name">${user.full_name || 'Unknown'}</p>
-          <p class="friend-meta">${user.company || 'No company listed'}</p>
-        </div>
-        <div class="friend-actions">${actionHtml}</div>`;
-      resultsList.appendChild(card);
-    });
-  }
-
-  function hideSearch() {
-    document.getElementById('searchResults').classList.remove('show');
-    document.getElementById('searchResultsList').innerHTML = '';
-  }
-
-  function focusSearch() {
-    document.getElementById('searchInput').focus();
-    window.scrollTo({ top: 100, behavior: 'smooth' });
-  }
-
-  // ── SEND FRIEND REQUEST ──
-  async function sendRequest(receiverId, btn) {
-    btn.disabled = true; btn.textContent = '…';
-    const { error } = await sb.from('friendships').insert({
-      sender_id:   currentUser.id,
-      receiver_id: receiverId,
-      status:      'pending'
-    });
-    if (error) {
-      btn.disabled = false; btn.textContent = '+ Add';
-      showToast('Could not send request.'); return;
-    }
-    btn.textContent = 'Sent ✓';
-    btn.style.background = 'transparent';
-    btn.style.color = 'var(--lime)';
-    btn.style.border = '1px solid var(--lime)';
-    showToast('Friend request sent! 🎉');
-  }
-
-  // ── HAMBURGER ──
-  const hBtn = document.getElementById('hamburgerBtn');
-  const hMenu = document.getElementById('mobileMenu');
-  if (hBtn && hMenu) {
-    hBtn.addEventListener('click', () => {
-      const open = hMenu.classList.toggle('open');
-      hBtn.classList.toggle('open', open);
-    });
-  }
-
-  // ── TOAST ──
   function showToast(msg) {
-    const existing = document.querySelector('.toast');
-    if (existing) existing.remove();
     const t = document.createElement('div');
-    t.className = 'toast'; t.textContent = msg;
+    t.textContent = msg;
+    t.style.cssText = 'position:fixed;bottom:32px;left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--lime);border-radius:4px;padding:10px 20px;font-size:12px;font-weight:600;color:var(--lime);z-index:1000;white-space:nowrap;pointer-events:none;font-family:"DM Mono",monospace;letter-spacing:0.06em;';
     document.body.appendChild(t);
     setTimeout(() => t.style.opacity = '0', 2000);
     setTimeout(() => t.remove(), 2400);
   }
+
+  // Stagger MTA dots on load
+  document.querySelectorAll('.mta-dot').forEach((dot, i) => {
+    dot.style.opacity = '0';
+    dot.style.transform = 'scale(0.5)';
+    setTimeout(() => {
+      dot.style.opacity = '1';
+      dot.style.transform = 'scale(1)';
+    }, 80 + i * 50);
+  });
   </script>
 </body>
 </html>
