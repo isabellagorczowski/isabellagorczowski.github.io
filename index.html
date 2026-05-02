@@ -317,6 +317,9 @@
     .reveal-delay-1 { transition-delay: 0.1s; }
     .reveal-delay-2 { transition-delay: 0.2s; }
 
+    /* ── SAFETY — ensure full-section elements never stay hidden ── */
+    .compare-section, .testimonials-section, .cta-section, footer { opacity: 1 !important; transform: none !important; }
+
     /* ── RESPONSIVE ── */
     @media (min-width: 600px) {
       .hero-actions { flex-direction: row; }
@@ -480,7 +483,7 @@
   </section>
 
   <!-- COMPARE -->
-  <section class="compare-section reveal">
+  <section class="compare-section">
     <p class="section-tag">The difference</p>
     <h2 class="section-title">Friday at 5 PM.<br>Two very different nights.</h2>
     <div class="compare-grid">
@@ -549,14 +552,14 @@
   const SUPABASE_URL  = 'https://kurizbyorntmmdqfviac.supabase.co';
   const SUPABASE_ANON = 'sb_publishable_b8N7U5X4--k8b1VRLiqcew_sRtymSlZ';
   const { createClient } = supabase;
-  const sb = createClient(SUPABASE_URL, SUPABASE_ANON{
-  auth: {
-    persistSession: true,
-    storageKey: 'afterfive-auth',
-    storage: window.localStorage,
-    autoRefreshToken: true,
-  }
-});
+  const sb = createClient(SUPABASE_URL, SUPABASE_ANON, {
+    auth: {
+      persistSession: true,
+      storageKey: 'afterfive-auth',
+      storage: window.localStorage,
+      autoRefreshToken: true,
+    }
+  });
 
   // ── AUTH STATE ──
   (async () => {
@@ -626,7 +629,7 @@
   }
 
   // ── SCROLL REVEAL ──
-  const revealTargets = document.querySelectorAll('.steps-grid .step-item, .features-grid .feature-card, .testimonials-grid .testimonial-card, .cta-section, .compare-section');
+  const revealTargets = document.querySelectorAll('.steps-grid .step-item, .features-grid .feature-card, .testimonials-grid .testimonial-card');
   revealTargets.forEach((el, i) => {
     el.classList.add('reveal');
     if (i % 3 === 1) el.classList.add('reveal-delay-1');
@@ -634,7 +637,7 @@
   });
   const revealObs = new IntersectionObserver(entries => {
     entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); revealObs.unobserve(e.target); } });
-  }, { threshold: 0.08 });
+  }, { threshold: 0.05, rootMargin: '0px 0px -50px 0px' });
   document.querySelectorAll('.reveal').forEach(el => revealObs.observe(el));
 
   // ── MTA DOTS ──
