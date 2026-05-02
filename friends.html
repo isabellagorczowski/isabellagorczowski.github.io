@@ -425,11 +425,17 @@
 
   <script>
   // ── SUPABASE INIT ──
-  // Replace with your values from: supabase.com → Settings → API Keys
   const SUPABASE_URL  = 'YOUR_SUPABASE_URL';
   const SUPABASE_ANON = 'YOUR_PUBLISHABLE_KEY';
   const { createClient } = supabase;
-  const sb = createClient(SUPABASE_URL, SUPABASE_ANON);
+  const sb = createClient(SUPABASE_URL, SUPABASE_ANON, {
+  auth: {
+    persistSession: true,
+    storageKey: 'afterfive-auth',
+    storage: window.localStorage,
+    autoRefreshToken: true,
+  }
+});
 
   let mode = 'login';
 
