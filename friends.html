@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>afterfive — Friends</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;500;600;700;800&display=swap" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    :root {
+      --midnight: #080A14;
+      --surface:  #0D0F1F;
+      --surface2: #141728;
+      --border:   #1A1D2E;
+      --border2:  #2A2E44;
+      --lime:     #FCCC0A;
+      --lime-dim: rgba(252,204,10,0.10);
+      --text:     #E8ECF8;
+      --muted:    #7A80A0;
+      --subdued:  #3A3F58;
+      --amber:    #EE352C;
+      --green:    #00933C;
+      --blue:     #0039A6;
+      --orange:   #FF6319;
+      --pad-sm:   20px;
+      --r-card:   4px;
+      --r-btn:    4px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--midnight); color: var(--text);
+      font-family: 'Syne', sans-serif; font-size: 15px;
+      line-height: 1.6; overflow-x: hidden; min-height: 100dvh;
+      display: flex; flex-direction: column;
+      padding-bottom: 80px;
+    }
+
+    /* ── NAV ── */
+    .nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 var(--pad-sm); height: 56px;
+      background: var(--midnight); border-bottom: 3px solid var(--lime);
+    }
+    .nav-stripe { position: fixed; top: 56px; left: 0; right: 0; z-index: 199; display: flex; height: 4px; }
+    .nav-stripe span { flex: 1; }
+    .nav-logo {
+      font-size: 17px; font-weight: 800; text-decoration: none;
+      letter-spacing: -0.5px; font-family: 'DM Mono', monospace; text-transform: uppercase;
+    }
+    .nav-logo .after { color: var(--text); }
+    .nav-logo .five  { color: var(--lime); }
+    .nav-links { display: none; list-style: none; gap: 2px; }
+    .nav-links a {
+      color: var(--muted); text-decoration: none; font-size: 12px;
+      font-weight: 600; padding: 6px 12px;
+      letter-spacing: 0.06em; text-transform: uppercase; transition: color 0.15s;
+    }
+    .nav-links a:hover { color: var(--text); }
+    .nav-links a.active { color: var(--lime); }
+    .hamburger { display: flex; flex-direction: column; gap: 5px; background: none; border: none; cursor: pointer; padding: 4px; }
+    .hamburger span { display: block; width: 22px; height: 2px; background: var(--text); border-radius: 0; transition: all 0.25s; }
+    .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+    .mobile-menu {
+      display: none; position: fixed; inset: 0; z-index: 199;
+      background: var(--midnight); flex-direction: column;
+      padding: 80px var(--pad-sm) var(--pad-sm); gap: 0;
+      border-top: 3px solid var(--lime); margin-top: 56px;
+    }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a {
+      color: var(--text); text-decoration: none; font-size: 24px; font-weight: 800;
+      padding: 16px 0; border-bottom: 1px solid var(--border);
+      transition: color 0.15s; display: flex; align-items: center; justify-content: space-between;
+      letter-spacing: -0.5px; font-family: 'DM Mono', monospace; text-transform: uppercase;
+    }
+    .mobile-menu a::after { content: '→'; color: var(--subdued); font-size: 16px; }
+    .mobile-menu a:hover { color: var(--lime); }
+
+    /* ── BOTTOM NAV ── */
+    .bottom-nav {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: var(--midnight); border-top: 3px solid var(--lime);
+      display: flex; justify-content: space-around; align-items: center;
+      padding: 10px 0 16px; z-index: 300;
+    }
+    .bottom-nav-item {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 3px; color: var(--subdued); text-decoration: none;
+      font-family: 'DM Mono', monospace; font-size: 9px;
+      font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase;
+      transition: color 0.15s; padding: 4px 12px;
+    }
+    .bottom-nav-item.active { color: var(--lime); }
+    .bottom-nav-item svg { width: 20px; height: 20px; }
+
+    /* ── PAGE HEADER ── */
+    .page-header {
+      margin-top: 76px; padding: 28px var(--pad-sm) 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;
+    }
+    .page-header-left p {
+      font-size: 9px; color: var(--lime); font-family: 'DM Mono', monospace;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      display: flex; align-items: center; gap: 8px; margin-bottom: 6px;
+    }
+    .page-header-left p::before { content: ''; display: block; width: 16px; height: 2px; background: var(--lime); }
+    .page-header-left h2 { font-size: 24px; font-weight: 800; letter-spacing: -0.5px; }
+
+    /* ── BUTTONS ── */
+    .btn-primary {
+      background: var(--lime); color: var(--midnight);
+      border: none; border-radius: var(--r-btn);
+      padding: 10px 20px; font-family: 'Syne', sans-serif;
+      font-size: 12px; font-weight: 700; cursor: pointer;
+      letter-spacing: 0.06em; text-transform: uppercase;
+      transition: opacity 0.15s; white-space: nowrap;
+    }
+    .btn-primary:hover { opacity: 0.88; }
+    .btn-ghost {
+      background: transparent; color: var(--text);
+      border: 1px solid var(--border2); border-radius: var(--r-btn);
+      padding: 8px 16px; font-family: 'DM Mono', monospace;
+      font-size: 11px; font-weight: 500; cursor: pointer;
+      letter-spacing: 0.06em; text-transform: uppercase;
+      transition: border-color 0.15s, background 0.15s; white-space: nowrap;
+    }
+    .btn-ghost:hover { border-color: var(--muted); background: var(--surface2); }
+    .btn-sm { padding: 6px 14px !important; font-size: 10px !important; }
+
+    /* ── SEARCH ── */
+    .search-wrap {
+      padding: 16px var(--pad-sm); border-bottom: 1px solid var(--border);
+      position: relative;
+    }
+    .search-input {
+      width: 100%; background: var(--surface2);
+      border: 1px solid var(--border2); border-radius: var(--r-card);
+      padding: 11px 14px 11px 40px; color: var(--text);
+      font-family: 'Syne', sans-serif; font-size: 13px;
+      outline: none; transition: border-color 0.15s;
+    }
+    .search-input:focus { border-color: var(--lime); }
+    .search-input::placeholder { color: var(--subdued); }
+    .search-icon {
+      position: absolute; left: calc(var(--pad-sm) + 13px); top: 50%;
+      transform: translateY(-50%); color: var(--subdued); pointer-events: none;
+    }
+    .search-icon svg { width: 16px; height: 16px; }
+
+    /* ── TABS ── */
+    .friend-tabs {
+      display: flex; border-bottom: 1px solid var(--border2);
+      padding: 0 var(--pad-sm);
+    }
+    .friend-tab {
+      padding: 12px 0; margin-right: 24px; border: none;
+      background: none; color: var(--muted);
+      font-family: 'DM Mono', monospace; font-size: 11px;
+      font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase;
+      cursor: pointer; border-bottom: 2px solid transparent;
+      margin-bottom: -1px; transition: color 0.15s;
+      display: flex; align-items: center; gap: 7px;
+    }
+    .friend-tab:hover { color: var(--text); }
+    .friend-tab.active { color: var(--lime); border-bottom-color: var(--lime); }
+    .tab-badge {
+      background: var(--amber); color: #fff;
+      font-size: 9px; font-weight: 700; padding: 1px 6px;
+      border-radius: 100px; font-family: 'DM Mono', monospace;
+    }
+
+    /* ── FRIEND LIST ── */
+    .friends-list { padding: var(--pad-sm); display: flex; flex-direction: column; gap: 10px; flex: 1; }
+
+    .section-label {
+      font-size: 9px; font-weight: 500; color: var(--subdued);
+      letter-spacing: 0.12em; text-transform: uppercase;
+      font-family: 'DM Mono', monospace; margin-top: 8px; margin-bottom: 2px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .section-label::before { content: ''; display: block; width: 12px; height: 1px; background: var(--subdued); }
+
+    /* ── FRIEND CARD ── */
+    .friend-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-left: 3px solid var(--border2);
+      border-radius: var(--r-card); padding: 14px;
+      display: flex; align-items: center; gap: 12px;
+      transition: border-color 0.15s;
+    }
+    .friend-card:hover { border-color: var(--border2); }
+    .friend-card.pending { border-left-color: var(--amber); }
+    .friend-card.accepted { border-left-color: var(--green); }
+
+    .avatar {
+      width: 42px; height: 42px; border-radius: 50%;
+      background: var(--surface2); border: 2px solid var(--border2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; flex-shrink: 0; font-family: 'DM Mono', monospace;
+      font-weight: 700; color: var(--lime); font-size: 14px;
+    }
+
+    .friend-info { flex: 1; min-width: 0; }
+    .friend-name { font-size: 14px; font-weight: 700; margin-bottom: 2px; }
+    .friend-meta { font-size: 10px; color: var(--muted); font-family: 'DM Mono', monospace; letter-spacing: 0.04em; }
+
+    .friend-actions { display: flex; gap: 6px; flex-shrink: 0; }
+
+    /* ── STATUS BADGE ── */
+    .status-badge {
+      font-size: 9px; font-weight: 600; padding: 3px 9px;
+      border-radius: 100px; font-family: 'DM Mono', monospace;
+      letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap;
+    }
+    .s-pending  { background: rgba(238,53,44,0.12);  color: var(--amber); }
+    .s-accepted { background: rgba(0,147,60,0.12);   color: var(--green); }
+
+    /* ── SEARCH RESULTS ── */
+    .search-results {
+      display: none; padding: var(--pad-sm);
+      flex-direction: column; gap: 10px;
+    }
+    .search-results.show { display: flex; }
+
+    .search-result-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--r-card); padding: 14px;
+      display: flex; align-items: center; gap: 12px;
+      transition: border-color 0.15s;
+    }
+    .search-result-card:hover { border-color: var(--border2); }
+
+    /* ── EMPTY STATE ── */
+    .empty-state {
+      text-align: center; padding: 48px 20px; color: var(--subdued);
+    }
+    .empty-state .icon { font-size: 36px; margin-bottom: 14px; opacity: 0.4; display: block; }
+    .empty-state p { font-size: 13px; color: var(--muted); line-height: 1.7; }
+    .empty-state .hint { font-size: 11px; font-family: 'DM Mono', monospace; margin-top: 8px; }
+
+    /* ── LOADING ── */
+    .loading-state {
+      display: flex; align-items: center; justify-content: center;
+      padding: 40px; gap: 10px; color: var(--muted);
+      font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.08em;
+    }
+    .loading-dot {
+      width: 6px; height: 6px; border-radius: 50%; background: var(--lime);
+      animation: loadpulse 1s ease-in-out infinite;
+    }
+    .loading-dot:nth-child(2) { animation-delay: 0.2s; }
+    .loading-dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes loadpulse { 0%,100%{opacity:0.2} 50%{opacity:1} }
+
+    /* ── TOAST ── */
+    .toast {
+      position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%);
+      background: var(--surface); border: 1px solid var(--lime); border-radius: 4px;
+      padding: 10px 20px; font-size: 12px; font-weight: 600; color: var(--lime);
+      z-index: 1000; white-space: nowrap; pointer-events: none;
+      font-family: 'DM Mono', monospace; letter-spacing: 0.06em;
+      animation: toastIn 0.2s ease; transition: opacity 0.3s;
+    }
+    @keyframes toastIn { from{opacity:0;transform:translate(-50%,10px)} to{opacity:1;transform:translate(-50%,0)} }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 3px solid var(--lime); padding: 18px var(--pad-sm);
+      background: var(--surface);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .footer-logo {
+      font-size: 12px; font-weight: 800; text-decoration: none;
+      font-family: 'DM Mono', monospace; text-transform: uppercase;
+    }
+    .footer-logo .after { color: var(--text); }
+    .footer-logo .five  { color: var(--lime); }
+    footer p { font-size: 10px; color: var(--subdued); font-family: 'DM Mono', monospace; }
+
+    /* ── RESPONSIVE ── */
+    @media (min-width: 640px) {
+      .hamburger { display: none; }
+      .nav-links  { display: flex; }
+      .bottom-nav { display: none; }
+      body { padding-bottom: 0; }
+    }
+    @media (min-width: 900px) {
+      .nav { padding: 0 80px; }
+      .page-header, .search-wrap, .friend-tabs, .friends-list, .search-results { padding-left: 80px; padding-right: 80px; }
+      footer { padding: 18px 80px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav class="nav">
+    <a class="nav-logo" href="index.html"><span class="after">after</span><span class="five">five</span></a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="explore.html">Explore</a></li>
+      <li><a href="plans.html">Plans</a></li>
+      <li><a href="friends.html" class="active">Friends</a></li>
+      <li><a href="ai.html">Plan Gen</a></li>
+      <li><a href="map.html">Map</a></li>
+    </ul>
+    <button class="hamburger" id="hamburgerBtn"><span></span><span></span><span></span></button>
+  </nav>
+  <div class="nav-stripe" aria-hidden="true">
+    <span style="background:#EE352C;"></span><span style="background:#00933C;"></span>
+    <span style="background:#FCCC0A;"></span><span style="background:#0039A6;"></span>
+    <span style="background:#FF6319;"></span>
+  </div>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="index.html">Home</a><a href="explore.html">Explore</a>
+    <a href="plans.html">Plans</a><a href="friends.html">Friends</a>
+    <a href="ai.html">Plan Gen</a><a href="map.html">Map</a>
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <nav class="bottom-nav">
+    <a class="bottom-nav-item" href="index.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Home
+    </a>
+    <a class="bottom-nav-item" href="map.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/></svg>
+      Map
+    </a>
+    <a class="bottom-nav-item" href="ai.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/></svg>
+      Plan
+    </a>
+    <a class="bottom-nav-item" href="plans.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      Plans
+    </a>
+    <a class="bottom-nav-item active" href="friends.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+      Friends
+    </a>
+  </nav>
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <div class="page-header-left">
+      <p>Social</p>
+      <h2>Friends</h2>
+    </div>
+    <button class="btn-primary" onclick="focusSearch()">+ Find Friends</button>
+  </div>
+
+  <!-- SEARCH -->
+  <div class="search-wrap">
+    <span class="search-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+    </span>
+    <input class="search-input" id="searchInput" type="text"
+      placeholder="Search by name or company…"
+      oninput="handleSearch(this.value)" />
+  </div>
+
+  <!-- TABS -->
+  <div class="friend-tabs">
+    <button class="friend-tab active" onclick="switchTab('friends', this)">
+      Friends <span id="friendsCount" class="tab-badge" style="display:none;"></span>
+    </button>
+    <button class="friend-tab" onclick="switchTab('pending', this)">
+      Requests <span id="pendingCount" class="tab-badge" style="display:none;"></span>
+    </button>
+  </div>
+
+  <!-- SEARCH RESULTS (shown while typing) -->
+  <div class="search-results" id="searchResults">
+    <p class="section-label">Search results</p>
+    <div id="searchResultsList"></div>
+  </div>
+
+  <!-- FRIENDS LIST -->
+  <div class="friends-list" id="friendsList">
+    <div class="loading-state" id="loadingState">
+      <div class="loading-dot"></div>
+      <div class="loading-dot"></div>
+      <div class="loading-dot"></div>
+    </div>
+  </div>
+
+  <footer>
+    <a class="footer-logo" href="index.html"><span class="after">after</span><span class="five">five</span></a>
+    <p>"Your NYC nights, sorted."</p>
+  </footer>
+
+  <script>
+  // ── SUPABASE ──
+  const SUPABASE_URL  = 'YOUR_SUPABASE_URL';
+  const SUPABASE_ANON = 'YOUR_PUBLISHABLE_KEY';
+  const { createClient } = supabase;
+  const sb = createClient(SUPABASE_URL, SUPABASE_ANON);
+
+  let currentUser = null;
+  let currentTab  = 'friends';
+  let searchTimer = null;
+
+  // ── INIT ──
+  (async () => {
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) { window.location.href = 'auth.html'; return; }
+    currentUser = session.user;
+    await loadTab('friends');
+  })();
+
+  // ── TAB SWITCH ──
+  function switchTab(tab, el) {
+    currentTab = tab;
+    document.querySelectorAll('.friend-tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    hideSearch();
+    loadTab(tab);
+  }
+
+  async function loadTab(tab) {
+    const list = document.getElementById('friendsList');
+    list.innerHTML = `<div class="loading-state"><div class="loading-dot"></div><div class="loading-dot"></div><div class="loading-dot"></div></div>`;
+
+    if (tab === 'friends') await loadFriends();
+    else await loadPendingRequests();
+  }
+
+  // ── LOAD ACCEPTED FRIENDS ──
+  async function loadFriends() {
+    const list = document.getElementById('friendsList');
+
+    const { data, error } = await sb
+      .from('friendships')
+      .select(`
+        id, sender_id, receiver_id, status,
+        sender:profiles!friendships_sender_id_fkey(id, full_name, company),
+        receiver:profiles!friendships_receiver_id_fkey(id, full_name, company)
+      `)
+      .eq('status', 'accepted')
+      .or(`sender_id.eq.${currentUser.id},receiver_id.eq.${currentUser.id}`);
+
+    if (error || !data || data.length === 0) {
+      list.innerHTML = `
+        <div class="empty-state">
+          <span class="icon">🗺️</span>
+          <p>No friends yet — search above to find other interns.</p>
+          <p class="hint">SEARCH BY NAME OR COMPANY TO GET STARTED</p>
+        </div>`;
+      return;
+    }
+
+    // update badge
+    const badge = document.getElementById('friendsCount');
+    badge.textContent = data.length;
+    badge.style.display = '';
+
+    list.innerHTML = `<p class="section-label">${data.length} connection${data.length !== 1 ? 's' : ''}</p>`;
+
+    data.forEach(f => {
+      const friend = f.sender_id === currentUser.id ? f.receiver : f.sender;
+      if (!friend) return;
+      const initials = (friend.full_name || '?').split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
+      const card = document.createElement('div');
+      card.className = 'friend-card accepted';
+      card.innerHTML = `
+        <div class="avatar">${initials}</div>
+        <div class="friend-info">
+          <p class="friend-name">${friend.full_name || 'Unknown'}</p>
+          <p class="friend-meta">${friend.company || 'No company listed'}</p>
+        </div>
+        <div class="friend-actions">
+          <span class="status-badge s-accepted">Connected</span>
+        </div>`;
+      list.appendChild(card);
+    });
+  }
+
+  // ── LOAD PENDING REQUESTS ──
+  async function loadPendingRequests() {
+    const list = document.getElementById('friendsList');
+
+    const { data, error } = await sb
+      .from('friendships')
+      .select(`
+        id, sender_id, status,
+        sender:profiles!friendships_sender_id_fkey(id, full_name, company)
+      `)
+      .eq('receiver_id', currentUser.id)
+      .eq('status', 'pending');
+
+    if (error || !data || data.length === 0) {
+      list.innerHTML = `
+        <div class="empty-state">
+          <span class="icon">📬</span>
+          <p>No pending requests.</p>
+          <p class="hint">WHEN SOMEONE ADDS YOU, THEY'LL APPEAR HERE</p>
+        </div>`;
+      return;
+    }
+
+    // update badge
+    const badge = document.getElementById('pendingCount');
+    badge.textContent = data.length;
+    badge.style.display = '';
+
+    list.innerHTML = `<p class="section-label">${data.length} pending request${data.length !== 1 ? 's' : ''}</p>`;
+
+    data.forEach(f => {
+      const sender = f.sender;
+      if (!sender) return;
+      const initials = (sender.full_name || '?').split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
+      const card = document.createElement('div');
+      card.className = 'friend-card pending';
+      card.innerHTML = `
+        <div class="avatar">${initials}</div>
+        <div class="friend-info">
+          <p class="friend-name">${sender.full_name || 'Unknown'}</p>
+          <p class="friend-meta">${sender.company || 'No company listed'}</p>
+        </div>
+        <div class="friend-actions">
+          <button class="btn-primary btn-sm" onclick="acceptRequest('${f.id}', this)">Accept</button>
+          <button class="btn-ghost btn-sm" onclick="declineRequest('${f.id}', this)">Decline</button>
+        </div>`;
+      list.appendChild(card);
+    });
+  }
+
+  // ── ACCEPT / DECLINE ──
+  async function acceptRequest(id, btn) {
+    btn.disabled = true; btn.textContent = '…';
+    const { error } = await sb.from('friendships').update({ status: 'accepted' }).eq('id', id);
+    if (error) { showToast('Something went wrong.'); return; }
+    showToast('Friend request accepted! 🎉');
+    loadTab('pending');
+    // refresh badge
+    const badge = document.getElementById('friendsCount');
+    const current = parseInt(badge.textContent || '0') + 1;
+    badge.textContent = current; badge.style.display = '';
+  }
+
+  async function declineRequest(id, btn) {
+    btn.disabled = true;
+    const { error } = await sb.from('friendships').update({ status: 'declined' }).eq('id', id);
+    if (error) { showToast('Something went wrong.'); return; }
+    showToast('Request declined.');
+    loadTab('pending');
+  }
+
+  // ── SEARCH ──
+  function handleSearch(val) {
+    clearTimeout(searchTimer);
+    if (!val.trim()) { hideSearch(); return; }
+    searchTimer = setTimeout(() => searchUsers(val.trim()), 300);
+  }
+
+  async function searchUsers(query) {
+    const resultsDiv  = document.getElementById('searchResults');
+    const resultsList = document.getElementById('searchResultsList');
+    resultsDiv.classList.add('show');
+    resultsList.innerHTML = `<div class="loading-state" style="padding:16px 0;"><div class="loading-dot"></div><div class="loading-dot"></div><div class="loading-dot"></div></div>`;
+
+    const { data, error } = await sb
+      .from('profiles')
+      .select('id, full_name, company')
+      .neq('id', currentUser.id)
+      .or(`full_name.ilike.%${query}%,company.ilike.%${query}%`)
+      .limit(8);
+
+    if (error || !data || data.length === 0) {
+      resultsList.innerHTML = `<div class="empty-state" style="padding:20px 0;"><p>No users found for "${query}"</p></div>`;
+      return;
+    }
+
+    // Get existing friendships to check status
+    const { data: existing } = await sb
+      .from('friendships')
+      .select('sender_id, receiver_id, status')
+      .or(`sender_id.eq.${currentUser.id},receiver_id.eq.${currentUser.id}`);
+
+    const friendMap = {};
+    (existing || []).forEach(f => {
+      const otherId = f.sender_id === currentUser.id ? f.receiver_id : f.sender_id;
+      friendMap[otherId] = f.status;
+    });
+
+    resultsList.innerHTML = '';
+    data.forEach(user => {
+      const initials = (user.full_name || '?').split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
+      const status   = friendMap[user.id];
+      let actionHtml = '';
+      if (status === 'accepted')     actionHtml = `<span class="status-badge s-accepted">Connected</span>`;
+      else if (status === 'pending') actionHtml = `<span class="status-badge s-pending">Pending</span>`;
+      else actionHtml = `<button class="btn-primary btn-sm" onclick="sendRequest('${user.id}', this)">+ Add</button>`;
+
+      const card = document.createElement('div');
+      card.className = 'search-result-card';
+      card.innerHTML = `
+        <div class="avatar">${initials}</div>
+        <div class="friend-info">
+          <p class="friend-name">${user.full_name || 'Unknown'}</p>
+          <p class="friend-meta">${user.company || 'No company listed'}</p>
+        </div>
+        <div class="friend-actions">${actionHtml}</div>`;
+      resultsList.appendChild(card);
+    });
+  }
+
+  function hideSearch() {
+    document.getElementById('searchResults').classList.remove('show');
+    document.getElementById('searchResultsList').innerHTML = '';
+  }
+
+  function focusSearch() {
+    document.getElementById('searchInput').focus();
+    window.scrollTo({ top: 100, behavior: 'smooth' });
+  }
+
+  // ── SEND FRIEND REQUEST ──
+  async function sendRequest(receiverId, btn) {
+    btn.disabled = true; btn.textContent = '…';
+    const { error } = await sb.from('friendships').insert({
+      sender_id:   currentUser.id,
+      receiver_id: receiverId,
+      status:      'pending'
+    });
+    if (error) {
+      btn.disabled = false; btn.textContent = '+ Add';
+      showToast('Could not send request.'); return;
+    }
+    btn.textContent = 'Sent ✓';
+    btn.style.background = 'transparent';
+    btn.style.color = 'var(--lime)';
+    btn.style.border = '1px solid var(--lime)';
+    showToast('Friend request sent! 🎉');
+  }
+
+  // ── HAMBURGER ──
+  const hBtn = document.getElementById('hamburgerBtn');
+  const hMenu = document.getElementById('mobileMenu');
+  if (hBtn && hMenu) {
+    hBtn.addEventListener('click', () => {
+      const open = hMenu.classList.toggle('open');
+      hBtn.classList.toggle('open', open);
+    });
+  }
+
+  // ── TOAST ──
+  function showToast(msg) {
+    const existing = document.querySelector('.toast');
+    if (existing) existing.remove();
+    const t = document.createElement('div');
+    t.className = 'toast'; t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(() => t.style.opacity = '0', 2000);
+    setTimeout(() => t.remove(), 2400);
+  }
+  </script>
+</body>
+</html>
