@@ -518,12 +518,12 @@
       setLoading(false);
       if (error) { showBanner(error.message === 'Invalid login credentials' ? 'Wrong email or password. Try again.' : error.message, 'error'); return; }
       showToast('Welcome back! 🎉');
-      setTimeout(() => window.location.href = 'index.html', 800);
+      setTimeout(() => window.location.href = 'https://afterfivenyc.com/index.html', 800);
     }
   }
 
   async function handleGoogle() {
-    const { error } = await sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin + '/index.html' } });
+    const { error } = await sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: 'https://afterfivenyc.com/index.html' } });
     if (error) showBanner(error.message, 'error');
   }
 
@@ -532,7 +532,7 @@
     const email = document.getElementById('inputEmail').value.trim();
     if (!email) { showBanner('Enter your email above first.', 'error'); return; }
     setLoading(true);
-    const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: window.location.origin + '/auth.html' });
+    const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: 'https://afterfivenyc.com/auth.html' });
     setLoading(false);
     if (error) { showBanner(error.message, 'error'); return; }
     showBanner('Reset link sent — check your inbox.', 'success');
