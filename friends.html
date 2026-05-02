@@ -230,6 +230,8 @@
     }
   });
 
+    sb.auth.getSession().then(({data}) => console.log('SESSION:', data.session ? 'FOUND' : 'NULL', data.session?.access_token?.slice(0,20)));
+
   let currentUser = null;
   let currentTab  = 'friends';
   let searchTimer = null;
