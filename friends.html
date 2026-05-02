@@ -221,7 +221,14 @@
   const SUPABASE_URL  = 'https://kurizbyorntmmdqfviac.supabase.co';
   const SUPABASE_ANON = 'sb_publishable_b8N7U5X4--k8b1VRLiqcew_sRtymSlZ';
   const { createClient } = supabase;
-  const sb = createClient(SUPABASE_URL, SUPABASE_ANON);
+  const sb = createClient(SUPABASE_URL, SUPABASE_ANON, {
+    auth: {
+      persistSession: true,
+      storageKey: 'afterfive-auth',
+      storage: window.localStorage,
+      autoRefreshToken: true,
+    }
+  });
 
   let currentUser = null;
   let currentTab  = 'friends';
