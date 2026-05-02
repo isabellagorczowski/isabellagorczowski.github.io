@@ -7,9 +7,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;500;600;700;800&display=swap" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
-    /* ── TOKENS ── */
     :root {
       --midnight: #080A14;
       --surface:  #0D0F1F;
@@ -21,68 +21,51 @@
       --text:     #E8ECF8;
       --muted:    #7A80A0;
       --subdued:  #3A3F58;
-      --amber:    #EE352C;   /* MTA Red */
-      --green:    #00933C;   /* MTA Green */
-      --blue:     #0039A6;   /* MTA Blue */
-      --purple:   #FF6319;   /* MTA Orange */
+      --amber:    #EE352C;
+      --green:    #00933C;
+      --blue:     #0039A6;
+      --purple:   #FF6319;
       --pad-sm:   20px;
       --pad-md:   40px;
       --pad-lg:   80px;
-      --r-card:   4px;       /* transit: square-ish cards */
-      --r-btn:    4px;       /* transit: square buttons */
+      --r-card:   4px;
+      --r-btn:    4px;
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
-
     body {
-      background: var(--midnight);
-      color: var(--text);
-      font-family: 'Syne', sans-serif;
-      font-size: 15px;
-      line-height: 1.6;
-      overflow-x: hidden;
+      background: var(--midnight); color: var(--text);
+      font-family: 'Syne', sans-serif; font-size: 15px;
+      line-height: 1.6; overflow-x: hidden;
     }
 
     /* ── NAV ── */
     .nav {
       position: fixed; top: 0; left: 0; right: 0; z-index: 200;
       display: flex; align-items: center; justify-content: space-between;
-      padding: 0 var(--pad-sm);
-      height: 56px;
-      background: var(--midnight);
-      border-bottom: 3px solid var(--lime);
+      padding: 0 var(--pad-sm); height: 56px;
+      background: var(--midnight); border-bottom: 3px solid var(--lime);
     }
-
-    /* MTA stripe accent under nav */
-    .nav-stripe {
-      position: fixed; top: 56px; left: 0; right: 0; z-index: 199;
-      display: flex; height: 4px;
-    }
+    .nav-stripe { position: fixed; top: 56px; left: 0; right: 0; z-index: 199; display: flex; height: 4px; }
     .nav-stripe span { flex: 1; }
-
     .nav-logo {
       font-size: 17px; font-weight: 800; text-decoration: none;
-      letter-spacing: -0.5px; line-height: 1;
-      font-family: 'DM Mono', monospace;
-      text-transform: uppercase;
+      letter-spacing: -0.5px; font-family: 'DM Mono', monospace; text-transform: uppercase;
     }
     .nav-logo .after { color: var(--text); }
     .nav-logo .five  { color: var(--lime); }
-
-    .nav-links {
-      display: none; list-style: none; gap: 2px;
-    }
+    .nav-links { display: none; list-style: none; gap: 2px; }
     .nav-links a {
       color: var(--muted); text-decoration: none; font-size: 12px;
       font-weight: 600; padding: 6px 12px;
-      letter-spacing: 0.06em; text-transform: uppercase;
-      transition: color 0.15s;
+      letter-spacing: 0.06em; text-transform: uppercase; transition: color 0.15s;
     }
     .nav-links a:hover { color: var(--text); }
 
+    /* NAV RIGHT — auth area */
+    .nav-right { display: none; align-items: center; gap: 10px; }
     .nav-cta {
-      display: none;
       background: var(--lime); color: var(--midnight);
       border: none; border-radius: var(--r-btn);
       padding: 8px 18px; font-family: 'Syne', sans-serif;
@@ -91,86 +74,110 @@
       white-space: nowrap; letter-spacing: 0.04em; text-transform: uppercase;
     }
     .nav-cta:hover { opacity: 0.85; }
+    .nav-user {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 12px; font-family: 'DM Mono', monospace;
+      letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted);
+    }
+    .nav-avatar {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: var(--lime); color: var(--midnight);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 800; font-family: 'DM Mono', monospace;
+      flex-shrink: 0;
+    }
+    .nav-signout {
+      background: none; border: 1px solid var(--border2);
+      border-radius: var(--r-btn); padding: 6px 12px;
+      color: var(--muted); font-family: 'DM Mono', monospace;
+      font-size: 10px; font-weight: 500; letter-spacing: 0.08em;
+      text-transform: uppercase; cursor: pointer; transition: all 0.15s;
+    }
+    .nav-signout:hover { border-color: var(--amber); color: var(--amber); }
 
     .hamburger {
       display: flex; flex-direction: column;
       gap: 5px; background: none; border: none; cursor: pointer; padding: 4px;
     }
-    .hamburger span {
-      display: block; width: 22px; height: 2px;
-      background: var(--text); border-radius: 0;
-      transition: all 0.25s;
-    }
+    .hamburger span { display: block; width: 22px; height: 2px; background: var(--text); border-radius: 0; transition: all 0.25s; }
     .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
     .hamburger.open span:nth-child(2) { opacity: 0; }
     .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
     .mobile-menu {
       display: none; position: fixed; inset: 0; z-index: 199;
-      background: var(--midnight);
-      flex-direction: column;
-      padding: 80px var(--pad-sm) var(--pad-sm);
-      gap: 0;
-      border-top: 3px solid var(--lime);
-      margin-top: 56px;
+      background: var(--midnight); flex-direction: column;
+      padding: 80px var(--pad-sm) var(--pad-sm); gap: 0;
+      border-top: 3px solid var(--lime); margin-top: 56px;
     }
     .mobile-menu.open { display: flex; }
     .mobile-menu a {
-      color: var(--text); text-decoration: none;
-      font-size: 24px; font-weight: 800;
+      color: var(--text); text-decoration: none; font-size: 24px; font-weight: 800;
       padding: 16px 0; border-bottom: 1px solid var(--border);
-      transition: color 0.15s; display: flex;
-      align-items: center; justify-content: space-between;
-      letter-spacing: -0.5px;
-      font-family: 'DM Mono', monospace;
-      text-transform: uppercase;
+      transition: color 0.15s; display: flex; align-items: center; justify-content: space-between;
+      letter-spacing: -0.5px; font-family: 'DM Mono', monospace; text-transform: uppercase;
     }
     .mobile-menu a::after { content: '→'; color: var(--subdued); font-size: 16px; }
-    .mobile-menu a:hover { color: var(--lime); }
+    .mobile-menu a:hover  { color: var(--lime); }
     .mobile-menu a.menu-cta {
-      font-size: 14px; margin-top: 24px;
-      background: var(--lime); color: var(--midnight);
-      border-radius: var(--r-btn);
-      padding: 14px 28px; text-align: center; font-weight: 700;
-      border-bottom: none; letter-spacing: 0.06em;
-      justify-content: center;
+      font-size: 14px; margin-top: 24px; background: var(--lime); color: var(--midnight);
+      border-radius: var(--r-btn); padding: 14px 28px; text-align: center; font-weight: 700;
+      border-bottom: none; letter-spacing: 0.06em; justify-content: center;
     }
     .mobile-menu a.menu-cta::after { display: none; }
-    .mobile-menu .menu-tagline {
-      margin-top: auto; font-size: 11px; color: var(--subdued);
-      font-family: 'DM Mono', monospace;
+    .mobile-menu .menu-tagline { margin-top: auto; font-size: 11px; color: var(--subdued); font-family: 'DM Mono', monospace; }
+
+    /* ── WELCOME BANNER (logged in) ── */
+    .welcome-banner {
+      display: none;
+      background: var(--surface); border-bottom: 1px solid var(--border);
+      padding: 10px var(--pad-sm);
+      align-items: center; justify-content: space-between; gap: 12px;
+      margin-top: 60px;
     }
+    .welcome-banner.show { display: flex; }
+    .welcome-banner p {
+      font-size: 11px; font-family: 'DM Mono', monospace;
+      color: var(--muted); letter-spacing: 0.06em;
+    }
+    .welcome-banner p strong { color: var(--lime); }
+    .welcome-banner a {
+      font-size: 10px; font-family: 'DM Mono', monospace;
+      color: var(--lime); text-decoration: none; letter-spacing: 0.08em;
+      text-transform: uppercase; white-space: nowrap;
+    }
+
+    /* ── TICKER ── */
+    .ticker-wrap {
+      overflow: hidden; border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      background: var(--surface); padding: 10px 0;
+    }
+    .ticker-track { display: flex; white-space: nowrap; animation: ticker 30s linear infinite; }
+    .ticker-track:hover { animation-play-state: paused; }
+    @keyframes ticker { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+    .ticker-item {
+      display: inline-flex; align-items: center; gap: 10px;
+      padding: 0 32px; font-size: 11px; font-family: 'DM Mono', monospace;
+      color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; flex-shrink: 0;
+    }
+    .ticker-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
 
     /* ── HERO ── */
     .hero {
-      min-height: 100dvh;
-      display: flex; flex-direction: column; justify-content: center;
-      padding: 120px var(--pad-sm) 60px;
-      position: relative; overflow: hidden;
+      min-height: 100dvh; display: flex; flex-direction: column; justify-content: center;
+      padding: 120px var(--pad-sm) 60px; position: relative; overflow: hidden;
     }
-
-    /* Subtle grid texture — transit map vibe */
     .hero::before {
-      content: '';
-      position: absolute; inset: 0;
-      background-image:
-        linear-gradient(var(--border) 1px, transparent 1px),
-        linear-gradient(90deg, var(--border) 1px, transparent 1px);
-      background-size: 48px 48px;
-      opacity: 0.35;
-      pointer-events: none;
+      content: ''; position: absolute; inset: 0;
+      background-image: linear-gradient(var(--border) 1px,transparent 1px), linear-gradient(90deg,var(--border) 1px,transparent 1px);
+      background-size: 48px 48px; opacity: 0.35; pointer-events: none;
     }
-
     .hero-eyebrow {
-      font-family: 'DM Mono', monospace;
-      font-size: 10px; font-weight: 500;
-      color: var(--lime); letter-spacing: 0.18em;
-      text-transform: uppercase; margin-bottom: 20px;
-      display: flex; align-items: center; gap: 10px;
-      position: relative;
+      font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 500;
+      color: var(--lime); letter-spacing: 0.18em; text-transform: uppercase;
+      margin-bottom: 20px; display: flex; align-items: center; gap: 10px; position: relative;
     }
-
-    /* MTA circle bullet */
     .hero-eyebrow .mta-bullet {
       width: 20px; height: 20px; border-radius: 50%;
       background: var(--lime); color: var(--midnight);
@@ -178,626 +185,251 @@
       display: flex; align-items: center; justify-content: center;
       flex-shrink: 0; font-family: 'DM Mono', monospace;
     }
-
     .hero-title {
-      font-size: clamp(42px, 12vw, 96px);
-      font-weight: 800; line-height: 1.0;
-      letter-spacing: -3px; margin-bottom: 24px;
-      position: relative;
+      font-size: clamp(42px,12vw,96px); font-weight: 800; line-height: 1.0;
+      letter-spacing: -3px; margin-bottom: 24px; position: relative;
     }
-    .hero-title em {
-      font-style: normal; color: var(--lime);
-      /* station-sign underline */
-      border-bottom: 4px solid var(--lime);
-      padding-bottom: 2px;
-    }
-
-    .hero-sub {
-      font-size: clamp(14px, 2.2vw, 17px);
-      color: var(--muted); max-width: 420px;
-      line-height: 1.7; margin-bottom: 36px;
-      position: relative;
-    }
-
-    .hero-actions {
-      display: flex; flex-direction: column; gap: 10px;
-      position: relative;
-    }
-
-    /* MTA line dots row */
-    .mta-lines {
-      display: flex; gap: 8px; margin-bottom: 28px;
-      position: relative;
-    }
+    .hero-title em { font-style: normal; color: var(--lime); border-bottom: 4px solid var(--lime); padding-bottom: 2px; }
+    .hero-sub { font-size: clamp(14px,2.2vw,17px); color: var(--muted); max-width: 420px; line-height: 1.7; margin-bottom: 36px; position: relative; }
+    .hero-actions { display: flex; flex-direction: column; gap: 10px; position: relative; }
+    .mta-lines { display: flex; gap: 8px; margin-bottom: 28px; position: relative; }
     .mta-dot {
       width: 28px; height: 28px; border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
-      font-size: 11px; font-weight: 800; font-family: 'DM Mono', monospace;
-      flex-shrink: 0; letter-spacing: 0;
+      font-size: 11px; font-weight: 800; font-family: 'DM Mono', monospace; flex-shrink: 0;
     }
 
+    /* ── BUTTONS ── */
     .btn-primary {
       display: inline-flex; align-items: center; justify-content: center;
-      background: var(--lime); color: var(--midnight);
-      border: none; border-radius: var(--r-btn);
-      padding: 15px 28px; font-family: 'Syne', sans-serif;
-      font-size: 14px; font-weight: 700; cursor: pointer;
-      text-decoration: none; transition: opacity 0.15s, transform 0.1s;
-      letter-spacing: 0.04em; text-transform: uppercase;
+      background: var(--lime); color: var(--midnight); border: none; border-radius: var(--r-btn);
+      padding: 15px 28px; font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700;
+      cursor: pointer; text-decoration: none; transition: opacity 0.15s, transform 0.1s;
+      letter-spacing: 0.04em; text-transform: uppercase; position: relative; overflow: hidden;
     }
-    .btn-primary:hover { opacity: 0.88; }
+    .btn-primary:hover  { opacity: 0.88; }
     .btn-primary:active { transform: scale(0.97); }
-
     .btn-ghost {
       display: inline-flex; align-items: center; justify-content: center;
-      background: transparent; color: var(--text);
-      border: 1px solid var(--border2); border-radius: var(--r-btn);
-      padding: 15px 28px; font-family: 'Syne', sans-serif;
-      font-size: 14px; font-weight: 600; cursor: pointer;
-      text-decoration: none; transition: border-color 0.15s, background 0.15s;
-      letter-spacing: 0.04em; text-transform: uppercase;
+      background: transparent; color: var(--text); border: 1px solid var(--border2);
+      border-radius: var(--r-btn); padding: 15px 28px; font-family: 'Syne', sans-serif;
+      font-size: 14px; font-weight: 600; cursor: pointer; text-decoration: none;
+      transition: border-color 0.15s, background 0.15s; letter-spacing: 0.04em; text-transform: uppercase;
     }
     .btn-ghost:hover { border-color: var(--muted); background: var(--surface2); }
 
-    /* ── STAT BAR — station board style ── */
+    /* ── STAT BAR ── */
     .stat-bar {
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-      display: flex; flex-wrap: wrap; gap: 0;
-      background: var(--surface);
+      border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+      display: flex; flex-wrap: wrap; gap: 0; background: var(--surface);
     }
-    .stat-item {
-      flex: 1 1 50%; padding: 20px 0;
-      text-align: center; position: relative;
-    }
+    .stat-item { flex: 1 1 50%; padding: 20px 0; text-align: center; position: relative; }
     .stat-item:nth-child(odd)  { border-right: 1px solid var(--border); }
-    .stat-item:nth-child(1),
-    .stat-item:nth-child(2)    { border-bottom: 1px solid var(--border); }
+    .stat-item:nth-child(1), .stat-item:nth-child(2) { border-bottom: 1px solid var(--border); }
+    .stat-num { font-size: 30px; font-weight: 800; color: var(--lime); font-family: 'DM Mono', monospace; letter-spacing: -1px; line-height: 1.1; }
+    .stat-label { font-size: 9px; color: var(--muted); margin-top: 4px; font-family: 'DM Mono', monospace; letter-spacing: 0.12em; text-transform: uppercase; }
 
-    .stat-num {
-      font-size: 30px; font-weight: 800;
-      color: var(--lime); font-family: 'DM Mono', monospace;
-      letter-spacing: -1px; line-height: 1.1;
-    }
-    .stat-label {
-      font-size: 9px; color: var(--muted);
-      margin-top: 4px; font-family: 'DM Mono', monospace;
-      letter-spacing: 0.12em; text-transform: uppercase;
-    }
-
-    /* ── SECTION COMMON ── */
+    /* ── SECTIONS ── */
     section { padding: 72px var(--pad-sm); }
+    .section-tag { font-family: 'DM Mono', monospace; font-size: 9px; font-weight: 500; color: var(--lime); letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+    .section-tag::before { content: ''; display: block; width: 16px; height: 2px; background: var(--lime); }
+    .section-title { font-size: clamp(26px,6vw,44px); font-weight: 800; line-height: 1.08; letter-spacing: -1.5px; margin-bottom: 16px; }
+    .section-sub { font-size: 14px; color: var(--muted); line-height: 1.7; max-width: 480px; margin-bottom: 40px; }
 
-    .section-tag {
-      font-family: 'DM Mono', monospace;
-      font-size: 9px; font-weight: 500;
-      color: var(--lime); letter-spacing: 0.18em;
-      text-transform: uppercase; margin-bottom: 14px;
-      display: flex; align-items: center; gap: 8px;
-    }
-    .section-tag::before {
-      content: ''; display: block;
-      width: 16px; height: 2px; background: var(--lime);
-    }
-
-    .section-title {
-      font-size: clamp(26px, 6vw, 44px);
-      font-weight: 800; line-height: 1.08;
-      letter-spacing: -1.5px; margin-bottom: 16px;
-    }
-    .section-sub {
-      font-size: 14px; color: var(--muted);
-      line-height: 1.7; max-width: 480px;
-      margin-bottom: 40px;
-    }
-
-    /* ── HOW IT WORKS — station signage ── */
+    /* ── STEPS ── */
     .steps-section { background: var(--surface); }
-
-    /* multi-stripe divider */
-    .stripe-divider {
-      display: flex; height: 6px;
-      margin-bottom: 0;
-    }
+    .stripe-divider { display: flex; height: 6px; }
     .stripe-divider span { flex: 1; }
-
-    .steps-grid {
-      display: flex; flex-direction: column; gap: 0;
-      border: 1px solid var(--border);
-      border-radius: 0; /* square — transit */
-      overflow: hidden; margin-top: 40px;
-    }
-    .step-item {
-      display: flex; gap: 20px; align-items: flex-start;
-      padding: 24px; border-bottom: 1px solid var(--border);
-      transition: background 0.2s;
-      border-left: 4px solid transparent;
-    }
+    .steps-grid { display: flex; flex-direction: column; gap: 0; border: 1px solid var(--border); overflow: hidden; margin-top: 40px; }
+    .step-item { display: flex; gap: 20px; align-items: flex-start; padding: 24px; border-bottom: 1px solid var(--border); transition: background 0.2s; border-left: 4px solid transparent; }
     .step-item:nth-child(1) { border-left-color: var(--amber); }
     .step-item:nth-child(2) { border-left-color: var(--green); }
     .step-item:nth-child(3) { border-left-color: var(--lime); }
     .step-item:nth-child(4) { border-left-color: var(--blue); }
     .step-item:last-child { border-bottom: none; }
     .step-item:hover { background: var(--surface2); }
-
-    .step-num {
-      font-family: 'DM Mono', monospace;
-      font-size: 10px; color: var(--subdued); font-weight: 500;
-      letter-spacing: 0.1em; flex-shrink: 0;
-      width: 28px; padding-top: 2px;
-    }
+    .step-num { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--subdued); font-weight: 500; letter-spacing: 0.1em; flex-shrink: 0; width: 28px; padding-top: 2px; }
     .step-content h4 { font-size: 15px; font-weight: 700; margin-bottom: 5px; }
     .step-content p  { font-size: 13px; color: var(--muted); line-height: 1.6; }
     .step-icon { font-size: 20px; flex-shrink: 0; margin-left: auto; }
 
     /* ── FEATURES ── */
     .features-section { background: var(--midnight); }
-    .features-grid {
-      display: grid; grid-template-columns: 1fr;
-      gap: 1px; margin-top: 40px;
-      background: var(--border); /* gap becomes border */
-      border: 1px solid var(--border);
-    }
-    .feature-card {
-      background: var(--surface);
-      padding: 28px 24px;
-      transition: background 0.2s;
-      position: relative;
-    }
+    .features-grid { display: grid; grid-template-columns: 1fr; gap: 1px; margin-top: 40px; background: var(--border); border: 1px solid var(--border); }
+    .feature-card { background: var(--surface); padding: 28px 24px; transition: background 0.2s; position: relative; }
     .feature-card:hover { background: var(--surface2); }
-
-    /* MTA circle category icon */
-    .feature-dot {
-      width: 32px; height: 32px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 13px; font-weight: 800;
-      font-family: 'DM Mono', monospace;
-      color: #fff; margin-bottom: 16px; flex-shrink: 0;
-    }
-
+    .feature-dot { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; font-family: 'DM Mono', monospace; color: #fff; margin-bottom: 16px; }
     .feature-card h4 { font-size: 15px; font-weight: 700; margin-bottom: 8px; }
     .feature-card p  { font-size: 13px; color: var(--muted); line-height: 1.6; }
 
+    /* ── COMPARE ── */
+    .compare-section { padding: 72px var(--pad-sm); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); border: 1px solid var(--border); margin-top: 32px; }
+    .compare-col { background: var(--surface); padding: 28px 24px; }
+    .compare-col-label { font-size: 10px; font-family: 'DM Mono', monospace; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
+    .compare-col-label.bad  { color: #EE352C; }
+    .compare-col-label.good { color: #00933C; }
+    .compare-item { display: flex; align-items: flex-start; gap: 10px; font-size: 12px; color: var(--muted); margin-bottom: 14px; line-height: 1.5; }
+    .compare-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+
     /* ── TESTIMONIALS ── */
     .testimonials-section { background: var(--surface); }
-    .testimonials-grid {
-      display: flex; flex-direction: column; gap: 12px;
-      margin-top: 40px;
-    }
-    .testimonial-card {
-      background: var(--midnight);
-      border: 1px solid var(--border);
-      border-radius: 0;
-      padding: 24px;
-      border-left: 3px solid var(--lime);
-    }
-    .testimonial-text {
-      font-size: 14px; line-height: 1.75;
-      color: var(--text); margin-bottom: 18px;
-    }
+    .testimonials-grid { display: flex; flex-direction: column; gap: 12px; margin-top: 40px; }
+    .testimonial-card { background: var(--midnight); border: 1px solid var(--border); padding: 24px; border-left: 3px solid var(--lime); }
+    .testimonial-text { font-size: 14px; line-height: 1.75; color: var(--text); margin-bottom: 18px; }
     .testimonial-text::before { content: '"'; color: var(--lime); font-size: 18px; line-height: 0; vertical-align: -4px; margin-right: 2px; }
     .testimonial-text::after  { content: '"'; color: var(--lime); font-size: 18px; line-height: 0; vertical-align: -4px; margin-left: 2px; }
     .testimonial-author { display: flex; align-items: center; gap: 12px; }
-    .t-avatar {
-      width: 34px; height: 34px; border-radius: 50%;
-      background: var(--surface2); border: 1px solid var(--border2);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 15px; flex-shrink: 0;
-    }
+    .t-avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--surface2); border: 1px solid var(--border2); display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; }
     .t-name { font-size: 13px; font-weight: 700; }
     .t-role { font-size: 10px; color: var(--muted); font-family: 'DM Mono', monospace; letter-spacing: 0.04em; }
 
-    /* ── FINAL CTA ── */
-    .cta-section {
-      background: var(--midnight);
-      text-align: center;
-      padding: 80px var(--pad-sm) 100px;
-      position: relative; overflow: hidden;
-    }
-    /* grid texture */
-    .cta-section::before {
-      content: '';
-      position: absolute; inset: 0;
-      background-image:
-        linear-gradient(var(--border) 1px, transparent 1px),
-        linear-gradient(90deg, var(--border) 1px, transparent 1px);
-      background-size: 48px 48px;
-      opacity: 0.3;
-      pointer-events: none;
-    }
+    /* ── CTA ── */
+    .cta-section { background: var(--midnight); text-align: center; padding: 80px var(--pad-sm) 100px; position: relative; overflow: hidden; }
+    .cta-section::before { content: ''; position: absolute; inset: 0; background-image: linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px); background-size: 48px 48px; opacity: 0.3; pointer-events: none; }
     .cta-section .section-tag { justify-content: center; }
     .cta-section .section-sub { margin: 0 auto 36px; text-align: center; }
-    .cta-actions {
-      display: flex; flex-direction: column;
-      align-items: center; gap: 10px; position: relative;
-    }
-    .cta-note {
-      font-size: 11px; color: var(--subdued);
-      font-family: 'DM Mono', monospace; margin-top: 12px;
-      position: relative;
-    }
+    .cta-actions { display: flex; flex-direction: column; align-items: center; gap: 10px; position: relative; }
+    .cta-note { font-size: 11px; color: var(--subdued); font-family: 'DM Mono', monospace; margin-top: 12px; position: relative; }
 
     /* ── FOOTER ── */
-    footer {
-      border-top: 3px solid var(--lime);
-      padding: 24px var(--pad-sm);
-      display: flex; flex-direction: column; gap: 16px;
-      background: var(--surface);
-    }
-    .footer-top {
-      display: flex; align-items: center; justify-content: space-between;
-    }
-    .footer-logo {
-      font-size: 15px; font-weight: 800;
-      text-decoration: none; letter-spacing: -0.4px;
-      font-family: 'DM Mono', monospace; text-transform: uppercase;
-    }
+    footer { border-top: 3px solid var(--lime); padding: 24px var(--pad-sm); display: flex; flex-direction: column; gap: 16px; background: var(--surface); }
+    .footer-top { display: flex; align-items: center; justify-content: space-between; }
+    .footer-logo { font-size: 15px; font-weight: 800; text-decoration: none; letter-spacing: -0.4px; font-family: 'DM Mono', monospace; text-transform: uppercase; }
     .footer-logo .after { color: var(--text); }
     .footer-logo .five  { color: var(--lime); }
-    .footer-links { display: flex; gap: 20px; }
-    .footer-links a {
-      font-size: 11px; color: var(--muted); text-decoration: none;
-      transition: color 0.15s; text-transform: uppercase;
-      letter-spacing: 0.08em; font-family: 'DM Mono', monospace;
-    }
-    .footer-links a:hover { color: var(--text); }
-    .footer-bottom {
-      font-size: 10px; color: var(--subdued);
-      font-family: 'DM Mono', monospace; letter-spacing: 0.06em;
-    }
-
-    /* MTA stripe footer */
     .footer-stripe { display: flex; height: 4px; margin-bottom: 20px; }
     .footer-stripe span { flex: 1; }
-
-    .footer-ig {
-      display: flex; align-items: center; gap: 6px;
-      color: var(--muted); text-decoration: none;
-      font-size: 11px; transition: color 0.15s;
-      font-family: 'DM Mono', monospace;
-    }
+    .footer-ig { display: flex; align-items: center; gap: 6px; color: var(--muted); text-decoration: none; font-size: 11px; transition: color 0.15s; font-family: 'DM Mono', monospace; }
     .footer-ig:hover { color: var(--lime); }
     .footer-ig svg { width: 14px; height: 14px; }
+    .footer-bottom { font-size: 10px; color: var(--subdued); font-family: 'DM Mono', monospace; letter-spacing: 0.06em; }
 
-    /* price tag tilt — on stat numbers */
-    .price-tag {
-      display: inline-block;
-      background: var(--lime); color: var(--midnight);
-      font-family: 'DM Mono', monospace;
-      font-size: 11px; font-weight: 700;
-      padding: 2px 8px;
-      transform: rotate(-2deg);
-      letter-spacing: 0.04em;
-    }
+    /* ── MISC ── */
+    .arrival-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--lime); margin-right: 6px; vertical-align: middle; animation: blink 1.4s ease-in-out infinite; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.15} }
+    .typewriter-cursor { display: inline-block; width: 3px; height: 0.85em; background: var(--lime); margin-left: 4px; vertical-align: middle; animation: cur 1s step-end infinite; }
+    @keyframes cur { 0%,100%{opacity:1} 50%{opacity:0} }
+    .mta-dot-animated { opacity: 0; transform: scale(0.5); animation: dotpop 0.4s cubic-bezier(0.16,1,0.3,1) forwards; }
+    @keyframes dotpop { to { opacity:1; transform:scale(1); } }
+    .reveal { opacity:0; transform:translateY(28px); transition: opacity 0.6s cubic-bezier(0.16,1,0.3,1), transform 0.6s cubic-bezier(0.16,1,0.3,1); }
+    .reveal.visible { opacity:1; transform:translateY(0); }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
 
-    /* blinking arrival dot */
-    .arrival-dot {
-      display: inline-block;
-      width: 6px; height: 6px; border-radius: 50%;
-      background: var(--lime); margin-right: 6px;
-      vertical-align: middle;
-      animation: blink 1.4s ease-in-out infinite;
-    }
-    @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50%       { opacity: 0.15; }
-    }
-
-    /* ══ RESPONSIVE ══ */
+    /* ── RESPONSIVE ── */
     @media (min-width: 600px) {
       .hero-actions { flex-direction: row; }
       .stat-bar { flex-wrap: nowrap; }
-      .stat-item { flex: 1; border-bottom: none !important; }
+      .stat-item { flex:1; border-bottom: none !important; }
       .stat-item:nth-child(odd) { border-right: 1px solid var(--border); }
       .stat-item:last-child { border-right: none; }
       .features-grid { grid-template-columns: 1fr 1fr; }
       .testimonials-grid { display: grid; grid-template-columns: 1fr 1fr; }
       .cta-actions { flex-direction: row; justify-content: center; }
     }
-
     @media (min-width: 900px) {
       .nav { padding: 0 var(--pad-lg); }
       .nav-links { display: flex; }
-      .nav-cta   { display: inline-flex; }
-      .hamburger { display: none; }
+      .nav-right  { display: flex; }
+      .hamburger  { display: none; }
       .hero { padding: 140px var(--pad-lg) 80px; }
-      .stat-bar { padding: 0; }
       .stat-num { font-size: 36px; }
       section { padding: 96px var(--pad-lg); }
       .steps-grid { flex-direction: row; }
-      .step-item {
-        flex: 1; flex-direction: column;
-        border-bottom: none; border-right: 1px solid var(--border);
-        border-left-width: 0; border-top: 4px solid transparent;
-      }
+      .step-item { flex:1; flex-direction: column; border-bottom: none; border-right: 1px solid var(--border); border-left-width: 0; border-top: 4px solid transparent; }
       .step-item:nth-child(1) { border-top-color: var(--amber); }
       .step-item:nth-child(2) { border-top-color: var(--green); }
       .step-item:nth-child(3) { border-top-color: var(--lime); }
       .step-item:nth-child(4) { border-top-color: var(--blue); }
       .step-item:last-child { border-right: none; }
       .step-icon { margin-left: 0; margin-top: auto; }
-      .features-grid { grid-template-columns: repeat(3, 1fr); }
-      .testimonials-grid { grid-template-columns: repeat(3, 1fr); }
+      .features-grid { grid-template-columns: repeat(3,1fr); }
+      .testimonials-grid { grid-template-columns: repeat(3,1fr); }
       footer { flex-direction: row; align-items: center; padding: 24px var(--pad-lg); }
       .footer-bottom { margin-left: auto; }
+      .welcome-banner { padding-left: var(--pad-lg); padding-right: var(--pad-lg); }
+      .compare-section { padding-left: var(--pad-lg); padding-right: var(--pad-lg); }
     }
-
-  /* ── SCROLL REVEALS ── */
-  .reveal {
-    opacity: 0;
-    transform: translateY(28px);
-    transition: opacity 0.6s cubic-bezier(0.16,1,0.3,1), transform 0.6s cubic-bezier(0.16,1,0.3,1);
-  }
-  .reveal.visible { opacity: 1; transform: translateY(0); }
-  .reveal-delay-1 { transition-delay: 0.1s; }
-  .reveal-delay-2 { transition-delay: 0.2s; }
-  .reveal-delay-3 { transition-delay: 0.3s; }
-  .reveal-delay-4 { transition-delay: 0.4s; }
-
-  /* ── ANIMATED COUNTER ── */
-  .stat-num { transition: color 0.3s; }
-  .stat-num.popped { color: var(--lime); }
-
-  /* ── TICKER ── */
-  .ticker-wrap {
-    overflow: hidden;
-    border-top: 1px solid var(--border);
-    border-bottom: 1px solid var(--border);
-    background: var(--surface);
-    padding: 10px 0;
-    margin-bottom: 0;
-  }
-  .ticker-track {
-    display: flex;
-    white-space: nowrap;
-    animation: ticker 30s linear infinite;
-  }
-  .ticker-track:hover { animation-play-state: paused; }
-  @keyframes ticker {
-    0%   { transform: translateX(0); }
-    100% { transform: translateX(-50%); }
-  }
-  .ticker-item {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    padding: 0 32px;
-    font-size: 11px;
-    font-family: 'DM Mono', monospace;
-    color: var(--muted);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    flex-shrink: 0;
-  }
-  .ticker-dot {
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    flex-shrink: 0;
-  }
-
-  /* ── HERO HEADLINE TYPEWRITER ── */
-  .typewriter-cursor {
-    display: inline-block;
-    width: 3px;
-    height: 0.85em;
-    background: var(--lime);
-    margin-left: 4px;
-    vertical-align: middle;
-    animation: blink 1s step-end infinite;
-  }
-  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
-
-  /* ── CARD HOVER LIFT ── */
-  .card {
-    transition: border-color 0.15s, transform 0.2s cubic-bezier(0.16,1,0.3,1) !important;
-  }
-  .card:hover { transform: translateY(-4px) !important; }
-
-  /* ── LIVE PULSE DOT ── */
-  .live-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    font-size: 10px;
-    font-family: 'DM Mono', monospace;
-    color: var(--lime);
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    margin-bottom: 18px;
-  }
-  .live-dot {
-    width: 7px; height: 7px;
-    border-radius: 50%;
-    background: #00933C;
-    animation: livepulse 1.8s ease infinite;
-    flex-shrink: 0;
-  }
-  @keyframes livepulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.8)} }
-
-  /* ── WITHOUT / WITH SECTION ── */
-  .compare-section {
-    padding: 72px var(--pad-sm);
-    border-top: 1px solid var(--border);
-    border-bottom: 1px solid var(--border);
-  }
-  .compare-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1px;
-    background: var(--border);
-    border: 1px solid var(--border);
-    margin-top: 32px;
-  }
-  .compare-col {
-    background: var(--surface);
-    padding: 28px 24px;
-  }
-  .compare-col-label {
-    font-size: 10px;
-    font-family: 'DM Mono', monospace;
-    font-weight: 600;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    margin-bottom: 20px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .compare-col-label.bad  { color: #EE352C; }
-  .compare-col-label.good { color: #00933C; }
-  .compare-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    font-size: 12px;
-    color: var(--muted);
-    margin-bottom: 14px;
-    line-height: 1.5;
-    font-family: 'Syne', sans-serif;
-  }
-  .compare-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
-
-  /* ── SOCIAL PROOF ROW ── */
-  .proof-row {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-top: 28px;
-    flex-wrap: wrap;
-  }
-  .proof-avatars { display: flex; }
-  .proof-av {
-    width: 28px; height: 28px; border-radius: 50%;
-    border: 2px solid var(--midnight);
-    background: var(--surface2);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 13px;
-    margin-left: -7px;
-  }
-  .proof-av:first-child { margin-left: 0; }
-  .proof-text {
-    font-size: 12px;
-    color: var(--muted);
-    font-family: 'Syne', sans-serif;
-  }
-  .proof-text strong { color: var(--lime); }
-
-  /* ── MTA DOTS STAGGER ── */
-  .mta-dot-animated {
-    opacity: 0;
-    transform: scale(0.5);
-    animation: dotpop 0.4s cubic-bezier(0.16,1,0.3,1) forwards;
-  }
-  @keyframes dotpop {
-    to { opacity: 1; transform: scale(1); }
-  }
-
-  /* ── BUTTON SHIMMER ── */
-  .btn-primary { position: relative; overflow: hidden; }
-  .btn-primary::after {
-    content: '';
-    position: absolute;
-    top: 0; left: -100%;
-    width: 60%; height: 100%;
-    background: rgba(255,255,255,0.2);
-    transform: skewX(-20deg);
-    animation: shimmer 3s ease infinite;
-  }
-  @keyframes shimmer {
-    0%   { left: -100%; }
-    40%  { left: 150%; }
-    100% { left: 150%; }
-  }
-
-  @media (min-width: 640px) {
-    .compare-section { padding-left: var(--pad-md); padding-right: var(--pad-md); }
-  }
-  @media (min-width: 900px) {
-    .compare-section { padding-left: var(--pad-lg); padding-right: var(--pad-lg); }
-  }
-
   </style>
 </head>
 <body>
 
-  <!-- ── NAV ── -->
+  <!-- NAV -->
   <nav class="nav" id="mainNav">
-    <a class="nav-logo" href="index.html">
-      <span class="after">after</span><span class="five">five</span>
-    </a>
+    <a class="nav-logo" href="index.html"><span class="after">after</span><span class="five">five</span></a>
     <ul class="nav-links">
       <li><a href="explore.html">Explore</a></li>
       <li><a href="ai.html">Plan Generator</a></li>
+      <li><a href="friends.html">Friends</a></li>
       <li><a href="submit.html">Submit a Spot</a></li>
-      <li><a href="about.html">About</a></li>
     </ul>
-    <a class="nav-cta" href="ai.html">✦ Build My Night</a>
+    <!-- Desktop auth area -->
+    <div class="nav-right" id="navRight">
+      <!-- filled by JS -->
+    </div>
     <button class="hamburger" id="hamburgerBtn" aria-label="Open menu">
       <span></span><span></span><span></span>
     </button>
   </nav>
 
-    <!-- TICKER -->
-<div class="ticker-wrap">
-  <div class="ticker-track" id="tickerTrack">
-    <span class="ticker-item"><span class="ticker-dot" style="background:#EE352C"></span>500+ curated NYC spots</span>
-    <span class="ticker-item"><span class="ticker-dot" style="background:#00933C"></span>Piano's Rooftop — 22 interns tonight</span>
-    <span class="ticker-item"><span class="ticker-dot" style="background:#FCCC0A"></span>MoMA Free Fridays 5:30 PM</span>
-    <span class="ticker-item"><span class="ticker-dot" style="background:#0039A6"></span>Please Don't Tell — 8 interns going</span>
-    <span class="ticker-item"><span class="ticker-dot" style="background:#FF6319"></span>$0 minimum budget · always free to use</span>
-    <span class="ticker-item"><span class="ticker-dot" style="background:#EE352C"></span>New: Dante, Cervo's, Bar Goto added</span>
-    <span class="ticker-item"><span class="ticker-dot" style="background:#00933C"></span>Xi'an Famous Foods — 12 going tonight</span>
-    <span class="ticker-item"><span class="ticker-dot" style="background:#FCCC0A"></span>Build your plan in 60 seconds ✦</span>
-    <span class="ticker-item"><span class="ticker-dot" style="background:#EE352C"></span>500+ curated NYC spots</span>
-    <span class="ticker-item"><span class="ticker-dot" style="background:#00933C"></span>Piano's Rooftop — 22 interns tonight</span>
-    <span class="ticker-item"><span class="ticker-dot" style="background:#FCCC0A"></span>MoMA Free Fridays 5:30 PM</span>
-    <span class="ticker-item"><span class="ticker-dot" style="background:#0039A6"></span>Please Don't Tell — 8 interns going</span>
-    <span class="ticker-item"><span class="ticker-dot" style="background:#FF6319"></span>$0 minimum budget · always free to use</span>
-    <span class="ticker-item"><span class="ticker-dot" style="background:#EE352C"></span>New: Dante, Cervo's, Bar Goto added</span>
-    <span class="ticker-item"><span class="ticker-dot" style="background:#00933C"></span>Xi'an Famous Foods — 12 going tonight</span>
-    <span class="ticker-item"><span class="ticker-dot" style="background:#FCCC0A"></span>Build your plan in 60 seconds ✦</span>
-  </div>
-</div>
-
-  <!-- MTA stripe under nav -->
   <div class="nav-stripe" aria-hidden="true">
-    <span style="background:#EE352C;"></span>
-    <span style="background:#00933C;"></span>
-    <span style="background:#FCCC0A;"></span>
-    <span style="background:#0039A6;"></span>
+    <span style="background:#EE352C;"></span><span style="background:#00933C;"></span>
+    <span style="background:#FCCC0A;"></span><span style="background:#0039A6;"></span>
     <span style="background:#FF6319;"></span>
   </div>
 
-  <!-- Mobile Drawer -->
+  <!-- WELCOME BANNER (logged in only) -->
+  <div class="welcome-banner" id="welcomeBanner">
+    <p>👋 Welcome back, <strong id="welcomeName">friend</strong>!</p>
+    <a href="friends.html">See what your crew is up to →</a>
+  </div>
+
+  <!-- MOBILE MENU -->
   <div class="mobile-menu" id="mobileMenu">
     <a href="index.html">Home</a>
     <a href="explore.html">Explore</a>
     <a href="ai.html">Plan Generator</a>
+    <a href="friends.html">Friends</a>
     <a href="submit.html">Submit a Spot</a>
-    <a href="about.html">About</a>
-    <a class="menu-cta" href="ai.html">✦ Build My Night</a>
+    <a class="menu-cta" id="mobileAuthLink" href="auth.html">Sign in →</a>
     <p class="menu-tagline">"Your NYC nights, sorted."</p>
   </div>
 
-  <!-- ── HERO ── -->
+  <!-- TICKER -->
+  <div class="ticker-wrap">
+    <div class="ticker-track">
+      <span class="ticker-item"><span class="ticker-dot" style="background:#EE352C"></span>500+ curated NYC spots</span>
+      <span class="ticker-item"><span class="ticker-dot" style="background:#00933C"></span>Piano's Rooftop — 22 interns tonight</span>
+      <span class="ticker-item"><span class="ticker-dot" style="background:#FCCC0A"></span>MoMA Free Fridays 5:30 PM</span>
+      <span class="ticker-item"><span class="ticker-dot" style="background:#0039A6"></span>Please Don't Tell — 8 interns going</span>
+      <span class="ticker-item"><span class="ticker-dot" style="background:#FF6319"></span>$0 minimum budget · always free to use</span>
+      <span class="ticker-item"><span class="ticker-dot" style="background:#EE352C"></span>New: Dante, Cervo's, Bar Goto added</span>
+      <span class="ticker-item"><span class="ticker-dot" style="background:#00933C"></span>Xi'an Famous Foods — 12 going tonight</span>
+      <span class="ticker-item"><span class="ticker-dot" style="background:#FCCC0A"></span>Build your plan in 60 seconds ✦</span>
+      <span class="ticker-item"><span class="ticker-dot" style="background:#EE352C"></span>500+ curated NYC spots</span>
+      <span class="ticker-item"><span class="ticker-dot" style="background:#00933C"></span>Piano's Rooftop — 22 interns tonight</span>
+      <span class="ticker-item"><span class="ticker-dot" style="background:#FCCC0A"></span>MoMA Free Fridays 5:30 PM</span>
+      <span class="ticker-item"><span class="ticker-dot" style="background:#0039A6"></span>Please Don't Tell — 8 interns going</span>
+      <span class="ticker-item"><span class="ticker-dot" style="background:#FF6319"></span>$0 minimum budget · always free to use</span>
+      <span class="ticker-item"><span class="ticker-dot" style="background:#EE352C"></span>New: Dante, Cervo's, Bar Goto added</span>
+      <span class="ticker-item"><span class="ticker-dot" style="background:#00933C"></span>Xi'an Famous Foods — 12 going tonight</span>
+      <span class="ticker-item"><span class="ticker-dot" style="background:#FCCC0A"></span>Build your plan in 60 seconds ✦</span>
+    </div>
+  </div>
+
+  <!-- HERO -->
   <section class="hero">
-    <p class="hero-eyebrow">
-      <span class="mta-bullet">A</span>
-      NYC · After Work · Every Night
-    </p>
-    <h1 class="hero-title">
-      After work,<br>do <em>more.</em>
-    </h1>
-    <p class="hero-sub">
-      Curated spots, generated plans, and a community of NYC interns — all on any budget.
-    </p>
+    <p class="hero-eyebrow"><span class="mta-bullet">A</span>NYC · After Work · Every Night</p>
+    <h1 class="hero-title">After work,<br>do <em>more.</em></h1>
+    <p class="hero-sub">Curated spots, generated plans, and a community of NYC interns — all on any budget.</p>
     <div class="mta-lines">
-      <div class="mta-dot" style="background:#EE352C; color:#fff;">1</div>
-      <div class="mta-dot" style="background:#EE352C; color:#fff;">2</div>
-      <div class="mta-dot" style="background:#00933C; color:#fff;">4</div>
-      <div class="mta-dot" style="background:#FCCC0A; color:#080A14;">N</div>
-      <div class="mta-dot" style="background:#0039A6; color:#fff;">A</div>
-      <div class="mta-dot" style="background:#FF6319; color:#fff;">B</div>
+      <div class="mta-dot" style="background:#EE352C;color:#fff;">1</div>
+      <div class="mta-dot" style="background:#EE352C;color:#fff;">2</div>
+      <div class="mta-dot" style="background:#00933C;color:#fff;">4</div>
+      <div class="mta-dot" style="background:#FCCC0A;color:#080A14;">N</div>
+      <div class="mta-dot" style="background:#0039A6;color:#fff;">A</div>
+      <div class="mta-dot" style="background:#FF6319;color:#fff;">B</div>
     </div>
     <div class="hero-actions">
       <a class="btn-primary" href="ai.html">✦ Build My Night</a>
@@ -805,34 +437,19 @@
     </div>
   </section>
 
-  <!-- ── STAT BAR ── -->
+  <!-- STAT BAR -->
   <div class="stat-bar">
-    <div class="stat-item">
-      <div class="stat-num">350+</div>
-      <div class="stat-label">Curated spots</div>
-    </div>
-    <div class="stat-item">
-      <div class="stat-num">$0</div>
-      <div class="stat-label">Min budget</div>
-    </div>
-    <div class="stat-item">
-      <div class="stat-num">150+</div>
-      <div class="stat-label">Interns in</div>
-    </div>
-    <div class="stat-item">
-      <div class="stat-num">60s</div>
-      <div class="stat-label">Build a plan</div>
-    </div>
+    <div class="stat-item"><div class="stat-num">350+</div><div class="stat-label">Curated spots</div></div>
+    <div class="stat-item"><div class="stat-num">$0</div><div class="stat-label">Min budget</div></div>
+    <div class="stat-item"><div class="stat-num">150+</div><div class="stat-label">Interns in</div></div>
+    <div class="stat-item"><div class="stat-num">60s</div><div class="stat-label">Build a plan</div></div>
   </div>
 
-  <!-- ── HOW IT WORKS ── -->
+  <!-- HOW IT WORKS -->
   <section class="steps-section">
-    <!-- MTA stripe -->
     <div class="stripe-divider" aria-hidden="true">
-      <span style="background:#EE352C;"></span>
-      <span style="background:#00933C;"></span>
-      <span style="background:#FCCC0A;"></span>
-      <span style="background:#0039A6;"></span>
+      <span style="background:#EE352C;"></span><span style="background:#00933C;"></span>
+      <span style="background:#FCCC0A;"></span><span style="background:#0039A6;"></span>
       <span style="background:#FF6319;"></span>
     </div>
     <div style="padding: 72px var(--pad-sm);">
@@ -840,145 +457,64 @@
       <h2 class="section-title">From 5 PM to a great night<br>in four steps.</h2>
       <p class="section-sub">No more group chat debates or endless scrolling. Pick your vibe, we handle the rest.</p>
       <div class="steps-grid">
-        <div class="step-item">
-          <span class="step-num">01</span>
-          <div class="step-content">
-            <h4>Pick your vibe</h4>
-            <p>Food, drinks, events, workout, date night — or all of the above.</p>
-          </div>
-          <span class="step-icon">🎯</span>
-        </div>
-        <div class="step-item">
-          <span class="step-num">02</span>
-          <div class="step-content">
-            <h4>Set your budget</h4>
-            <p>Free to $100+. We have options for every payday — and every broke week.</p>
-          </div>
-          <span class="step-icon">💰</span>
-        </div>
-        <div class="step-item">
-          <span class="step-num">03</span>
-          <div class="step-content">
-            <h4>Choose your area</h4>
-            <p>LES, Williamsburg, Midtown, or anywhere across NYC's neighborhoods.</p>
-          </div>
-          <span class="step-icon">📍</span>
-        </div>
-        <div class="step-item">
-          <span class="step-num">04</span>
-          <div class="step-content">
-            <h4>Get your plan</h4>
-            <p>A full itinerary — times, costs, descriptions — ready in seconds.</p>
-          </div>
-          <span class="step-icon">✦</span>
-        </div>
+        <div class="step-item"><span class="step-num">01</span><div class="step-content"><h4>Pick your vibe</h4><p>Food, drinks, events, workout, date night — or all of the above.</p></div><span class="step-icon">🎯</span></div>
+        <div class="step-item"><span class="step-num">02</span><div class="step-content"><h4>Set your budget</h4><p>Free to $100+. We have options for every payday — and every broke week.</p></div><span class="step-icon">💰</span></div>
+        <div class="step-item"><span class="step-num">03</span><div class="step-content"><h4>Choose your area</h4><p>LES, Williamsburg, Midtown, or anywhere across NYC's neighborhoods.</p></div><span class="step-icon">📍</span></div>
+        <div class="step-item"><span class="step-num">04</span><div class="step-content"><h4>Get your plan</h4><p>A full itinerary — times, costs, descriptions — ready in seconds.</p></div><span class="step-icon">✦</span></div>
       </div>
     </div>
   </section>
 
-  <!-- ── FEATURES ── -->
+  <!-- FEATURES -->
   <section class="features-section">
     <p class="section-tag">What's inside</p>
     <h2 class="section-title">Everything you need<br>for the perfect night.</h2>
     <div class="features-grid">
-      <div class="feature-card">
-        <div class="feature-dot" style="background:#EE352C;">E</div>
-        <h4>Explore by vibe</h4>
-        <p>Filter 350+ curated spots by category, price, and neighborhood. Every pick is intern-tested.</p>
+      <div class="feature-card"><div class="feature-dot" style="background:#EE352C;">E</div><h4>Explore by vibe</h4><p>Filter 350+ curated spots by category, price, and neighborhood. Every pick is intern-tested.</p></div>
+      <div class="feature-card"><div class="feature-dot" style="background:#FCCC0A;color:#080A14;">N</div><h4>Plan Generator</h4><p>Answer 4 questions, get a full multi-stop itinerary with times and costs — built just for you.</p></div>
+      <div class="feature-card"><div class="feature-dot" style="background:#0039A6;">A</div><h4>Interactive Map</h4><p>See every spot plotted across NYC, filtered by price tier or category. Plan routes visually.</p></div>
+      <div class="feature-card"><div class="feature-dot" style="background:#00933C;">6</div><h4>Plan with Friends</h4><p>See who's going where, invite your crew, and build shared plans for the whole group.</p></div>
+      <div class="feature-card"><div class="feature-dot" style="background:#FF6319;">B</div><h4>Budget-first</h4><p>Every spot is tagged with real costs. Free nights to splurge nights — we cover the full range.</p></div>
+      <div class="feature-card"><div class="feature-dot" style="background:#3A3F58;color:#E8ECF8;">+</div><h4>Submit a spot</h4><p>Know a hidden gem? Add it to the community map and share it with every intern in the city.</p></div>
+    </div>
+  </section>
+
+  <!-- COMPARE -->
+  <section class="compare-section reveal">
+    <p class="section-tag">The difference</p>
+    <h2 class="section-title">Friday at 5 PM.<br>Two very different nights.</h2>
+    <div class="compare-grid">
+      <div class="compare-col">
+        <p class="compare-col-label bad">✕ Without afterfive</p>
+        <div class="compare-item"><span class="compare-icon">😵</span><span>"What does everyone want to do tonight?" — no replies for 40 minutes</span></div>
+        <div class="compare-item"><span class="compare-icon">📱</span><span>Scrolling Yelp, Google Maps, and three Reddit threads simultaneously</span></div>
+        <div class="compare-item"><span class="compare-icon">💸</span><span>End up at the same overpriced Midtown bar because nobody could decide</span></div>
+        <div class="compare-item"><span class="compare-icon">😴</span><span>Home by 9 PM after an hour of "idk, what do you want to do?"</span></div>
+        <div class="compare-item"><span class="compare-icon">🗺️</span><span>Never actually explored the city. Just the two-block radius near the office.</span></div>
       </div>
-      <div class="feature-card">
-        <div class="feature-dot" style="background:#FCCC0A; color:#080A14;">N</div>
-        <h4>Plan Generator</h4>
-        <p>Answer 4 questions, get a full multi-stop itinerary with times and costs — built just for you.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-dot" style="background:#0039A6;">A</div>
-        <h4>Interactive Map</h4>
-        <p>See every spot plotted across NYC, filtered by price tier or category. Plan routes visually.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-dot" style="background:#00933C;">6</div>
-        <h4>Plan with Friends</h4>
-        <p>See who's going where, invite your crew, and build shared plans for the whole group.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-dot" style="background:#FF6319;">B</div>
-        <h4>Budget-first</h4>
-        <p>Every spot is tagged with real costs. Free nights to splurge nights — we cover the full range.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-dot" style="background:#3A3F58; color:#E8ECF8;">+</div>
-        <h4>Submit a spot</h4>
-        <p>Know a hidden gem? Add it to the community map and share it with every intern in the city.</p>
+      <div class="compare-col" style="background:var(--surface2);">
+        <p class="compare-col-label good">✦ With afterfive</p>
+        <div class="compare-item" style="color:var(--text)"><span class="compare-icon">⚡</span><span>Full night plan — dinner, drinks, and a stop — built in 60 seconds</span></div>
+        <div class="compare-item" style="color:var(--text)"><span class="compare-icon">💰</span><span>Filtered to your exact budget. Free nights to splurge nights covered.</span></div>
+        <div class="compare-item" style="color:var(--text)"><span class="compare-icon">📍</span><span>Real spots in your neighborhood with real prices and real descriptions</span></div>
+        <div class="compare-item" style="color:var(--text)"><span class="compare-icon">🫶</span><span>Invite your crew, see who's going, coordinate in one place</span></div>
+        <div class="compare-item" style="color:var(--text)"><span class="compare-icon">🗽</span><span>Actually explored NYC. Piano's rooftop, Cervo's, the Brooklyn Bridge at sunset.</span></div>
       </div>
     </div>
   </section>
 
-  <!-- WITHOUT / WITH -->
-<section class="compare-section reveal">
-  <p class="hero-label" style="margin-bottom:10px;">The difference</p>
-  <h2 style="font-size:clamp(22px,5vw,36px);font-weight:800;letter-spacing:-1px;line-height:1.1;">
-    Friday at 5 PM.<br>Two very different nights.
-  </h2>
-  <div class="compare-grid">
-    <div class="compare-col">
-      <p class="compare-col-label bad">✕ Without afterfive</p>
-      <div class="compare-item"><span class="compare-icon">😵</span><span>"What does everyone want to do tonight?" — no replies for 40 minutes</span></div>
-      <div class="compare-item"><span class="compare-icon">📱</span><span>Scrolling Yelp, Google Maps, and three Reddit threads simultaneously</span></div>
-      <div class="compare-item"><span class="compare-icon">💸</span><span>End up at the same overpriced Midtown bar because nobody could decide</span></div>
-      <div class="compare-item"><span class="compare-icon">😴</span><span>Home by 9 PM after an hour of "idk, what do you want to do?"</span></div>
-      <div class="compare-item"><span class="compare-icon">🗺️</span><span>Never actually explored the city. Just the two-block radius near the office.</span></div>
-    </div>
-    <div class="compare-col" style="background:var(--surface2);">
-      <p class="compare-col-label good">✦ With afterfive</p>
-      <div class="compare-item" style="color:var(--text)"><span class="compare-icon">⚡</span><span>Full night plan — dinner, drinks, and a stop — built in 60 seconds</span></div>
-      <div class="compare-item" style="color:var(--text)"><span class="compare-icon">💰</span><span>Filtered to your exact budget. Free nights to splurge nights covered.</span></div>
-      <div class="compare-item" style="color:var(--text)"><span class="compare-icon">📍</span><span>Real spots in your neighborhood with real prices and real descriptions</span></div>
-      <div class="compare-item" style="color:var(--text)"><span class="compare-icon">🫶</span><span>Invite your crew, see who's going, coordinate in one place</span></div>
-      <div class="compare-item" style="color:var(--text)"><span class="compare-icon">🗽</span><span>Actually explored NYC. Piano's rooftop, Cervo's, the Brooklyn Bridge at sunset.</span></div>
-    </div>
-  </div>
-</section>
-
-  <!-- ── TESTIMONIALS ── -->
+  <!-- TESTIMONIALS -->
   <section class="testimonials-section">
     <p class="section-tag">From the community</p>
     <h2 class="section-title">Interns who used it<br>loved it.</h2>
     <div class="testimonials-grid">
-      <div class="testimonial-card">
-        <p class="testimonial-text">I found Hillstone through the plan generator and had the best night of my whole summer. My whole team is obsessed now.</p>
-        <div class="testimonial-author">
-          <div class="t-avatar">😊</div>
-          <div>
-            <p class="t-name">Charlotte O.</p>
-            <p class="t-role">Oak Tree Capital · Summer 2025</p>
-          </div>
-        </div>
-      </div>
-      <div class="testimonial-card">
-        <p class="testimonial-text">We had $20 each and no idea what to do on a Friday. It gave us Prince Street Pizza → MoMA Free Friday → Piano's rooftop. Perfect night.</p>
-        <div class="testimonial-author">
-          <div class="t-avatar">🤙</div>
-          <div>
-            <p class="t-name">Jordan T.</p>
-            <p class="t-role">JPMorgan · Summer 2024</p>
-          </div>
-        </div>
-      </div>
-      <div class="testimonial-card">
-        <p class="testimonial-text">Finally something built for interns who actually want to explore NYC, not just go to the same midtown bar every week.</p>
-        <div class="testimonial-author">
-          <div class="t-avatar">🧠</div>
-          <div>
-            <p class="t-name">Priya S.</p>
-            <p class="t-role">McKinsey · Summer 2024</p>
-          </div>
-        </div>
-      </div>
+      <div class="testimonial-card"><p class="testimonial-text">I found Hillstone through the plan generator and had the best night of my whole summer. My whole team is obsessed now.</p><div class="testimonial-author"><div class="t-avatar">😊</div><div><p class="t-name">Charlotte O.</p><p class="t-role">Oak Tree Capital · Summer 2025</p></div></div></div>
+      <div class="testimonial-card"><p class="testimonial-text">We had $20 each and no idea what to do on a Friday. It gave us Prince Street Pizza → MoMA Free Friday → Piano's rooftop. Perfect night.</p><div class="testimonial-author"><div class="t-avatar">🤙</div><div><p class="t-name">Jordan T.</p><p class="t-role">JPMorgan · Summer 2024</p></div></div></div>
+      <div class="testimonial-card"><p class="testimonial-text">Finally something built for interns who actually want to explore NYC, not just go to the same midtown bar every week.</p><div class="testimonial-author"><div class="t-avatar">🧠</div><div><p class="t-name">Priya S.</p><p class="t-role">McKinsey · Summer 2024</p></div></div></div>
     </div>
   </section>
 
-  <!-- ── FINAL CTA ── -->
+  <!-- CTA -->
   <section class="cta-section">
     <p class="section-tag">Ready?</p>
     <h2 class="section-title">Stop debating in the<br>group chat.</h2>
@@ -987,33 +523,21 @@
       <a class="btn-primary" href="ai.html">✦ Build My Night</a>
       <a class="btn-ghost"   href="explore.html">Explore Spots →</a>
     </div>
-    <p class="cta-note">
-      <span class="arrival-dot"></span>Free · No account needed · Works on any budget
-    </p>
-    <p class="cta-note" style="margin-top:8px;">
-      Know a great spot? <a href="submit.html" style="color:var(--lime);text-decoration:none;font-weight:700;">Submit it →</a>
-    </p>
+    <p class="cta-note"><span class="arrival-dot"></span>Free · No account needed · Works on any budget</p>
+    <p class="cta-note" style="margin-top:8px;">Know a great spot? <a href="submit.html" style="color:var(--lime);text-decoration:none;font-weight:700;">Submit it →</a></p>
   </section>
 
-  <!-- ── FOOTER ── -->
+  <!-- FOOTER -->
   <footer>
     <div class="footer-stripe" aria-hidden="true">
-      <span style="background:#EE352C;"></span>
-      <span style="background:#00933C;"></span>
-      <span style="background:#FCCC0A;"></span>
-      <span style="background:#0039A6;"></span>
+      <span style="background:#EE352C;"></span><span style="background:#00933C;"></span>
+      <span style="background:#FCCC0A;"></span><span style="background:#0039A6;"></span>
       <span style="background:#FF6319;"></span>
     </div>
     <div class="footer-top">
-      <a class="footer-logo" href="index.html">
-        <span class="after">after</span><span class="five">five</span>
-      </a>
+      <a class="footer-logo" href="index.html"><span class="after">after</span><span class="five">five</span></a>
       <a class="footer-ig" href="https://instagram.com/afterfivenyc" target="_blank">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <rect x="2" y="2" width="20" height="20" rx="5"/>
-          <circle cx="12" cy="12" r="4"/>
-          <circle cx="17.5" cy="6.5" r="0.5" fill="currentColor"/>
-        </svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.5" fill="currentColor"/></svg>
         @afterfivenyc
       </a>
     </div>
@@ -1021,153 +545,145 @@
   </footer>
 
   <script>
-// ── HAMBURGER ──
-const btn  = document.getElementById('hamburgerBtn');
-const menu = document.getElementById('mobileMenu');
-if (btn && menu) {
-  btn.addEventListener('click', () => {
-    const isOpen = menu.classList.toggle('open');
-    btn.classList.toggle('open', isOpen);
-    document.body.style.overflow = isOpen ? 'hidden' : '';
-  });
-  menu.querySelectorAll('a').forEach(a => {
-    a.addEventListener('click', () => {
-      btn.classList.remove('open');
-      menu.classList.remove('open');
-      document.body.style.overflow = '';
-    });
-  });
-}
+  // ── SUPABASE ──
+  const SUPABASE_URL  = 'https://kurizbyorntmmdqfviac.supabase.co';
+  const SUPABASE_ANON = 'sb_publishable_b8N7U5X4--k8b1VRLiqcew_sRtymSlZ';
+  const { createClient } = supabase;
+  const sb = createClient(SUPABASE_URL, SUPABASE_ANON);
 
-// ── TOAST (inline — no shared.js needed) ──
-function showToast(msg) {
-  const existing = document.querySelector('.toast');
-  if (existing) existing.remove();
-  const t = document.createElement('div');
-  t.className = 'toast';
-  t.textContent = msg;
-  t.style.cssText = 'position:fixed;bottom:32px;left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--lime);border-radius:100px;padding:10px 20px;font-size:13px;font-weight:600;color:var(--lime);z-index:1000;white-space:nowrap;pointer-events:none;font-family:"DM Mono",monospace;';
-  document.body.appendChild(t);
-  setTimeout(() => t.style.opacity = '0', 2000);
-  setTimeout(() => t.remove(), 2400);
-}
+  // ── AUTH STATE ──
+  (async () => {
+    const { data: { session } } = await sb.auth.getSession();
+    const navRight   = document.getElementById('navRight');
+    const mobileLink = document.getElementById('mobileAuthLink');
+    const welcome    = document.getElementById('welcomeBanner');
 
-// ── SCROLL REVEAL — add classes first, then observe ──
-const revealTargets = document.querySelectorAll(
-  '.hero-actions, .plans-banner, .stat-bar, .steps-grid .step-item, .features-grid .feature-card, .testimonials-grid .testimonial-card, .cta-section, .compare-section'
-);
-revealTargets.forEach((el, i) => {
-  el.classList.add('reveal');
-  if (i % 3 === 1) el.classList.add('reveal-delay-1');
-  if (i % 3 === 2) el.classList.add('reveal-delay-2');
-});
+    if (session) {
+      // Fetch profile
+      const { data: profile } = await sb
+        .from('profiles')
+        .select('full_name')
+        .eq('id', session.user.id)
+        .single();
 
-// observe AFTER adding classes
-const revealObs = new IntersectionObserver(entries => {
-  entries.forEach(e => {
-    if (e.isIntersecting) {
-      e.target.classList.add('visible');
-      revealObs.unobserve(e.target);
+      const name     = profile?.full_name || session.user.email.split('@')[0];
+      const firstName = name.split(' ')[0];
+      const initials  = name.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
+
+      // Desktop nav — show avatar + name + sign out
+      navRight.innerHTML = `
+        <div class="nav-user">
+          <div class="nav-avatar">${initials}</div>
+          <a href="friends.html" style="color:var(--muted);text-decoration:none;font-size:11px;font-family:'DM Mono',monospace;letter-spacing:0.06em;text-transform:uppercase;">${firstName}</a>
+        </div>
+        <button class="nav-signout" onclick="signOut()">Sign out</button>
+      `;
+
+      // Mobile menu — update CTA
+      mobileLink.textContent = firstName + ' — My Profile →';
+      mobileLink.href = 'friends.html';
+
+      // Welcome banner
+      document.getElementById('welcomeName').textContent = firstName;
+      welcome.classList.add('show');
+
+    } else {
+      // Not logged in — show sign in button
+      navRight.innerHTML = `<a class="nav-cta" href="auth.html">Sign in</a>`;
+      mobileLink.textContent = 'Sign in →';
+      mobileLink.href = 'auth.html';
     }
-  });
-}, { threshold: 0.08 });
-document.querySelectorAll('.reveal').forEach(el => revealObs.observe(el));
+  })();
 
-// ── ANIMATED STAT COUNTERS ──
-function animateCount(el, target, suffix) {
-  const dur = 1400;
-  const start = performance.now();
-  function step(now) {
-    const p = Math.min((now - start) / dur, 1);
-    const eased = 1 - Math.pow(1 - p, 4);
-    const val = Math.round(eased * target);
-    el.textContent = val + (suffix || '');
-    if (p < 1) requestAnimationFrame(step);
-    else el.textContent = target + (suffix || '');
+  async function signOut() {
+    await sb.auth.signOut();
+    window.location.reload();
   }
-  requestAnimationFrame(step);
-}
 
-const statBar = document.querySelector('.stat-bar');
-if (statBar) {
-  const statObs = new IntersectionObserver(entries => {
-    if (entries[0].isIntersecting) {
-      document.querySelectorAll('.stat-num').forEach(el => {
-        const raw = el.textContent.trim();
-        if (raw === '130+') animateCount(el, 130, '+');
-        if (raw === '150+') animateCount(el, 150, '+');
-        if (raw === '500+') animateCount(el, 500, '+');
-        if (raw === '2400+') animateCount(el, 2400, '+');
+  // ── HAMBURGER ──
+  const btn  = document.getElementById('hamburgerBtn');
+  const menu = document.getElementById('mobileMenu');
+  if (btn && menu) {
+    btn.addEventListener('click', () => {
+      const isOpen = menu.classList.toggle('open');
+      btn.classList.toggle('open', isOpen);
+      document.body.style.overflow = isOpen ? 'hidden' : '';
+    });
+    menu.querySelectorAll('a').forEach(a => {
+      a.addEventListener('click', () => {
+        btn.classList.remove('open');
+        menu.classList.remove('open');
+        document.body.style.overflow = '';
       });
-      statObs.disconnect();
-    }
-  }, { threshold: 0.3 });
-  statObs.observe(statBar);
-}
-
-// ── STAGGERED MTA DOTS ──
-document.querySelectorAll('.mta-dot').forEach((dot, i) => {
-  dot.classList.add('mta-dot-animated');
-  dot.style.animationDelay = (0.5 + i * 0.07) + 's';
-});
-
-// ── TYPEWRITER ON HERO TITLE ──
-// FIX: your heading is .hero-title not h1
-const heroTitle = document.querySelector('.hero-title');
-if (heroTitle) {
-  const html = heroTitle.innerHTML;
-  const brIdx = html.indexOf('<br>');
-  if (brIdx !== -1) {
-    const firstLine = html.slice(0, brIdx);
-    const rest = html.slice(brIdx + 4); // after <br>
-    const secondLine = rest.replace(/<[^>]+>/g, '').trim();
-    let i = 0;
-    heroTitle.innerHTML = firstLine + '<br><span id="twTarget"></span><span class="typewriter-cursor"></span>';
-    const twEl = document.getElementById('twTarget');
-    function type() {
-      if (i <= secondLine.length) {
-        twEl.textContent = secondLine.slice(0, i);
-        i++;
-        setTimeout(type, i === 1 ? 700 : 55);
-      } else {
-        // remove cursor blink after done, keep it static
-        document.querySelector('.typewriter-cursor').style.animation = 'none';
-        document.querySelector('.typewriter-cursor').style.opacity = '1';
-      }
-    }
-    setTimeout(type, 400);
+    });
   }
-}
 
-// ── JOIN BUTTON FEEDBACK ──
-document.querySelectorAll('.btn-join').forEach(b => {
-  b.addEventListener('click', function(e) {
-    e.stopPropagation();
-    if (this.classList.contains('joined')) return;
-    this.classList.add('joined');
-    this.textContent = 'Joined ✓';
-    const strong = this.closest('.card-footer')?.querySelector('.going strong');
-    if (strong) strong.textContent = (parseInt(strong.textContent) + 1) + ' interns';
-    showToast('You\'re in! 🎉');
+  // ── SCROLL REVEAL ──
+  const revealTargets = document.querySelectorAll('.steps-grid .step-item, .features-grid .feature-card, .testimonials-grid .testimonial-card, .cta-section, .compare-section');
+  revealTargets.forEach((el, i) => {
+    el.classList.add('reveal');
+    if (i % 3 === 1) el.classList.add('reveal-delay-1');
+    if (i % 3 === 2) el.classList.add('reveal-delay-2');
   });
-});
+  const revealObs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); revealObs.unobserve(e.target); } });
+  }, { threshold: 0.08 });
+  document.querySelectorAll('.reveal').forEach(el => revealObs.observe(el));
 
-// ── ACTIVE NAV ON SCROLL ──
-const sections = document.querySelectorAll('section[id]');
-const navLinks = document.querySelectorAll('.nav-links a');
-if (sections.length && navLinks.length) {
-  window.addEventListener('scroll', () => {
-    let current = '';
-    sections.forEach(s => {
-      if (window.scrollY >= s.offsetTop - 80) current = s.id;
-    });
-    navLinks.forEach(a => {
-      a.classList.toggle('active', a.getAttribute('href') === '#' + current);
-    });
-  }, { passive: true });
-}
+  // ── MTA DOTS ──
+  document.querySelectorAll('.mta-dot').forEach((dot, i) => {
+    dot.classList.add('mta-dot-animated');
+    dot.style.animationDelay = (0.5 + i * 0.07) + 's';
+  });
+
+  // ── TYPEWRITER ──
+  const heroTitle = document.querySelector('.hero-title');
+  if (heroTitle) {
+    const html = heroTitle.innerHTML;
+    const brIdx = html.indexOf('<br>');
+    if (brIdx !== -1) {
+      const firstLine  = html.slice(0, brIdx);
+      const rest       = html.slice(brIdx + 4);
+      const secondLine = rest.replace(/<[^>]+>/g, '').trim();
+      let i = 0;
+      heroTitle.innerHTML = firstLine + '<br><span id="twTarget"></span><span class="typewriter-cursor"></span>';
+      const twEl = document.getElementById('twTarget');
+      function type() {
+        if (i <= secondLine.length) { twEl.textContent = secondLine.slice(0,i); i++; setTimeout(type, i===1?700:55); }
+        else { document.querySelector('.typewriter-cursor').style.animation = 'none'; document.querySelector('.typewriter-cursor').style.opacity = '1'; }
+      }
+      setTimeout(type, 400);
+    }
+  }
+
+  // ── STAT COUNTERS ──
+  function animateCount(el, target, suffix) {
+    const dur = 1400; const start = performance.now();
+    function step(now) {
+      const p = Math.min((now-start)/dur,1);
+      const eased = 1-Math.pow(1-p,4);
+      el.textContent = Math.round(eased*target)+(suffix||'');
+      if (p<1) requestAnimationFrame(step);
+      else el.textContent = target+(suffix||'');
+    }
+    requestAnimationFrame(step);
+  }
+  const statBar = document.querySelector('.stat-bar');
+  if (statBar) {
+    const statObs = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting) {
+        document.querySelectorAll('.stat-num').forEach(el => {
+          const raw = el.textContent.trim();
+          if (raw==='350+') animateCount(el,350,'+');
+          if (raw==='$0')   {} // leave as is
+          if (raw==='150+') animateCount(el,150,'+');
+          if (raw==='60s')  {} // leave as is
+        });
+        statObs.disconnect();
+      }
+    }, { threshold: 0.3 });
+    statObs.observe(statBar);
+  }
   </script>
-
-
 </body>
 </html>
