@@ -84,28 +84,28 @@
     .hamburger.open span:nth-child(2) { opacity: 0; }
     .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
-    .mobile-drawer {
+    .mobile-menu {
       display: none; position: fixed; inset: 0; z-index: 199;
       background: var(--midnight); flex-direction: column;
       padding: 72px var(--pad) var(--pad); gap: 0;
       border-top: 3px solid var(--lime); margin-top: 52px;
     }
-    .mobile-drawer.open { display: flex; }
-    .mobile-drawer a {
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a {
       color: var(--text); text-decoration: none;
       font-size: 22px; font-weight: 800; padding: 14px 0;
       border-bottom: 1px solid var(--border); transition: color 0.15s;
       display: flex; align-items: center; justify-content: space-between;
       font-family: 'DM Mono', monospace; text-transform: uppercase; letter-spacing: -0.5px;
     }
-    .mobile-drawer a::after { content: '→'; color: var(--subdued); font-size: 14px; }
-    .mobile-drawer a:hover { color: var(--lime); }
-    .mobile-drawer a.drawer-cta {
+    .mobile-menu a::after { content: '→'; color: var(--subdued); font-size: 14px; }
+    .mobile-menu a:hover { color: var(--lime); }
+    .mobile-menu a.menu-cta {
       font-size: 13px; margin-top: 24px; background: var(--lime); color: var(--midnight);
       border: none; border-radius: var(--r-btn); padding: 14px 28px;
       text-align: center; font-weight: 700; justify-content: center; letter-spacing: 0.06em;
     }
-    .mobile-drawer a.drawer-cta::after { display: none; }
+    .mobile-menu a.menu-cta::after { display: none; }
     .drawer-tag { margin-top: auto; font-size: 10px; color: var(--subdued); font-family: 'DM Mono', monospace; }
 
     /* ── CONTENT WRAP ── */
@@ -359,14 +359,13 @@
     <span style="background:#FF6319;"></span>
   </div>
 
-  <div class="mobile-drawer" id="mobileMenu">
+  <div class="mobile-menu" id="mobileMenu">
     <a href="index.html">Home</a>
     <a href="explore.html">Explore</a>
     <a href="ai.html">Plan Generator</a>
     <a href="friends.html">Friends</a>
     <a href="submit.html">Submit a Spot</a>
-    <a class="drawer-cta" href="ai.html">✦ Build My Night</a>
-    <p class="drawer-tag">"Your NYC nights, sorted."</p>
+    <a class="menu-cta" id="mobileAuthLink" href="auth.html">Sign in →</a>
   </div>
 
   <!-- ── CONTENT ── -->
@@ -577,35 +576,32 @@
       document.getElementById('gformSection').style.display = '';
       document.getElementById('successState').classList.remove('visible');
     }
-    // ── HAMBURGER ──
-  const _hBtn = document.getElementById('hamburgerBtn');
-  const _hMenu = document.getElementById('mobileMenu');
-  if (_hBtn && _hMenu) {
-    _hBtn.addEventListener('click', () => {
-      const open = _hMenu.classList.toggle('open');
-      _hBtn.classList.toggle('open', open);
-      document.body.style.overflow = open ? 'hidden' : '';
-    });
-    _hMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
-      _hBtn.classList.remove('open'); _hMenu.classList.remove('open'); document.body.style.overflow = '';
-    }));
-  }
+      hMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+        hBtn.classList.remove('open');
+        hMenu.classList.remove('open');
+        document.body.style.overflow = '';
+      }));
+    }
+  });
+  </script>
 
-  // ── AUTH STATE ──
-  (async () => {
-    try {
-      const { data: { session } } = await sb.auth.getSession();
-      const cta = document.getElementById('navCta');
-      const mobileLink = document.getElementById('mobileAuthLink');
-      if (session) {
-        const { data: profile } = await sb.from('profiles').select('full_name').eq('id', session.user.id).single();
-        const name = profile?.full_name?.split(' ')[0] || session.user.email?.split('@')[0] || 'You';
-        const initials = (profile?.full_name || name).split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-        if (cta) { cta.textContent = name + ' →'; cta.href = 'plans.html'; }
-        if (mobileLink) { mobileLink.textContent = name + ' →'; mobileLink.href = 'plans.html'; }
-      }
-    } catch(e) {}
-  })();
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const hBtn = document.getElementById('hamburgerBtn');
+    const hMenu = document.getElementById('mobileMenu');
+    if (hBtn && hMenu) {
+      hBtn.addEventListener('click', () => {
+        const open = hMenu.classList.toggle('open');
+        hBtn.classList.toggle('open', open);
+        document.body.style.overflow = open ? 'hidden' : '';
+      });
+      hMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+        hBtn.classList.remove('open');
+        hMenu.classList.remove('open');
+        document.body.style.overflow = '';
+      }));
+    }
+  });
   </script>
 </body>
 </html>

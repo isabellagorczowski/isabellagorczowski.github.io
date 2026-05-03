@@ -7,38 +7,17 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;500;600;700;800&display=swap" />
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js">  // ── HAMBURGER ──
-  const _hBtn = document.getElementById('hamburgerBtn');
-  const _hMenu = document.getElementById('mobileMenu');
-  if (_hBtn && _hMenu) {
-    _hBtn.addEventListener('click', () => {
-      const open = _hMenu.classList.toggle('open');
-      _hBtn.classList.toggle('open', open);
-      document.body.style.overflow = open ? 'hidden' : '';
-    });
-    _hMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
-      _hBtn.classList.remove('open'); _hMenu.classList.remove('open'); document.body.style.overflow = '';
-    }));
-  }
-
-  // ── AUTH STATE ──
-  (async () => {
-    try {
-      const { data: { session } } = await sb.auth.getSession();
-      const cta = document.getElementById('navCta');
-      const mobileLink = document.getElementById('mobileAuthLink');
-      if (session) {
-        const { data: profile } = await sb.from('profiles').select('full_name').eq('id', session.user.id).single();
-        const name = profile?.full_name?.split(' ')[0] || session.user.email?.split('@')[0] || 'You';
-        const initials = (profile?.full_name || name).split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-        if (cta) { cta.textContent = name + ' →'; cta.href = 'plans.html'; }
-        if (mobileLink) { mobileLink.textContent = name + ' →'; mobileLink.href = 'plans.html'; }
-      }
-    } catch(e) {}
-  })();
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script>
+  <script>
+      hMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+        hBtn.classList.remove('open');
+        hMenu.classList.remove('open');
+        document.body.style.overflow = '';
+      }));
+    }
+  });
   </script>
-
-  <style>
+    <style>
     :root {
       --midnight: #080A14;
       --surface:  #0D0F1F;
@@ -486,6 +465,25 @@ const SUPABASE_ANON = 'sb_publishable_b8N7U5X4--k8b1VRLiqcew_sRtymSlZ';
     setTimeout(() => t.style.opacity = '0', 2000);
     setTimeout(() => t.remove(), 2400);
   }
+  </script>
+
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const hBtn = document.getElementById('hamburgerBtn');
+    const hMenu = document.getElementById('mobileMenu');
+    if (hBtn && hMenu) {
+      hBtn.addEventListener('click', () => {
+        const open = hMenu.classList.toggle('open');
+        hBtn.classList.toggle('open', open);
+        document.body.style.overflow = open ? 'hidden' : '';
+      });
+      hMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+        hBtn.classList.remove('open');
+        hMenu.classList.remove('open');
+        document.body.style.overflow = '';
+      }));
+    }
+  });
   </script>
 </body>
 </html>
