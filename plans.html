@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>afterfive — My Plans</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;500;600;700;800&display=swap" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js">  // ── HAMBURGER ──
+  const _hBtn = document.getElementById('hamburgerBtn');
+  const _hMenu = document.getElementById('mobileMenu');
+  if (_hBtn && _hMenu) {
+    _hBtn.addEventListener('click', () => {
+      const open = _hMenu.classList.toggle('open');
+      _hBtn.classList.toggle('open', open);
+      document.body.style.overflow = open ? 'hidden' : '';
+    });
+    _hMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+      _hBtn.classList.remove('open'); _hMenu.classList.remove('open'); document.body.style.overflow = '';
+    }));
+  }
+
+  // ── AUTH STATE ──
+  (async () => {
+    try {
+      const { data: { session } } = await sb.auth.getSession();
+      const cta = document.getElementById('navCta');
+      const mobileLink = document.getElementById('mobileAuthLink');
+      if (session) {
+        const { data: profile } = await sb.from('profiles').select('full_name').eq('id', session.user.id).single();
+        const name = profile?.full_name?.split(' ')[0] || session.user.email?.split('@')[0] || 'You';
+        const initials = (profile?.full_name || name).split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+        if (cta) { cta.textContent = name + ' →'; cta.href = 'plans.html'; }
+        if (mobileLink) { mobileLink.textContent = name + ' →'; mobileLink.href = 'plans.html'; }
+      }
+    } catch(e) {}
+  })();
+  </script>
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#080A14" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="afterfive" />
+  <script>if('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');</script>
+
+  <style>
+    :root {
+      --midnight: #080A14; --surface: #0D0F1F; --surface2: #141728;
+      --border: #1A1D2E; --border2: #2A2E44; --lime: #FCCC0A;
+      --lime-dim: rgba(252,204,10,0.10); --text: #E8ECF8; --muted: #7A80A0;
+      --subdued: #3A3F58; --amber: #EE352C; --green: #00933C;
+      --blue: #0039A6; --orange: #FF6319;
+      --pad-sm: 20px; --pad-lg: 80px; --r-card: 4px; --r-btn: 4px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--midnight); color: var(--text);
+      font-family: 'Syne', sans-serif; font-size: 15px;
+      line-height: 1.6; overflow-x: hidden; min-height: 100dvh;
+      display: flex; flex-direction: column;
+    }
+
+    /* ── NAV ── */
+    .nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 var(--pad-sm); height: 56px;
+      background: var(--midnight); border-bottom: 3px solid var(--lime);
+    }
+    .nav-stripe { position: fixed; top: 56px; left: 0; right: 0; z-index: 199; display: flex; height: 4px; }
+    .nav-stripe span { flex: 1; }
+    .nav-logo { font-size: 17px; font-weight: 800; text-decoration: none; letter-spacing: -0.5px; font-family: 'DM Mono', monospace; text-transform: uppercase; }
+    .nav-logo .after { color: var(--text); }
+    .nav-logo .five  { color: var(--lime); }
+    .nav-links { display: none; list-style: none; gap: 2px; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: 12px; font-weight: 600; padding: 6px 12px; letter-spacing: 0.06em; text-transform: uppercase; transition: color 0.15s; }
+    .nav-links a:hover  { color: var(--text); }
+    .nav-links a.active { color: var(--lime); }
+    .nav-cta {
+      display: none; background: var(--lime); color: var(--midnight); border: none;
+      border-radius: var(--r-btn); padding: 8px 18px; font-family: 'Syne', sans-serif;
+      font-size: 12px; font-weight: 700; cursor: pointer; text-decoration: none;
+      transition: opacity 0.15s; white-space: nowrap; letter-spacing: 0.04em; text-transform: uppercase;
+    }
+    .nav-cta:hover { opacity: 0.85; }
+    .hamburger { display: flex; flex-direction: column; gap: 5px; background: none; border: none; cursor: pointer; padding: 4px; }
+    .hamburger span { display: block; width: 22px; height: 2px; background: var(--text); transition: all 0.25s; }
+    .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+    .mobile-menu {
+      display: none; position: fixed; inset: 0; z-index: 199;
+      background: var(--midnight); flex-direction: column;
+      padding: 80px var(--pad-sm) var(--pad-sm); gap: 0;
+      border-top: 3px solid var(--lime); margin-top: 56px;
+    }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a {
+      color: var(--text); text-decoration: none; font-size: 24px; font-weight: 800;
+      padding: 16px 0; border-bottom: 1px solid var(--border);
+      transition: color 0.15s; display: flex; align-items: center; justify-content: space-between;
+      letter-spacing: -0.5px; font-family: 'DM Mono', monospace; text-transform: uppercase;
+    }
+    .mobile-menu a::after { content: '→'; color: var(--subdued); font-size: 16px; }
+    .mobile-menu a:hover { color: var(--lime); }
+    .mobile-menu a.menu-cta {
+      font-size: 14px; margin-top: 24px; background: var(--lime); color: var(--midnight);
+      border-radius: var(--r-btn); padding: 14px 28px; font-weight: 700;
+      border-bottom: none; letter-spacing: 0.06em; justify-content: center;
+    }
+    .mobile-menu a.menu-cta::after { display: none; }
+
+    /* ── PAGE HEADER ── */
+    .page-header {
+      margin-top: 76px; padding: 28px var(--pad-sm) 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    .page-header p {
+      font-size: 9px; color: var(--lime); font-family: 'DM Mono', monospace;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      display: flex; align-items: center; gap: 8px; margin-bottom: 6px;
+    }
+    .page-header p::before { content: ''; display: block; width: 16px; height: 2px; background: var(--lime); }
+    .page-header h2 { font-size: 24px; font-weight: 800; letter-spacing: -0.5px; }
+
+    /* ── TABS ── */
+    .plan-tabs {
+      display: flex; border-bottom: 1px solid var(--border2);
+      padding: 0 var(--pad-sm);
+    }
+    .plan-tab {
+      padding: 14px 0; margin-right: 28px; border: none;
+      background: none; color: var(--muted);
+      font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 500;
+      letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer;
+      border-bottom: 2px solid transparent; margin-bottom: -1px; transition: color 0.15s;
+    }
+    .plan-tab:hover  { color: var(--text); }
+    .plan-tab.active { color: var(--lime); border-bottom-color: var(--lime); }
+
+    /* ── MAIN CONTENT ── */
+    .plans-content { padding: var(--pad-sm); flex: 1; }
+
+    /* ── SECTION LABEL ── */
+    .section-label {
+      font-size: 9px; font-weight: 500; color: var(--subdued);
+      letter-spacing: 0.12em; text-transform: uppercase;
+      font-family: 'DM Mono', monospace; margin-bottom: 14px; margin-top: 20px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .section-label:first-child { margin-top: 0; }
+    .section-label::before { content: ''; display: block; width: 12px; height: 1px; background: var(--subdued); }
+
+    /* ── SPOT CARDS ── */
+    .spot-grid { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+
+    .spot-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--r-card); padding: 16px;
+      display: flex; align-items: center; gap: 14px;
+      transition: border-color 0.15s;
+    }
+    .spot-card:hover { border-color: var(--border2); }
+    .spot-card.want { border-left: 3px solid var(--lime); }
+    .spot-card.been { border-left: 3px solid var(--green); }
+
+    .spot-icon {
+      width: 40px; height: 40px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; flex-shrink: 0;
+    }
+    .spot-icon.want { background: var(--lime-dim); }
+    .spot-icon.been { background: rgba(0,147,60,0.12); }
+
+    .spot-info { flex: 1; min-width: 0; }
+    .spot-name { font-size: 14px; font-weight: 700; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .spot-meta { font-size: 10px; color: var(--muted); font-family: 'DM Mono', monospace; letter-spacing: 0.04em; }
+
+    .spot-badge {
+      font-size: 9px; font-weight: 600; padding: 3px 9px;
+      border-radius: 100px; font-family: 'DM Mono', monospace;
+      letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; flex-shrink: 0;
+    }
+    .badge-want { background: var(--lime-dim); color: var(--lime); }
+    .badge-been { background: rgba(0,147,60,0.12); color: var(--green); }
+
+    .spot-remove {
+      background: none; border: none; color: var(--subdued);
+      cursor: pointer; font-size: 18px; padding: 4px; flex-shrink: 0;
+      transition: color 0.15s; line-height: 1;
+    }
+    .spot-remove:hover { color: var(--amber); }
+
+    /* ── SHARE PLAN ── */
+    .share-section {
+      background: var(--surface); border: 1px solid var(--border2);
+      border-top: 3px solid var(--lime); border-radius: var(--r-card);
+      padding: 20px; margin-top: 8px;
+    }
+    .share-section h3 { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+    .share-section p  { font-size: 12px; color: var(--muted); margin-bottom: 16px; line-height: 1.6; }
+
+    .friend-checks { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+    .friend-check {
+      display: flex; align-items: center; gap: 10px; padding: 10px;
+      border-radius: var(--r-card); cursor: pointer; transition: background 0.15s; font-size: 13px;
+      border: 1px solid var(--border);
+    }
+    .friend-check:hover { background: var(--surface2); border-color: var(--border2); }
+    .friend-check input { accent-color: var(--lime); width: 16px; height: 16px; }
+    .friend-avatar {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: var(--surface2); border: 1px solid var(--border2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 700; color: var(--lime);
+      font-family: 'DM Mono', monospace; flex-shrink: 0;
+    }
+    .friend-detail { flex: 1; }
+    .friend-name { font-size: 13px; font-weight: 600; }
+    .friend-company { font-size: 10px; color: var(--muted); font-family: 'DM Mono', monospace; }
+
+    /* ── BUTTONS ── */
+    .btn-primary {
+      background: var(--lime); color: var(--midnight); border: none;
+      border-radius: var(--r-btn); padding: 12px 24px;
+      font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700;
+      cursor: pointer; letter-spacing: 0.06em; text-transform: uppercase;
+      transition: opacity 0.15s; width: 100%;
+    }
+    .btn-primary:hover { opacity: 0.88; }
+    .btn-ghost {
+      background: transparent; color: var(--text); border: 1px solid var(--border2);
+      border-radius: var(--r-btn); padding: 10px 20px;
+      font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 500;
+      cursor: pointer; letter-spacing: 0.06em; text-transform: uppercase;
+      transition: border-color 0.15s, background 0.15s; text-decoration: none;
+      display: inline-flex; align-items: center; justify-content: center;
+    }
+    .btn-ghost:hover { border-color: var(--muted); background: var(--surface2); }
+
+    /* ── EMPTY STATE ── */
+    .empty-state {
+      text-align: center; padding: 60px 20px;
+    }
+    .empty-icon { font-size: 40px; margin-bottom: 16px; opacity: 0.4; display: block; }
+    .empty-state h3 { font-size: 17px; font-weight: 700; margin-bottom: 8px; }
+    .empty-state p  { font-size: 13px; color: var(--muted); line-height: 1.7; margin-bottom: 20px; }
+
+    /* ── LOADING ── */
+    .loading-state { display: flex; align-items: center; justify-content: center; padding: 60px; gap: 8px; color: var(--muted); font-family: 'DM Mono', monospace; font-size: 11px; }
+    .loading-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--lime); animation: loadpulse 1s ease-in-out infinite; }
+    .loading-dot:nth-child(2) { animation-delay: 0.2s; }
+    .loading-dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes loadpulse { 0%,100%{opacity:0.2} 50%{opacity:1} }
+
+    /* ── TOAST ── */
+    .toast { position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%); background: var(--surface); border: 1px solid var(--lime); border-radius: 4px; padding: 10px 20px; font-size: 12px; font-weight: 600; color: var(--lime); z-index: 1000; white-space: nowrap; pointer-events: none; font-family: 'DM Mono', monospace; letter-spacing: 0.06em; animation: toastIn 0.2s ease; }
+    @keyframes toastIn { from{opacity:0;transform:translate(-50%,10px)} to{opacity:1;transform:translate(-50%,0)} }
+
+    
+
+    /* ── RESPONSIVE ── */
+    @media (min-width: 640px) {
+      .hamburger { display: none; }
+      .nav-links  { display: flex; }
+      .nav-cta    { display: inline-flex; }
+    }
+    @media (min-width: 900px) {
+      .nav { padding: 0 var(--pad-lg); }
+      .page-header, .plan-tabs, .plans-content { padding-left: var(--pad-lg); padding-right: var(--pad-lg); }
+      .spot-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    }
+  
+    /* ── FOOTER ── */
+    footer {
+      border-top: 3px solid var(--lime); padding: 20px var(--pad-sm);
+      background: var(--surface);
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 12px; margin-top: auto;
+    }
+    .footer-logo { font-size: 14px; font-weight: 800; text-decoration: none; font-family: 'DM Mono', monospace; text-transform: uppercase; letter-spacing: -0.3px; }
+    .footer-logo .after { color: var(--text); }
+    .footer-logo .five  { color: var(--lime); }
+    .footer-links { display: flex; align-items: center; gap: 12px; }
+    .footer-link-about {
+      font-size: 11px; font-weight: 600; text-decoration: none;
+      font-family: 'DM Mono', monospace; letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--midnight); background: var(--lime);
+      border: 2px solid var(--lime); border-radius: var(--r-btn);
+      padding: 5px 12px; transition: opacity 0.15s;
+    }
+    .footer-link-about:hover { opacity: 0.85; }
+    .footer-ig { display: flex; align-items: center; gap: 6px; color: var(--muted); text-decoration: none; font-size: 11px; font-family: 'DM Mono', monospace; letter-spacing: 0.04em; transition: color 0.15s; }
+    .footer-ig:hover { color: var(--lime); }
+    .footer-tagline { font-size: 10px; color: var(--subdued); font-family: 'DM Mono', monospace; letter-spacing: 0.06em; }
+
+  </style>
+</head>
+<body>
+
+  <nav class="nav">
+    <a class="nav-logo" href="index.html"><span class="after">after</span><span class="five">five</span></a>
+    <ul class="nav-links">
+      <li><a href="explore.html">Explore</a></li>
+      <li><a href="ai.html">Plan Generator</a></li>
+      <li><a href="friends.html">Friends</a></li>
+      <li><a href="submit.html">Submit a Spot</a></li>
+    </ul>
+    <a class="nav-cta" id="navCta" href="auth.html">Sign in</a>
+    <button class="hamburger" id="hamburgerBtn"><span></span><span></span><span></span></button>
+  </nav>
+
+  <div class="nav-stripe" aria-hidden="true">
+    <span style="background:#EE352C;"></span><span style="background:#00933C;"></span>
+    <span style="background:#FCCC0A;"></span><span style="background:#0039A6;"></span>
+    <span style="background:#FF6319;"></span>
+  </div>
+
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="index.html">Home</a>
+    <a href="explore.html">Explore</a>
+    <a href="ai.html">Plan Generator</a>
+    <a href="friends.html">Friends</a>
+    <a href="submit.html">Submit a Spot</a>
+    <a class="menu-cta" id="mobileAuthLink" href="auth.html">Sign in →</a>
+  </div>
+
+  <div class="page-header">
+    <p>Your Lists</p>
+    <h2>Plans & Saved Spots</h2>
+  </div>
+
+  <div class="plan-tabs">
+    <button class="plan-tab active" onclick="switchTab('saved', this)">Saved Spots</button>
+    <button class="plan-tab" onclick="switchTab('share', this)">Share a Plan</button>
+  </div>
+
+  <div class="plans-content" id="plansContent">
+    <div class="loading-state">
+      <div class="loading-dot"></div>
+      <div class="loading-dot"></div>
+      <div class="loading-dot"></div>
+    </div>
+  </div>
+
+    <footer>
+    <a class="footer-logo" href="index.html"><span class="after">after</span><span class="five">five</span></a>
+    <div class="footer-links">
+      <a href="about.html" class="footer-link-about">About</a>
+      <a href="https://instagram.com/afterfivenyc" target="_blank" class="footer-ig">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.5" fill="currentColor"/></svg>
+        @afterfivenyc
+      </a>
+    </div>
+    <p class="footer-tagline">"Your NYC nights, sorted."</p>
+  </footer>
+
+  <script>
+  const SUPABASE_URL  = 'https://kurizbyorntmmdqfviac.supabase.co';
+  const SUPABASE_ANON = 'sb_publishable_b8N7U5X4--k8b1VRLiqcew_sRtymSlZ';
+  const { createClient } = supabase;
+  const sb = createClient(SUPABASE_URL, SUPABASE_ANON, {
+    auth: { persistSession: true, storageKey: 'afterfive-auth', storage: window.localStorage, autoRefreshToken: true }
+  });
+
+  let currentUser = null;
+  let savedSpots  = [];
+  let friends     = [];
+  let currentTab  = 'saved';
+
+  // ── INIT ──
+  (async () => {
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) { window.location.href = 'auth.html'; return; }
+    currentUser = session.user;
+
+    // Update nav
+    const { data: profile } = await sb.from('profiles').select('full_name').eq('id', currentUser.id).single();
+    const name = profile?.full_name?.split(' ')[0] || 'You';
+    document.getElementById('navCta').textContent = name + ' →';
+    document.getElementById('navCta').href = '#';
+    document.getElementById('mobileAuthLink').textContent = name;
+
+    await Promise.all([loadSavedSpots(), loadFriends()]);
+    renderTab('saved');
+  })();
+
+  async function loadSavedSpots() {
+    const { data } = await sb.from('saved_spots')
+      .select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false });
+    savedSpots = data || [];
+  }
+
+  async function loadFriends() {
+    const { data } = await sb.from('friendships')
+      .select(`id, sender_id, receiver_id,
+        sender:profiles!friendships_sender_id_fkey(id, full_name, company),
+        receiver:profiles!friendships_receiver_id_fkey(id, full_name, company)`)
+      .eq('status', 'accepted')
+      .or(`sender_id.eq.${currentUser.id},receiver_id.eq.${currentUser.id}`);
+
+    friends = (data || []).map(f => f.sender_id === currentUser.id ? f.receiver : f.sender).filter(Boolean);
+  }
+
+  // ── TAB SWITCH ──
+  function switchTab(tab, el) {
+    currentTab = tab;
+    document.querySelectorAll('.plan-tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    renderTab(tab);
+  }
+
+  function renderTab(tab) {
+    if (tab === 'saved') renderSaved();
+    else renderShare();
+  }
+
+  // ── RENDER SAVED SPOTS ──
+  function renderSaved() {
+    const content = document.getElementById('plansContent');
+    const wantList = savedSpots.filter(s => s.list_type === 'want');
+    const beenList = savedSpots.filter(s => s.list_type === 'been');
+
+    if (savedSpots.length === 0) {
+      content.innerHTML = `
+        <div class="empty-state">
+          <span class="empty-icon">♡</span>
+          <h3>No saved spots yet</h3>
+          <p>Head to Explore and tap "Want to go" or "Been here" on any spot.</p>
+          <a class="btn-ghost" href="explore.html">→ Explore spots</a>
+        </div>`;
+      return;
+    }
+
+    let html = '';
+    if (wantList.length > 0) {
+      html += `<p class="section-label">♡ Want to go (${wantList.length})</p><div class="spot-grid">`;
+      wantList.forEach(s => { html += spotCard(s); });
+      html += '</div>';
+    }
+    if (beenList.length > 0) {
+      html += `<p class="section-label">✓ Been here (${beenList.length})</p><div class="spot-grid">`;
+      beenList.forEach(s => { html += spotCard(s); });
+      html += '</div>';
+    }
+
+    content.innerHTML = html;
+  }
+
+  function spotCard(s) {
+    const isWant = s.list_type === 'want';
+    const icon   = isWant ? '♡' : '✓';
+    const catEmoji = { fd:'🍜', dk:'🍹', ev:'🎵', wk:'⚡' }[s.spot_category] || '📍';
+    return `
+      <div class="spot-card ${s.list_type}">
+        <div class="spot-icon ${s.list_type}">${catEmoji}</div>
+        <div class="spot-info">
+          <p class="spot-name">${s.spot_name}</p>
+          <p class="spot-meta">${s.spot_hood || 'NYC'}</p>
+        </div>
+        <span class="spot-badge ${isWant ? 'badge-want' : 'badge-been'}">${isWant ? 'Want to go' : 'Been here'}</span>
+        <button class="spot-remove" onclick="removeSpot('${s.id}', this)" title="Remove">×</button>
+      </div>`;
+  }
+
+  async function removeSpot(id, btn) {
+    const card = btn.closest('.spot-card');
+    card.style.opacity = '0.4';
+    const { error } = await sb.from('saved_spots').delete().eq('id', id);
+    if (!error) {
+      savedSpots = savedSpots.filter(s => s.id !== id);
+      renderSaved();
+      showToast('Removed from list');
+    } else {
+      card.style.opacity = '1';
+    }
+  }
+
+  // ── RENDER SHARE ──
+  function renderShare() {
+    const content = document.getElementById('plansContent');
+    if (savedSpots.length === 0) {
+      content.innerHTML = `
+        <div class="empty-state">
+          <span class="empty-icon">📤</span>
+          <h3>Nothing to share yet</h3>
+          <p>Save some spots first, then share your plan with friends.</p>
+          <a class="btn-ghost" href="explore.html">→ Explore spots</a>
+        </div>`;
+      return;
+    }
+
+    const wantList = savedSpots.filter(s => s.list_type === 'want');
+    const spotsPreview = wantList.slice(0, 4).map(s => s.spot_name).join(', ');
+
+    let friendsHtml = '';
+    if (friends.length === 0) {
+      friendsHtml = `<p style="font-size:12px;color:var(--muted);padding:12px 0;">No friends yet — <a href="friends.html" style="color:var(--lime);">add some friends</a> to share plans with them.</p>`;
+    } else {
+      friendsHtml = `<div class="friend-checks">` + friends.map(f => {
+        const initials = (f.full_name || '?').split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
+        return `
+          <label class="friend-check">
+            <input type="checkbox" value="${f.id}" />
+            <div class="friend-avatar">${initials}</div>
+            <div class="friend-detail">
+              <p class="friend-name">${f.full_name || 'Unknown'}</p>
+              <p class="friend-company">${f.company || ''}</p>
+            </div>
+          </label>`;
+      }).join('') + `</div>`;
+    }
+
+    content.innerHTML = `
+      <div class="share-section">
+        <h3>Share your want list</h3>
+        <p>Send your saved spots to friends so you can plan a night together.</p>
+        <p class="section-label">Your spots</p>
+        <p style="font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.7;">${spotsPreview}${wantList.length > 4 ? ` +${wantList.length-4} more` : ''}</p>
+        <p class="section-label">Send to</p>
+        ${friendsHtml}
+        ${friends.length > 0 ? `<button class="btn-primary" onclick="sharePlan()">✦ Share Plan</button>` : ''}
+      </div>`;
+  }
+
+  async function sharePlan() {
+    const checked = [...document.querySelectorAll('.friend-check input:checked')];
+    if (checked.length === 0) { showToast('Select at least one friend'); return; }
+
+    const wantSpots = savedSpots.filter(s => s.list_type === 'want').map(s => s.spot_name);
+    const names = checked.map(c => {
+      const label = c.closest('.friend-check');
+      return label.querySelector('.friend-name').textContent;
+    });
+
+    // Build mailto share link as a simple share mechanism
+    const subject = `afterfive plan from ${currentUser.email?.split('@')[0] || 'a friend'}`;
+    const body = `Hey! Here are the spots I want to check out in NYC:\n\n${wantSpots.map(s => `• ${s}`).join('\n')}\n\nCheck it out on afterfivenyc.com`;
+    window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    showToast(`Plan shared with ${names.join(', ')}! 🎉`);
+  }
+
+  // ── HAMBURGER ──
+  const hBtn = document.getElementById('hamburgerBtn');
+  const hMenu = document.getElementById('mobileMenu');
+  hBtn.addEventListener('click', () => {
+    const open = hMenu.classList.toggle('open');
+    hBtn.classList.toggle('open', open);
+    document.body.style.overflow = open ? 'hidden' : '';
+  });
+  hMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+    hBtn.classList.remove('open'); hMenu.classList.remove('open'); document.body.style.overflow = '';
+  }));
+
+  // ── TOAST ──
+  function showToast(msg) {
+    const existing = document.querySelector('.toast');
+    if (existing) existing.remove();
+    const t = document.createElement('div');
+    t.className = 'toast'; t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(() => t.style.opacity = '0', 2000);
+    setTimeout(() => t.remove(), 2400);
+  }
+  </script>
+</body>
+</html>

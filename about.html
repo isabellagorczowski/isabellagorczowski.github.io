@@ -290,28 +290,7 @@
     .ig-btn:hover { opacity: 0.88; }
     .ig-btn svg { width: 15px; height: 15px; }
 
-    /* ── FOOTER ── */
-    .footer-stripe { display: flex; height: 4px; }
-    .footer-stripe span { flex: 1; }
-    footer {
-      border-top: 3px solid var(--lime); padding: 20px var(--pad);
-      display: flex; align-items: center; justify-content: space-between;
-      flex-wrap: wrap; gap: 12px; background: var(--surface);
-    }
-    .footer-logo {
-      font-size: 14px; font-weight: 800; text-decoration: none;
-      font-family: 'DM Mono', monospace; text-transform: uppercase; letter-spacing: -0.3px;
-    }
-    .footer-logo .after { color: var(--text); }
-    .footer-logo .five  { color: var(--lime); }
-    .footer-ig {
-      display: flex; align-items: center; gap: 6px;
-      font-size: 11px; color: var(--muted); text-decoration: none;
-      font-family: 'DM Mono', monospace; transition: color 0.15s;
-    }
-    .footer-ig svg { width: 14px; height: 14px; }
-    .footer-ig:hover { color: var(--lime); }
-    footer p { font-size: 10px; color: var(--subdued); font-family: 'DM Mono', monospace; letter-spacing: 0.06em; }
+    
 
     /* ── RESPONSIVE ── */
     @media (min-width: 640px) {
@@ -324,17 +303,31 @@
       .about-wrap { padding-top: 48px; }
       .about-hero h1 { font-size: 36px; }
     }
-  </style>
+  
+    /* ── FOOTER ── */
+    footer {
+      border-top: 3px solid var(--lime); padding: 20px var(--pad-sm);
+      background: var(--surface);
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 12px; margin-top: auto;
+    }
+    .footer-logo { font-size: 14px; font-weight: 800; text-decoration: none; font-family: 'DM Mono', monospace; text-transform: uppercase; letter-spacing: -0.3px; }
+    .footer-logo .after { color: var(--text); }
+    .footer-logo .five  { color: var(--lime); }
+    .footer-links { display: flex; align-items: center; gap: 12px; }
+    .footer-link-about {
+      font-size: 11px; font-weight: 600; text-decoration: none;
+      font-family: 'DM Mono', monospace; letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--midnight); background: var(--lime);
+      border: 2px solid var(--lime); border-radius: var(--r-btn);
+      padding: 5px 12px; transition: opacity 0.15s;
+    }
+    .footer-link-about:hover { opacity: 0.85; }
+    .footer-ig { display: flex; align-items: center; gap: 6px; color: var(--muted); text-decoration: none; font-size: 11px; font-family: 'DM Mono', monospace; letter-spacing: 0.04em; transition: color 0.15s; }
+    .footer-ig:hover { color: var(--lime); }
+    .footer-tagline { font-size: 10px; color: var(--subdued); font-family: 'DM Mono', monospace; letter-spacing: 0.06em; }
 
-  <link rel="manifest" href="/manifest.json" />
-<meta name="theme-color" content="#080A14" />
-<meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<meta name="apple-mobile-web-app-title" content="afterfive" />
-<script>
-  if ('serviceWorker' in navigator)
-    navigator.serviceWorker.register('/sw.js');
-</script>
+  </style>
 </head>
 <body>
 
@@ -344,8 +337,8 @@
       <li><a href="index.html">Home</a></li>
       <li><a href="explore.html">Explore</a></li>
       <li><a href="ai.html">Plan Generator</a></li>
+      <li><a href="friends.html">Friends</a></li>
       <li><a href="submit.html">Submit a Spot</a></li>
-      <li><a href="about.html" class="active">About</a></li>
     </ul>
     <a class="nav-cta" href="ai.html">✦ Build My Night</a>
     <button class="hamburger" id="hamburgerBtn" aria-label="Open menu">
@@ -365,8 +358,8 @@
     <a href="index.html">Home</a>
     <a href="explore.html">Explore</a>
     <a href="ai.html">Plan Generator</a>
+    <a href="friends.html">Friends</a>
     <a href="submit.html">Submit a Spot</a>
-    <a href="about.html">About</a>
     <a class="drawer-cta" href="ai.html">✦ Build My Night</a>
     <p class="drawer-tag">"Your NYC nights, sorted."</p>
   </div>
@@ -378,7 +371,7 @@
     <div class="about-hero">
       <p class="about-tag">The story</p>
       <h1>NYC is incredible.<br>It's also <em>a lot.</em></h1>
-      <p>When you're new to the city, on an intern budget, and working long hours — figuring out what to do after work shouldn't be another stressful thing. The good spots exist. They're just buried under tourist traps, expensive restaurant guides, and recommendations that assume you have unlimited time and money.</p>
+      <p>When you're new to the city, on an intern budget, and working long hours — figuring out what to do after work shouldn't be another stressful thing to figure out. The good spots exist. They're just buried under tourist traps, expensive restaurant guides, and recommendations that assume you have unlimited time and money.</p>
       <p>after5nyc started as a personal list. Every good spot I found, every cheap dinner that was actually worth it, every free thing that felt genuinely New York — I kept notes. This is that list, turned into something shareable.</p>
       <p>Everything here is intern-tested. If it's on the site, it's actually good.</p>
     </div>
@@ -494,13 +487,16 @@
     <span style="background:#0039A6;"></span>
     <span style="background:#FF6319;"></span>
   </div>
-  <footer>
+    <footer>
     <a class="footer-logo" href="index.html"><span class="after">after</span><span class="five">five</span></a>
-    <a class="footer-ig" href="https://instagram.com/afterfivenyc" target="_blank">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.5" fill="currentColor"/></svg>
-      @afterfivenyc
-    </a>
-    <p>"Your NYC nights, sorted."</p>
+    <div class="footer-links">
+      <a href="about.html" class="footer-link-about">About</a>
+      <a href="https://instagram.com/afterfivenyc" target="_blank" class="footer-ig">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.5" fill="currentColor"/></svg>
+        @afterfivenyc
+      </a>
+    </div>
+    <p class="footer-tagline">"Your NYC nights, sorted."</p>
   </footer>
 
   <script>
@@ -524,6 +520,35 @@
       document.querySelectorAll('.faq-item').forEach(f => f.classList.remove('open'));
       if (!isOpen) item.classList.add('open');
     }
+    // ── HAMBURGER ──
+  const _hBtn = document.getElementById('hamburgerBtn');
+  const _hMenu = document.getElementById('mobileMenu');
+  if (_hBtn && _hMenu) {
+    _hBtn.addEventListener('click', () => {
+      const open = _hMenu.classList.toggle('open');
+      _hBtn.classList.toggle('open', open);
+      document.body.style.overflow = open ? 'hidden' : '';
+    });
+    _hMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+      _hBtn.classList.remove('open'); _hMenu.classList.remove('open'); document.body.style.overflow = '';
+    }));
+  }
+
+  // ── AUTH STATE ──
+  (async () => {
+    try {
+      const { data: { session } } = await sb.auth.getSession();
+      const cta = document.getElementById('navCta');
+      const mobileLink = document.getElementById('mobileAuthLink');
+      if (session) {
+        const { data: profile } = await sb.from('profiles').select('full_name').eq('id', session.user.id).single();
+        const name = profile?.full_name?.split(' ')[0] || session.user.email?.split('@')[0] || 'You';
+        const initials = (profile?.full_name || name).split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+        if (cta) { cta.textContent = name + ' →'; cta.href = 'plans.html'; }
+        if (mobileLink) { mobileLink.textContent = name + ' →'; mobileLink.href = 'plans.html'; }
+      }
+    } catch(e) {}
+  })();
   </script>
 </body>
 </html>

@@ -419,16 +419,31 @@
       .step-bar, .step-labels, .step-nav { padding-left: 48px; padding-right: 48px; }
       .choice-grid { grid-template-columns: repeat(4, 1fr); }
     }
+  
+    /* ── FOOTER ── */
+    footer {
+      border-top: 3px solid var(--lime); padding: 20px var(--pad-sm);
+      background: var(--surface);
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 12px; margin-top: auto;
+    }
+    .footer-logo { font-size: 14px; font-weight: 800; text-decoration: none; font-family: 'DM Mono', monospace; text-transform: uppercase; letter-spacing: -0.3px; }
+    .footer-logo .after { color: var(--text); }
+    .footer-logo .five  { color: var(--lime); }
+    .footer-links { display: flex; align-items: center; gap: 12px; }
+    .footer-link-about {
+      font-size: 11px; font-weight: 600; text-decoration: none;
+      font-family: 'DM Mono', monospace; letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--midnight); background: var(--lime);
+      border: 2px solid var(--lime); border-radius: var(--r-btn);
+      padding: 5px 12px; transition: opacity 0.15s;
+    }
+    .footer-link-about:hover { opacity: 0.85; }
+    .footer-ig { display: flex; align-items: center; gap: 6px; color: var(--muted); text-decoration: none; font-size: 11px; font-family: 'DM Mono', monospace; letter-spacing: 0.04em; transition: color 0.15s; }
+    .footer-ig:hover { color: var(--lime); }
+    .footer-tagline { font-size: 10px; color: var(--subdued); font-family: 'DM Mono', monospace; letter-spacing: 0.06em; }
+
   </style>
-  <link rel="manifest" href="/manifest.json" />
-<meta name="theme-color" content="#080A14" />
-<meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<meta name="apple-mobile-web-app-title" content="afterfive" />
-<script>
-  if ('serviceWorker' in navigator)
-    navigator.serviceWorker.register('/sw.js');
-</script>
 </head>
 <body>
 
@@ -697,153 +712,8 @@
         {n:'Lucali',                   h:'Carroll Gardens',   c:28, desc:'BYOB, cash only, the best pizza in NYC. Zero regrets.',              tags:['pizza','date'],           out:false, min:90},
         {n:'Sugarfish',                h:'Various',           c:60, desc:'Trust-me omakase sets. Reliable and always excellent.',               tags:['sushi','omakase'],        out:false, min:90},
         {n:"Sadelle's",                h:'SoHo',              c:45, desc:'Iconic SoHo brunch spot. The smoked fish tower is legendary.',        tags:['brunch','soho'],          out:false, min:60},
-        {n:'Scarpetta',             h:'Meatpacking District',c:65,desc:'Scott Conant\'s Italian flagship. The spaghetti with tomato and basil is one of NYC\'s most iconic dishes.',tags:['italian','upscale'],   out:false, min:90},
-        {n:'Moody Tongue Sushi',    h:'Various',           c:55, desc:'Michelin-starred sushi with a unique brewing influence. Refined and special occasion worthy.',  tags:['sushi','michelin'],      out:false, min:90},
-{n:'Happy Tuna',            h:'Various',           c:35, desc:'Creative rolls and solid omakase options. Great quality for the price — reliably excellent.',     tags:['sushi','japanese'],      out:false, min:75},
-{n:'Eataly NYC',            h:'Flatiron',          c:35, desc:'Italian food hall with restaurants, counters, and a market. Great for grazing or groups.',        tags:['italian','groups'],      out:false, min:75},
-{n:'Carrot Express',        h:'Various',           c:12, desc:'Fast, healthy, and affordable. Fresh wraps, bowls, and juices done right.',                       tags:['healthy','quick'],       out:false, min:20},
-{n:'Oases Cafe',            h:'Various',           c:11, desc:'Warm neighbourhood café with solid food and a calm, welcoming atmosphere.',                       tags:['cafe','chill'],          out:false, min:30},
-{n:'Bagel Pub',             h:'Various',           c:7,  desc:'NYC bagels done properly — hand-rolled, boiled, baked. Whatever you need on a Tuesday morning.',  tags:['bagels','breakfast'],    out:false, min:20},
-{n:'Burger Head',           h:'Various',           c:16, desc:'Smash burgers, crispy fries, and shakes. No frills, just a really good burger at a fair price.',  tags:['burgers','quick'],       out:false, min:30},
-{n:'Din Tai Fung',          h:'Midtown',           c:35, desc:'World-famous Taiwanese soup dumplings. The xiao long bao are flawless. Expect a wait.',           tags:['dumplings','taiwanese'], out:false, min:75},
-{n:'Joe\'s House of Soup Dumplings',h:'Flushing',  c:14, desc:'Flushing\'s beloved soup dumpling spot. Huge portions, tiny prices.',                            tags:['dumplings','flushing'],  out:false, min:45},
-{n:'Slicehaus Pizza',       h:'Various',           c:6,  desc:'Creative NYC slices with inventive toppings. The kind of slice that makes you rethink pizza.',    tags:['pizza','creative'],      out:false, min:20},
-{n:'Casa Toscana',          h:'Various',           c:45, desc:'Rustic Tuscan cooking, handmade pasta, and a warm candlelit room. A proper Italian night out.',   tags:['italian','tuscan'],      out:false, min:75},
-{n:'Gottino',               h:'Greenwich Village', c:32, desc:'Tiny Village wine bar and salumeria. Exceptional Italian small plates. Perfect for two.',          tags:['wine','italian'],        out:false, min:75},
-{n:'Bond St',               h:'NoHo',              c:75, desc:'Sleek NoHo Japanese with some of the best sushi in the city. Dark, romantic, impeccable.',         tags:['sushi','upscale'],       out:false, min:90},
-{n:'Aqua Kyoto',            h:'Midtown',           c:75, desc:'Stunning rooftop Japanese with wraparound Manhattan views. Exceptional omakase.',                  tags:['sushi','rooftop'],       out:true,  min:90},
-{n:'Printemps',             h:'FiDi',              c:65, desc:'NYC outpost of the iconic Parisian department store\'s restaurant. Beautiful room.',               tags:['french','upscale'],      out:false, min:90},
-{n:'Hatsuhana',             h:'Midtown',           c:75, desc:'One of NYC\'s oldest sushi bars. Understated, precise, beloved by purists for decades.',           tags:['sushi','classic'],       out:false, min:90},
-{n:'Blue Ribbon',           h:'SoHo',              c:65, desc:'Legendary late-night SoHo brasserie open until 4 AM. Beloved by chefs and night owls.',            tags:['brasserie','late-night'],out:false, min:90},
-{n:'Sushi Saikou',          h:'Various',           c:110,desc:'Intimate omakase counter with exceptional nigiri. A deeply personal dining experience.',           tags:['omakase','sushi'],       out:false, min:120},
-{n:'Mimosa',                h:'Various',           c:45, desc:'Bright, seasonal European cooking and natural wine. The kind of place you immediately want to return.',tags:['european','wine'],     out:false, min:75},
-{n:'Zuma',                  h:'Midtown',           c:100,desc:'Global izakaya with an exceptional robata grill and an electric atmosphere. The payday dinner.',    tags:['japanese','upscale'],    out:false, min:90},
-{n:'Osakana',               h:'Park Slope',        c:45, desc:'Japanese fish shop and restaurant. Pristine sashimi and excellent omakase. Neighbourhood prices.',  tags:['sushi','brooklyn'],      out:false, min:75},
-{n:'Genki Omakase',         h:'Various',           c:150,desc:'Extraordinary chef-driven omakase. Reserve months ahead. Worth planning your whole summer around.',  tags:['omakase','upscale'],     out:false, min:120},
-{n:'Lure Fishbar',          h:'SoHo',              c:65, desc:'Subterranean SoHo seafood styled like a yacht. Lobster rolls, raw bar, excellent cocktails.',       tags:['seafood','soho'],        out:false, min:90},
-{n:'Joji Omakase',          h:'Midtown',           c:350,desc:'One of NYC\'s most celebrated omakase counters inside Grand Central. Once in a lifetime.',          tags:['omakase','luxury'],      out:false, min:120},
-{n:'Square Diner',          h:'Tribeca',           c:14, desc:'Old-school Tribeca diner in a genuine vintage railcar. Eggs, pancakes, burgers. A time-warp classic.',tags:['diner','classic'],      out:false, min:45},
-{n:'Leon\'s Bagels',        h:'Various',           c:7,  desc:'Hand-rolled, kettle-boiled NYC bagels with rotating schmears. Lines out the door for a reason.',    tags:['bagels','breakfast'],    out:false, min:20},
-{n:'Fairfax',               h:'West Village',      c:45, desc:'American bistro with a warm, candlelit West Village room and a seasonal menu.',                     tags:['american','date'],       out:false, min:75},
-{n:'Claude Bakery',         h:'Various',           c:7,  desc:'Charming neighbourhood bakery with beautifully crafted pastries and breads.',                       tags:['bakery','pastry'],       out:false, min:20},
-{n:'Tasti D-Lite',          h:'Various',           c:6,  desc:'NYC\'s iconic low-cal soft serve chain. Dozens of rotating flavors. A city institution since 1987.',tags:['dessert','soft-serve'],  out:false, min:15},
-{n:'Grace Street',          h:'Various',           c:8,  desc:'Korean-inspired café with beautiful bingsu, latte art, and seasonal pastries.',                    tags:['korean','dessert'],      out:false, min:30},
-{n:'Sundaes Best',          h:'Various',           c:8,  desc:'House-made ice cream sundaes with inventive toppings and generous portions.',                       tags:['dessert','ice-cream'],   out:false, min:20},
-{n:'Saint Street Cakes',    h:'Various',           c:7,  desc:'Beautifully decorated layer cakes and individual slices. The bakery you can\'t walk past.',         tags:['bakery','cakes'],        out:false, min:20},
-{n:'Burdock Cookie Shop',   h:'Various',           c:5,  desc:'Thick, gooey, perfectly baked cookies. The brown butter chocolate chip is a religious experience.',  tags:['cookies','bakery'],      out:false, min:15},
-{n:'JM Bakery',             h:'Various',           c:6,  desc:'Neighbourhood bakery with rotating breads, pastries, and cakes. Unpretentious and excellent.',      tags:['bakery','pastry'],       out:false, min:20},
-{n:'Lucie',                 h:'Various',           c:8,  desc:'French-inspired pastry shop with flawless croissants, tarts, and éclairs.',                        tags:['french','pastry'],       out:false, min:20},
-{n:'Kora',                  h:'Various',           c:7,  desc:'Plant-based bakery with creative, naturally-sweetened pastries. Genuinely delicious.',              tags:['vegan','bakery'],        out:false, min:20},
-{n:'La Mercerie',           h:'SoHo',              c:14, desc:'Parisian café inside the Roman and Williams Guild. Impeccable pastries and a dreamy room.',         tags:['french','pastry'],       out:false, min:45},
-{n:'The Pastry Box',        h:'Various',           c:7,  desc:'Curated rotating selection of beautifully made pastries. The box you don\'t want to share.',        tags:['pastry','bakery'],       out:false, min:20},
-{n:'Funny Face Bakery',     h:'Various',           c:6,  desc:'Playful custom-decorated cookies and seasonal designs. Joyful, delicious, very shareable.',         tags:['cookies','fun'],         out:false, min:15},
-{n:'Hani\'s',               h:'Various',           c:7,  desc:'Middle Eastern-inspired pastries — baklava, knafeh, creative sweet bites. Unique and generous.',    tags:['middle-eastern','dessert'],out:false,min:20},
-{n:'Figo Gelato',           h:'Various',           c:7,  desc:'Artisan Italian gelato with rotating seasonal flavors. Slow-churned, creamy, dense. The real thing.',tags:['gelato','italian'],      out:false, min:20},
-{n:'Cookie Odyssey',        h:'Various',           c:5,  desc:'Wildly creative rotating cookie flavors — miso butterscotch, brown butter espresso, black sesame.',  tags:['cookies','creative'],    out:false, min:15},
-{n:'Salt & Straw',          h:'Various',           c:8,  desc:'Portland-born artisan ice cream with the most creative flavor program in the city.',                tags:['ice-cream','artisan'],   out:false, min:20},
-{n:'Madman Espresso',       h:'Various',           c:6,  desc:'Serious specialty espresso. Exceptional extraction, beautiful latte art, zero filler drinks.',       tags:['coffee','espresso'],     out:false, min:20},
-{n:'Birch Coffee',          h:'Various',           c:6,  desc:'NYC-born specialty coffee roaster with a warm, community-focused atmosphere.',                       tags:['coffee','nyc'],          out:false, min:30},
-{n:'Maman',                 h:'Various',           c:7,  desc:'French-inspired café with the most beautiful nutty chocolate chip cookie in NYC.',                   tags:['french','cafe'],         out:false, min:30},
-{n:'Buddy Buddy',           h:'Various',           c:6,  desc:'Cheerful neighbourhood café with great drip coffee and a loyal local crowd.',                        tags:['coffee','chill'],        out:false, min:30},
-{n:'Tom\'s Juice',          h:'Various',           c:8,  desc:'Cold-pressed juice bar with smoothies and acai bowls. Fresh, fast, and genuinely good for you.',    tags:['juice','healthy'],       out:false, min:20},
-{n:'Justin\'s',             h:'Various',           c:6,  desc:'Low-key neighbourhood café with excellent coffee. The spot you make your regular without trying.',   tags:['coffee','local'],        out:false, min:30},
-{n:'Massara',               h:'Williamsburg',      c:45, desc:'Neapolitan-inspired wood-fired dishes and natural wine in Williamsburg. A beautiful room.',  tags:['italian','wood-fired'],  out:false, min:75},
-{n:'Casa Mono',             h:'Gramercy',          c:50, desc:'Spanish tapas bar. Sit at the counter, order the bone marrow, and share everything.',        tags:['spanish','tapas'],       out:false, min:75},
-{n:'Cote',                  h:'Flatiron',          c:85, desc:'Korean steakhouse — grill wagyu tableside. The butcher\'s feast is the move.',               tags:['korean','steakhouse'],   out:false, min:90},
-{n:'Theodora',              h:'West Village',      c:50, desc:'Mediterranean-leaning menu in a warm, candlelit West Village room. Perfect for a date.',     tags:['mediterranean','date'],  out:false, min:75},
-{n:'Le Crocodile',          h:'Williamsburg',      c:50, desc:'French brasserie inside the Wythe Hotel. Steak frites, raw bar, excellent wine.',            tags:['french','brasserie'],    out:false, min:75},
-{n:'Eyval',                 h:'Williamsburg',      c:45, desc:'Persian-inspired small plates and natural wine. Herbaceous, smoky, completely delicious.',    tags:['persian','wine'],        out:false, min:75},
-{n:'Miss Ada',              h:'Fort Greene',       c:45, desc:'Israeli-Mediterranean with a stunning Fort Greene terrace. Mezze, grilled fish, excellent hummus.',tags:['israeli','outdoor'],   out:true,  min:75},
-{n:'Cecconi\'s',            h:'DUMBO',             c:60, desc:'Italian restaurant with stunning Brooklyn Bridge views. Great pasta and a beautiful space.',  tags:['italian','views'],       out:false, min:75},
-{n:'Public Records',        h:'Gowanus',           c:38, desc:'Record store, bar, and restaurant with an incredible sound system and plant-based menu.',    tags:['vegan','music'],         out:false, min:90},
-{n:'Swoony\'s',             h:'Park Slope',        c:42, desc:'Park Slope gem with seasonal American cooking and a warm, convivial dining room.',           tags:['american','brooklyn'],   out:false, min:75},
-{n:'Da Toscano',            h:'West Village',      c:50, desc:'Rustic Tuscan cooking. Handmade pasta, bistecca, and a proper Italian wine list.',           tags:['italian','tuscan'],      out:false, min:75},
-{n:'Sfoglia',               h:'Upper East Side',   c:60, desc:'Intimate UES Italian with handmade pasta and a short, perfect menu. Quietly one of NYC\'s best.',tags:['italian','intimate'],  out:false, min:90},
-{n:'La Lanterna di Vittorio',h:'Greenwich Village',c:28, desc:'Fireplace café and wine bar open until 2 AM. Paninis, wine, old-world Village atmosphere.',  tags:['wine','late-night'],     out:false, min:90},
-{n:'Osteria 57',            h:'West Village',      c:45, desc:'Classic Italian osteria on a quiet West Village block. Handmade pasta, low lighting.',       tags:['italian','pasta'],       out:false, min:75},
-{n:'Il Cantinori',          h:'Greenwich Village', c:50, desc:'Beloved Tuscan restaurant that never goes out of style. Flowers, candles, great pasta.',     tags:['italian','classic'],     out:false, min:75},
-{n:'Emmett\'s on Grove',    h:'West Village',      c:32, desc:'Chicago-style deep dish in the West Village. The sausage pie is legendary. Bring a group.',  tags:['pizza','deep-dish'],     out:false, min:75},
-{n:'4 Charles Prime Rib',   h:'West Village',      c:85, desc:'The best prime rib in NYC in a tiny reservation-only townhouse. A true special occasion.',   tags:['steakhouse','upscale'],  out:false, min:90},
-{n:'San Sabino',            h:'West Village',      c:50, desc:'Southern Italian seafood from the Don Angie team. Clams, pasta, and a buzzy room.',          tags:['seafood','italian'],     out:false, min:75},
-{n:'Sip & Guzzle',          h:'West Village',      c:42, desc:'Wine bar and restaurant duo in the West Village. Excellent natural pours and small plates.',  tags:['wine','small-plates'],   out:false, min:90},
-{n:'Commerce Inn',          h:'West Village',      c:50, desc:'Classic American tavern in one of the WV\'s most beautiful old rooms. Roast chicken.',       tags:['american','classic'],    out:false, min:75},
-{n:'Wilfie & Nell',         h:'West Village',      c:32, desc:'Irish pub meets wine bar. Great burgers, good pints, reliably fun crowd.',                   tags:['pub','burgers'],         out:false, min:90},
-{n:'Olio e Più',            h:'Greenwich Village', c:45, desc:'Wood-fired Neapolitan pizza on a stunning Village corner. Perfect outdoor seating.',         tags:['pizza','outdoor'],       out:true,  min:75},
-{n:'The Waverly Inn',       h:'West Village',      c:62, desc:'Old-school West Village townhouse with celebrity regulars and a legendary mac and cheese.',  tags:['american','upscale'],    out:false, min:90},
-{n:'Anton\'s',              h:'West Village',      c:45, desc:'Neighbourhood West Village Italian-American with a warm, unpretentious dining room.',        tags:['italian','locals'],      out:false, min:75},
-{n:'Lavagna',               h:'East Village',      c:42, desc:'Cozy Italian BYOB in the East Village. Handmade pasta, warm neighbourhood feel. Bring a bottle.',tags:['italian','byob'],     out:false, min:75},
-{n:'Cathedral',             h:'Harlem',            c:45, desc:'Restaurant in a converted Gothic church. The space is jaw-dropping — the food matches it.',  tags:['american','stunning'],   out:false, min:75},
-{n:'Le French Diner',       h:'Lower East Side',   c:28, desc:'French comfort food on the LES. Croque monsieurs, French onion soup, $14 Burgundy.',        tags:['french','cheap'],        out:false, min:75},
-{n:'Foul Witch',            h:'East Village',      c:45, desc:'Roman-inspired pasta and wine bar. Cacio e pepe, natural wine, very cool East Village room.',tags:['italian','wine'],        out:false, min:75},
-{n:'Cervo\'s',              h:'Lower East Side',   c:42, desc:'Portuguese seafood and natural wine. Tinned fish, grilled things, excellent vibes all night.',tags:['seafood','wine'],        out:false, min:75},
-{n:'Manhatta',              h:'FiDi',              c:75, desc:'60th-floor restaurant with the best views in NYC. Splurge-worthy on a clear night.',         tags:['views','upscale'],       out:false, min:90},
-{n:'The Odeon',             h:'Tribeca',           c:50, desc:'Classic NYC brasserie since 1980. Late-night steak frites in an iconic room.',               tags:['brasserie','late-night'],out:false, min:75},
-{n:'Au Cheval',             h:'Nolita',            c:35, desc:'The legendary Chicago diner\'s NYC outpost. Double cheeseburger with fried egg — one of the best.',tags:['burgers','classic'],  out:false, min:75},
-{n:'Peasant',               h:'Nolita',            c:60, desc:'Wood-fired Italian in a gorgeous Nolita space. Everything from the open hearth. Romantic.',  tags:['italian','romantic'],    out:false, min:90},
-{n:'Double Knot',           h:'Various',           c:45, desc:'Asian-inspired restaurant with a serious cocktail program and a buzzy, dimly lit room.',     tags:['asian','groups'],        out:false, min:75},
-{n:'Lloyd\'s Carrot Cake',  h:'Harlem',            c:6,  desc:'Harlem institution since 1984. The carrot cake is legendary — dense, moist, cream cheese perfection.',tags:['bakery','harlem'],   out:false, min:20},
-{n:'Radio Bakery',          h:'Greenpoint',        c:6,  desc:'Greenpoint\'s most beloved bakery. The focaccia and almond croissant are worth setting an alarm for.',tags:['bakery','brooklyn'], out:false, min:20},
-{n:'Cafe Reggio',           h:'Greenwich Village', c:6,  desc:'NYC\'s oldest cappuccino bar, open since 1927. Antiques, proper cappuccino, total history.',  tags:['cafe','historic'],       out:false, min:45},
-{n:'Cha An Tea House',      h:'East Village',      c:12, desc:'Japanese tea house on a second-floor EV walk-up. Matcha sweets, rare teas, total tranquility.',tags:['tea','japanese'],       out:false, min:60},
-{n:'Caffe Panna',           h:'Gramercy',          c:7,  desc:'Italian-inspired soft serve and affogatos in a tiny Gramercy shop. Always a line, always worth it.',tags:['dessert','italian'],  out:false, min:20},
-{n:'Ray\'s Candy Store',    h:'East Village',      c:4,  desc:'Open until 3 AM. Soft serve, Belgian waffles, egg creams since 1974. True NYC late-night icon.',tags:['dessert','late-night'], out:false, min:15},
-{n:'Mister Dips',           h:'Williamsburg',      c:7,  desc:'Iconic dipped soft serve at the William Vale hotel. Outdoor seating, skyline views.',         tags:['dessert','outdoor'],     out:true,  min:20},
-{n:'% Arabica',             h:'DUMBO',             c:7,  desc:'Japanese specialty coffee in a stunning DUMBO space with Brooklyn Bridge views.',             tags:['cafe','coffee'],         out:false, min:30},
-{n:'L\'Appartement 4F',     h:'SoHo',              c:7,  desc:'French café with flawless croissants and a Parisian living room vibe. A SoHo gem.',           tags:['cafe','french'],         out:false, min:30},
       ],
       drinks:[
-        {n:'Casa Thirteen',         h:'Various',           c:14, desc:'Latin-inspired bar with strong cocktails and a warm, festive energy. Great for groups.',               tags:['latin','groups'],        out:false, min:90},
-{n:'Antler',                h:'West Village',      c:14, desc:'Cosy West Village bar with a lodge-like aesthetic, strong whiskeys, and a warm vibe.',                 tags:['whiskey','cosy'],        out:false, min:90},
-{n:'Bar Revival',           h:'Various',           c:10, desc:'Late-night dive bar with cheap drinks and a reliably fun atmosphere. Open until 4 AM.',               tags:['dive','late-night'],     out:false, min:90},
-{n:'Pretty Ricky\'s',       h:'Various',           c:10, desc:'Fun, lively bar with an upbeat crowd and affordable drinks. Where great nights accidentally start.',   tags:['fun','cheap'],           out:false, min:90},
-{n:'Bar Belly',             h:'Lower East Side',   c:16, desc:'Natural wine and low-key vibes on the LES. Great for a weeknight wind-down.',                         tags:['wine','les'],            out:false, min:90},
-{n:'Cafe Skye',             h:'Various',           c:14, desc:'All-day café with a solid evening wine and cocktail menu. Cozy, unpretentious, easy to linger in.',   tags:['wine','cafe'],           out:false, min:75},
-{n:'Baby Sips',             h:'Various',           c:10, desc:'Small, affordable cocktail bar with a playful menu and a fun, youthful crowd.',                       tags:['cocktails','fun'],       out:false, min:75},
-{n:'Brick Wine Bar',        h:'Various',           c:16, desc:'Exposed brick wine bar with a warm feel and a well-curated bottle list.',                             tags:['wine','intimate'],       out:false, min:90},
-{n:'So & So\'s Piano Bar',  h:'Various',           c:14, desc:'Live piano bar with a fun sing-along atmosphere. One of the most genuinely fun nights in NYC.',       tags:['piano','live-music'],    out:false, min:120},
-{n:'Fanelli Cafe',          h:'SoHo',              c:10, desc:'One of NYC\'s oldest bars — open since 1847. Cold beers, burgers, a SoHo spot unchanged for decades.',tags:['historic','soho'],       out:false, min:90},
-{n:'Salt\'s Cure',          h:'Various',           c:16, desc:'American bar with a cured meats focus and a strong cocktail program.',                                tags:['cocktails','american'],  out:false, min:90},
-{n:'Chloe',                 h:'Various',           c:16, desc:'Chic cocktail bar and restaurant with a strong natural wine list and warm, intimate atmosphere.',      tags:['wine','intimate'],       out:false, min:90},
-{n:'Impact Kitchen',        h:'Various',           c:12, desc:'Health-focused café and juice bar. Smoothies, bowls, clean cocktails. Feel good about your drinks.',  tags:['healthy','juice'],       out:false, min:30},
-{n:'Georgie\'s Cafe & Bar', h:'Various',           c:6,  desc:'All-day café and bar with great coffee and a WFH-friendly atmosphere. Great wifi, long tables.',      tags:['cafe','wfh'],            out:false, min:60},
-{n:'The Lost Draft',        h:'Various',           c:6,  desc:'Café and bar hybrid perfect for working remotely. Great coffee, cold beer, no-rush atmosphere.',      tags:['cafe','wfh'],            out:false, min:60},
-{n:'Gather Espresso & Wine',h:'Various',           c:8,  desc:'Coffee by day, natural wine by evening, laptops welcome all day. The WFH café that becomes a night out.',tags:['wine','wfh'],          out:false, min:60},
-        {n:'Beefbar',               h:'Tribeca',           c:25, desc:'Upscale meat-forward bar with a serious cocktail program. Dark, glamorous, a genuine scene.',       tags:['cocktails','upscale'],   out:false, min:90},
-{n:'Bar Blondeau',          h:'Williamsburg',      c:16, desc:'Rooftop wine bar atop the Wythe Hotel. Manhattan skyline views and natural wine.',                   tags:['rooftop','wine'],        out:true,  min:90},
-{n:'Tanner Smith\'s',       h:'Hell\'s Kitchen',   c:12, desc:'Prohibition-era inspired bar with craft cocktails and a relaxed, unpretentious vibe.',               tags:['cocktails','hk'],        out:false, min:90},
-{n:'Bar Snack',             h:'West Village',      c:16, desc:'Cozy West Village bar with excellent snacks and a thoughtful drinks list.',                          tags:['wine','snacks'],         out:false, min:75},
-{n:'Tara Mor',              h:'Various',           c:16, desc:'Warm, welcoming bar with a strong cocktail list and a neighbourhood feel.',                          tags:['cocktails','chill'],     out:false, min:90},
-{n:'Bar Valentina',         h:'Various',           c:18, desc:'Intimate cocktail bar with a romantic, candlelit atmosphere. Perfect for a date.',                   tags:['cocktails','romantic'],  out:false, min:75},
-{n:'Shy Shy Chelsea',       h:'Chelsea',           c:10, desc:'$5 fries and great cocktails in Chelsea. One of the best value deals in the city.',                  tags:['cheap','deal'],          out:false, min:90},
-{n:'Stout FiDi',            h:'FiDi',              c:25, desc:'$25 spritz flights in the Financial District. A great happy hour deal. Post-work essential.',        tags:['spritz','deal'],         out:false, min:90},
-{n:'Rosemary\'s',           h:'West Village',      c:30, desc:'$30 bottomless brunch in the West Village. Italian food, unlimited drinks, a beautiful garden.',     tags:['bottomless','brunch'],   out:true,  min:120},
-{n:'Fernando\'s Hideaway',  h:'Various',           c:25, desc:'$25 bottomless drinks — one of the best deals in NYC. Fun, unpretentious, always a great crowd.',    tags:['bottomless','deal'],     out:false, min:120},
-{n:'Empire Hotel Rooftop',  h:'Upper West Side',   c:18, desc:'UWS rooftop bar with pool, skyline views, and a great summer crowd.',                               tags:['rooftop','uws'],         out:true,  min:90},
-{n:'Tara Rose',             h:'Various',           c:9,  desc:'$9 Aperol Spritz — a genuinely great deal with a fun, easy-going bar to match.',                    tags:['spritz','cheap'],        out:false, min:75},
-{n:'Mean Fiddler',          h:'Hell\'s Kitchen',   c:30, desc:'$30 bottomless brunch in a lively Irish pub. Great craic, great value, great for groups.',           tags:['bottomless','irish'],    out:false, min:120},
-{n:'Houston Hall',          h:'West Village',      c:10, desc:'Massive beer hall with communal tables, huge pours, and a reliably fun crowd every night.',           tags:['beer','groups'],         out:false, min:90},
-{n:'Metate',                h:'Various',           c:16, desc:'Mexican-inspired cocktail bar with an excellent mezcal and tequila selection.',                       tags:['mezcal','mexican'],      out:false, min:90},
-{n:'Bowtie Bar',            h:'Various',           c:14, desc:'Stylish neighbourhood bar with a strong cocktail program and a well-dressed crowd.',                  tags:['cocktails','stylish'],   out:false, min:90},
-{n:'The Living Room',       h:'Union Square',      c:14, desc:'Chill, sofa-filled bar near Union Square. Low-key drinks, good music, crowd there to relax.',        tags:['chill','lounge'],        out:false, min:90},
-{n:'Bibi Wine Bar',         h:'Various',           c:18, desc:'Intimate wine bar with natural and biodynamic bottles. Quiet, sophisticated, very good.',             tags:['wine','natural'],        out:false, min:90},
-{n:'Ten Degrees',           h:'East Village',      c:12, desc:'Buy one get one free cocktails every night. Best BOGO deal in the EV. Strong pours, fun crowd.',     tags:['bogo','deal'],           out:false, min:90},
-{n:'El Camino',             h:'Bushwick',          c:10, desc:'Laid-back Bushwick bar with cheap drinks and a great outdoor space. Open until 4 AM.',               tags:['cheap','late-night'],    out:true,  min:90},
-{n:'The Wayland',           h:'East Village',      c:12, desc:'Beloved EV bar with live music, strong cocktails, and a warm neighbourhood feel.',                   tags:['live-music','ev'],       out:false, min:90},
-{n:'Aura',                  h:'Various',           c:16, desc:'Sleek cocktail bar with a strong spirits program and a cool, minimal aesthetic.',                     tags:['cocktails','minimal'],   out:false, min:90},
-{n:'The Immigrant',         h:'East Village',      c:14, desc:'Tiny beloved EV bar with great beer and a warm, unpretentious atmosphere.',                           tags:['beer','dive'],           out:false, min:90},
-{n:'Rosso',                 h:'Various',           c:12, desc:'Buy one get one free cocktails — one of the better BOGO deals in the city. Always fun.',              tags:['bogo','deal'],           out:false, min:90},
-{n:'&Son Speakeasy',        h:'Various',           c:18, desc:'Hidden speakeasy with a proper cocktail program and intimate underground atmosphere.',                tags:['speakeasy','hidden'],    out:false, min:90},
-{n:'Nightingale',           h:'Various',           c:16, desc:'Moody, low-lit bar with a carefully crafted cocktail list. Great for a date or a catch-up.',         tags:['cocktails','romantic'],  out:false, min:75},
-{n:'Joey\'s',               h:'Various',           c:10, desc:'Classic dive bar energy. Cheap drinks, loyal unpretentious crowd, open late, zero attitude.',         tags:['dive','cheap'],          out:false, min:90},
-{n:'Stability Wine Cafe',   h:'Various',           c:16, desc:'Relaxed wine café with a thoughtful list. For when you want wine without the fuss.',                  tags:['wine','chill'],          out:false, min:90},
-{n:'Bobo',                  h:'West Village',      c:22, desc:'Charming West Village townhouse. Dark wood, candlelight, excellent cocktails. A special room.',       tags:['cocktails','romantic'],  out:false, min:90},
-{n:'Emporio',               h:'Nolita',            c:16, desc:'Italian restaurant bar in Nolita. Great Aperol spritzes and a buzzy, lively dining room.',            tags:['spritz','italian'],      out:false, min:90},
-{n:'Beyond the Pale',       h:'East Village',      c:10, desc:'Irish pub in the EV with cheap pints and a reliably rowdy, fun crowd. Open late.',                    tags:['irish','cheap'],         out:false, min:90},
-{n:'Botanica Bar',          h:'Lower East Side',   c:14, desc:'Plant-filled LES bar with botanical cocktails and a lush, tropical vibe.',                            tags:['cocktails','botanical'], out:false, min:90},
-{n:'Epistrophy',            h:'Nolita',            c:16, desc:'Tiny Italian wine bar named after the Monk standard. Natural wines, small bites, jazz on the speakers.',tags:['wine','jazz'],          out:false, min:75},
-{n:'Vig Bar',               h:'Lower East Side',   c:10, desc:'No-frills LES bar with cheap drinks, great music, loyal crowd. Open until 4 AM.',                    tags:['dive','late-night'],     out:false, min:90},
-{n:'Balsem',                h:'Various',           c:16, desc:'Herbal and botanical cocktails with a pharmacy-meets-speakeasy aesthetic.',                           tags:['cocktails','botanical'], out:false, min:75},
-{n:'Grey Dog',              h:'Various',           c:10, desc:'All-day café by day, relaxed bar by evening. Great coffee, affordable drinks. Neighbourhood staple.',  tags:['cafe','chill'],          out:false, min:90},
         {n:'Happy Hour @ Ample Hills', h:'Sunset Park',       c:5,  desc:'$5 draft beers 5–8pm. Outdoor seating and a great crowd.',           tags:['happy-hour','cheap'],     out:true,  min:90},
         {n:"Piano's Rooftop Bar",      h:'Lower East Side',   c:8,  desc:'$6 beers, jazz on Fridays, no cover. Classic intern spot.',           tags:['rooftop','jazz'],         out:true,  min:90},
         {n:'Attaboy',                  h:'Lower East Side',   c:18, desc:'No menu — tell them your vibe, they build it perfectly.',             tags:['cocktails','speakeasy'],  out:false, min:90},
@@ -851,71 +721,8 @@
         {n:'Westlight Rooftop',        h:'Williamsburg',      c:18, desc:'Best rooftop in Brooklyn. Skyline views, great for groups.',          tags:['rooftop','views'],        out:true,  min:90},
         {n:'Death & Co',               h:'East Village',      c:22, desc:'NYC cocktail institution. Mezcal negroni is unmatched.',              tags:['cocktails','upscale'],    out:false, min:90},
         {n:'Dram Shop',                h:'Park Slope',        c:10, desc:'Craft beer dive. $6 local drafts and an excellent jukebox.',          tags:['dive','brooklyn'],        out:false, min:90},
-        {n:'A10 Kitchen',           h:'Upper East Side',   c:16, desc:'Sleek UES cocktail bar with a strong wine program and a buzzy after-work crowd.',        tags:['cocktails','ues'],       out:false, min:90},
-        {n:'Bar Belly',             h:'Lower East Side',   c:16, desc:'Natural wine and low-key vibes on the LES. Great for a weeknight wind-down.',             tags:['wine','les'],            out:false, min:90},
-        {n:'Dante',                 h:'Greenwich Village', c:16, desc:'World\'s best bar. Negroni variations and Italian aperitivo. Grab an outdoor seat.',      tags:['cocktails','aperitivo'], out:true,  min:90},
-        {n:'Mister Paradise',       h:'East Village',      c:14, desc:'Dive-bar-meets-cocktail-bar. Strong drinks, no attitude, always a good time.',            tags:['cocktails','dive'],      out:false, min:90},
-        {n:'E Bar',                 h:'East Village',      c:10, desc:'No-frills late-night bar open until 4 AM. Cheap drinks and a pool table.',                tags:['cheap','late-night'],    out:false, min:90},
-        {n:'Chateau 49',            h:'Upper East Side',   c:16, desc:'Cozy UES wine bar with a French-ish feel. Great bottles and a candlelit room.',           tags:['wine','romantic'],       out:false, min:90},
-        {n:'Entwine',               h:'West Village',      c:18, desc:'Wine bar and bottle shop. Knowledgeable staff, great small plates, zero pretension.',     tags:['wine','west-village'],   out:false, min:90},
-        {n:'Jungle Bird',           h:'Midtown',           c:15, desc:'Tropical tiki cocktails in a sleek Midtown room. Order the Jungle Bird.',                 tags:['tiki','tropical'],       out:false, min:75},
-        {n:'The York',              h:'Upper East Side',   c:12, desc:'Classic UES bar, cheap drinks, open super late. A reliable neighbourhoody standby.',      tags:['cheap','late-night'],    out:false, min:90},
-{n:'Dudley\'s',             h:'Lower East Side',   c:12, desc:'Australian all-day café by day, serious cocktail bar by night. Effortlessly cool.',       tags:['cocktails','cool'],      out:false, min:90},
-{n:'Colbo',                 h:'Lower East Side',   c:16, desc:'Israeli wine bar with natural pours and excellent bar snacks. Intimate and warm.',        tags:['wine','israeli'],        out:false, min:75},
-{n:'Contact',               h:'Lower East Side',   c:16, desc:'Moody, minimal cocktail bar. Strong drinks, cool crowd, great late-night energy.',        tags:['cocktails','les'],       out:false, min:90},
-{n:'Armada',                h:'Greenwich Village', c:16, desc:'Subterranean Village cocktail bar. Dark, romantic, great list. Serious date-night material.',tags:['cocktails','romantic'], out:false, min:90},
-{n:'St. Ambroeus',          h:'West Village',      c:22, desc:'Milanese café with impeccable aperitivo hour. Order a Campari soda, feel European.',      tags:['aperitivo','upscale'],   out:true,  min:75},
-{n:'Bar Veloce',            h:'East Village',      c:14, desc:'Narrow Italian wine bar. Great pours, cured meats, bruschetta. Perfect vibe.',            tags:['wine','italian'],        out:false, min:75},
-{n:'Cafe Mogador',          h:'East Village',      c:14, desc:'Moroccan-inspired EV institution. Great cocktails and sidewalk seating. A true classic.',  tags:['cocktails','outdoor'],   out:true,  min:90},
-{n:'Forgetmenot',           h:'East Village',      c:14, desc:'Flower-filled EV bar with a rotating cocktail menu. Cozy, creative, always unexpected.',  tags:['cocktails','quirky'],    out:false, min:90},
-{n:'Vin Sur Vingt',         h:'West Village',      c:18, desc:'French wine bar. Excellent by-the-glass pours. Cheese boards, good conversation. Très chic.',tags:['wine','french'],       out:false, min:90},
-{n:'OPS',                   h:'Greenpoint',        c:14, desc:'Natural wine and cold beer in Greenpoint. Unpretentious crowd. Brooklyn at its best.',     tags:['wine','brooklyn'],       out:false, min:90},
-{n:'The Tusk Bar',          h:'East Village',      c:16, desc:'Intimate EV bar with serious cocktails and a warm, candlelit atmosphere. Great for a date.',tags:['cocktails','romantic'], out:false, min:75},
-{n:'Borgo',                 h:'West Village',      c:18, desc:'Cozy Italian wine bar. Natural wines, small bites, warm West Village neighbourhood feel.', tags:['wine','italian'],        out:false, min:90},
-{n:'Monkey Bar',            h:'Midtown',           c:24, desc:'Classic Midtown power bar with historic murals. Order an Old Fashioned, feel the room.',   tags:['cocktails','classic'],   out:false, min:90},
-{n:'Bemelmans Bar',         h:'Upper East Side',   c:26, desc:'Legendary Carlyle Hotel bar with Madeline murals. The most classic cocktail experience in NYC.',tags:['cocktails','upscale'],out:false,min:90},
-{n:'The Polo Bar',          h:'Midtown',           c:26, desc:'Ralph Lauren\'s bar. Dark wood, equestrian art, impeccable martinis. A true NYC splurge.', tags:['cocktails','upscale'],   out:false, min:90},
-{n:'Do Not Disturb',        h:'East Village',      c:16, desc:'Motel-themed cocktail bar. Creative drinks, fun concept, great energy on weekends.',       tags:['cocktails','fun'],       out:false, min:90},
-{n:'Shmone',                h:'Lower East Side',   c:16, desc:'Israeli-inflected cocktail bar on the LES. Creative drinks and a warm atmosphere.',        tags:['cocktails','israeli'],   out:false, min:75},
-{n:'Lords',                 h:'East Village',      c:14, desc:'Laid-back EV bar with good cocktails and a no-frills crowd. Perfect Thursday spot.',       tags:['cocktails','chill'],     out:false, min:90},
-{n:'Cecchi\'s',             h:'West Village',      c:18, desc:'Intimate West Village wine bar with Italian pours and a warm neighbourhood feel.',         tags:['wine','romantic'],       out:false, min:90},
-{n:'Nowon',                 h:'East Village',      c:14, desc:'Korean-American bar. Soju cocktails, fried chicken, loud and fun. A great group spot.',    tags:['soju','groups'],         out:false, min:90},
-{n:'Soothr',                h:'East Village',      c:16, desc:'Thai cocktail bar with creative spirit-forward drinks and excellent bar snacks.',          tags:['cocktails','thai'],      out:false, min:75},
-{n:'Please Don\'t Tell',    h:'East Village',      c:18, desc:'Phone-booth speakeasy inside Crif Dogs. Ring the phone, get in, drink well.',              tags:['speakeasy','hidden'],    out:false, min:90},
-{n:'Bar Goto',              h:'Lower East Side',   c:16, desc:'Japanese-inspired cocktails by Kenta Goto. Delicate, precise, unforgettable.',             tags:['cocktails','japanese'],  out:false, min:75},
-{n:'Angel\'s Share',        h:'East Village',      c:16, desc:'Hidden Japanese cocktail bar above a restaurant. No standing — intimate perfection.',      tags:['cocktails','hidden'],    out:false, min:75},
-{n:'Ye\'s Apothecary',      h:'Lower East Side',   c:16, desc:'Botanical cocktails in an apothecary-inspired bar. Experimental, memorable, unique.',      tags:['cocktails','botanical'], out:false, min:75},
-{n:'Chinese Tuxedo',        h:'Chinatown',         c:16, desc:'Cocktail bar in a former Chinatown opera house. Two stunning floors. The room alone is worth it.',tags:['cocktails','beautiful'],out:false,min:90},
-{n:'Casino',                h:'Lower East Side',   c:14, desc:'Natural wine meets cocktail bar. Laid-back crowd, good music, no-fuss drinks.',            tags:['wine','chill'],          out:false, min:90},
-{n:'Crown Shy',             h:'FiDi',              c:22, desc:'World-class cocktails in a stunning Art Deco FiDi skyscraper. Special occasion worthy.',   tags:['cocktails','upscale'],   out:false, min:90},
-{n:'Bar Room at The Beekman',h:'FiDi',             c:22, desc:'Nine-story atrium bar inside the historic Beekman Hotel. One of the most beautiful bars in NYC.',tags:['cocktails','beautiful'],out:false,min:90},
-{n:'C as in Charlie',       h:'Hell\'s Kitchen',   c:14, desc:'Neighbourhood HK bar with a devoted local following. Unpretentious, fun, welcoming.',      tags:['dive','locals'],         out:false, min:90},
-{n:'The Nines',             h:'East Village',      c:14, desc:'EV bar open until 4 AM. Strong, affordable cocktails. Where you end up after everywhere else.',tags:['late-night','cheap'],  out:false, min:90},
-{n:'The Corner Store',      h:'Nolita',            c:16, desc:'Americana bar in Nolita. Great burgers, classic cocktails, reliably packed and fun.',       tags:['cocktails','burgers'],   out:false, min:90},
-{n:'Raoul\'s',              h:'SoHo',              c:22, desc:'SoHo French bistro institution. Legendary bar, dark and romantic. Old-world NYC at its best.',tags:['cocktails','romantic'], out:false, min:90},
-{n:'Pearl Box',             h:'Lower East Side',   c:16, desc:'Intimate LES cocktail bar with a jewel-box atmosphere and a thoughtful short drinks menu.',tags:['cocktails','intimate'],  out:false, min:75},
-{n:'Indochine',             h:'NoHo',              c:22, desc:'Iconic 1984 NoHo restaurant bar. Celebrity pedigree, stunning tropical Art Deco room.',     tags:['cocktails','upscale'],   out:false, min:90},
       ],
       events:[
-        {n:'Edge NYC',              h:'Midtown West',      c:38, desc:'Highest outdoor sky deck in the Western Hemisphere. 100 floors, glass floors, 360-degree views.',    tags:['views','iconic'],        out:true,  min:90},
-        {n:'Hauser & Wirth',        h:'Chelsea',           c:0,  desc:'One of the world\'s top galleries. Major shows, huge Chelsea space. Perfect for a gallery hop.',tags:['art','gallery','free'],  out:false, min:60},
-{n:'Gagosian',              h:'Chelsea',           c:0,  desc:'The world\'s most powerful gallery. Free entry, world-renowned artists.',                     tags:['art','gallery','free'],  out:false, min:60},
-{n:'White Cube New York',   h:'Chelsea',           c:0,  desc:'NYC outpost of the iconic London gallery. Serious contemporary artists, free admission.',      tags:['art','gallery','free'],  out:false, min:60},
-{n:'Anton Kern Gallery',    h:'Chelsea',           c:0,  desc:'Respected Chelsea gallery with a strong international roster. Low-key, high quality, free.',  tags:['art','gallery','free'],  out:false, min:45},
-{n:'Lévy Gorvy Dayan',      h:'Upper East Side',   c:0,  desc:'Blue-chip postwar and contemporary art. Always a significant show. Free to walk in.',         tags:['art','gallery','free'],  out:false, min:45},
-{n:'Arader Galleries',      h:'Upper East Side',   c:0,  desc:'Antique maps, rare books, and botanical prints in a stunning UES townhouse. Free to browse.',  tags:['art','gallery','free'],  out:false, min:45},
-{n:'Carpenters Workshop',   h:'West Village',      c:0,  desc:'Design-art gallery with sculptural furniture by international designers. Always surprising.',  tags:['art','design','free'],   out:false, min:45},
-{n:'Morgan Presents',       h:'Tribeca',           c:0,  desc:'Intimate Tribeca gallery championing emerging artists. A great place to discover what\'s next.',tags:['art','gallery','free'],  out:false, min:45},
-{n:'Elizabeth Street Garden',h:'NoLIta',           c:0,  desc:'Outdoor sculpture garden tucked between NoLIta buildings. Statues, greenery, secret calm.',   tags:['outdoor','garden','free'],out:true, min:45},
-{n:'South Street Seaport',  h:'FiDi',              c:0,  desc:'Historic waterfront, Brooklyn Bridge views, tall ships, markets. Totally underrated.',         tags:['waterfront','free'],     out:true,  min:60},
-{n:'Argosy Bookstore',      h:'Midtown East',      c:0,  desc:'Six floors of rare books, antique maps, and prints. Family-run since 1925. Free to explore.',  tags:['books','free'],          out:false, min:45},
-{n:'Explore Chinatown',     h:'Chinatown',         c:5,  desc:'Wander Mott, Mulberry, and Canal. Bakeries, $1 dumplings, herbal shops — sensory overload.',  tags:['explore','food','free'], out:true,  min:90},
-{n:'Shop SoHo',             h:'SoHo',              c:0,  desc:'Cobblestone streets, independent boutiques, gallery storefronts. Best people-watching in NYC.',tags:['shopping','free'],       out:true,  min:60},
-{n:'Cooper Hewitt Garden',  h:'Upper East Side',   c:0,  desc:'The Smithsonian design museum\'s garden is free. A peaceful UES escape with rotating installations.',tags:['garden','free'],     out:true,  min:45},
-{n:'STREB Trapeze',         h:'Williamsburg',      c:35, desc:'Take a trapeze or extreme action class. Terrifying, exhilarating, and completely unforgettable.',tags:['active','unique'],      out:false, min:90},
-{n:'Happy Medium Art Café', h:'Brooklyn',          c:20, desc:'Drop-in painting and craft sessions with drinks. No experience needed. Just show up and make something.',tags:['art','social'],   out:false, min:90},
-{n:'Aunt Jake\'s Pasta Class',h:'Various',         c:75, desc:'Hands-on fresh pasta making with wine. Great for groups — you eat everything you make.',      tags:['food','class','groups'], out:false, min:120},
-{n:'Olfactory NYC',         h:'Various',           c:30, desc:'Guided scent experiences and perfume workshops. Surprisingly fascinating and hard to forget.',  tags:['unique','experience'],   out:false, min:90},
         {n:'MoMA Free Fridays',        h:'Midtown',           c:0,  desc:'World-class art, free every Friday 5:30–9pm.',                       tags:['art','museum','free'],    out:false, min:90},
         {n:"Jazz on Piano's Rooftop",  h:'Lower East Side',   c:0,  desc:'Live jazz, no cover on Fridays. $6 beers. Very NYC.',                tags:['jazz','music','free'],    out:true,  min:120},
         {n:'Comedy Night @ The Stand', h:'Gramercy',          c:0,  desc:'Free open-mic comedy. 2-drink minimum, drinks from $7.',            tags:['comedy','free'],          out:false, min:90},
@@ -929,28 +736,6 @@
         {n:'St. Marks Yoga',           h:'East Village',      c:12, desc:'Great yoga classes for just $12. Best value in the city.',          tags:['yoga','cheap'],           out:false, min:75},
         {n:'East River Pilates',       h:'Lower East Side',   c:20, desc:'Reformer pilates for $20. Excellent teachers, great vibes.',        tags:['pilates','les'],          out:false, min:60},
         {n:'Kove Cold Plunge & Sauna', h:'Various',           c:40, desc:'Cold plunge and sauna. Recovery and relaxation.',                   tags:['wellness'],               out:false, min:60},
-        {n:'SkyTing Hot Yoga',      h:'Various',           c:30, desc:'NYC\'s coolest yoga studio. Hot classes, breathwork, and sound baths. First class deals.',    tags:['yoga','hot'],            out:false, min:75},
-{n:'Solidcore',             h:'Various',           c:38, desc:'Slow, controlled reformer classes. Deceptively brutal. You will shake. You will come back.',   tags:['pilates','intense'],     out:false, min:60},
-{n:'New York Pilates',      h:'Various',           c:42, desc:'NYC\'s most recognized pilates brand. Reformer and tower classes with world-class instructors.',tags:['pilates','reformer'],    out:false, min:60},
-{n:'DanceBody',             h:'Various',           c:35, desc:'Cardio dance classes that are genuinely fun. No dance experience needed — just energy.',       tags:['dance','cardio'],        out:false, min:60},
-{n:'Physique 57',           h:'Various',           c:38, desc:'Iconic barre method, 20 years strong. Interval training at the ballet barre. Always effective.',tags:['barre','classic'],      out:false, min:60},
-{n:'Bode',                  h:'Various',           c:35, desc:'Cult NYC fitness studio blending strength and cardio in a high-energy, music-driven format.',  tags:['strength','cardio'],     out:false, min:60},
-{n:'KKsweat',               h:'Various',           c:35, desc:'High-intensity strength and cardio led by top NYC trainers. A serious workout.',               tags:['hiit','strength'],       out:false, min:60},
-{n:'Tremble',               h:'Various',           c:35, desc:'Barre-based classes designed to make your muscles shake. Small classes, big results.',         tags:['barre','intense'],       out:false, min:60},
-{n:'Housework',             h:'Various',           c:35, desc:'Boutique fitness with a cult following. Creative programming and strong instructors.',          tags:['boutique','strength'],   out:false, min:60},
-{n:'Fuze House',            h:'Various',           c:35, desc:'Strength, cardio, and mobility fused into high-energy group classes. Book ahead — goes fast.',  tags:['hiit','mobility'],       out:false, min:60},
-{n:'Jetset Pilates',        h:'Various',           c:35, desc:'High-energy reformer pilates set to a curated playlist. Fast-paced, fun, seriously good.',     tags:['pilates','fun'],         out:false, min:60},
-{n:'Peloton Studio NYC',    h:'Midtown',           c:35, desc:'Live classes at Peloton\'s flagship NYC studio with the instructors you know.',                 tags:['cycling','classes'],     out:false, min:60},
-{n:'We RUN LIC',            h:'Long Island City',  c:0,  desc:'Community run club with East River views. All paces welcome. Great for meeting people.',       tags:['running','social'],      out:true,  min:75},
-{n:'NARC (Not A Run Club)', h:'Various',           c:0,  desc:'NYC\'s most social not-a-run-club. Casual, fun, great for meeting people.',                    tags:['running','social'],      out:true,  min:75},
-{n:'Lunge Run Club',        h:'Various',           c:0,  desc:'Social run club with a fun, inclusive energy. Weekly NYC routes, all paces welcome.',          tags:['running','social'],      out:true,  min:75},
-{n:'City Girls Who Walk',   h:'Various',           c:0,  desc:'Community walking club exploring NYC on foot. Welcoming, social, and zero pressure.',          tags:['walking','social'],      out:true,  min:60},
-{n:'Hot Girl Walk NYC',     h:'Various',           c:0,  desc:'NYC\'s viral walking movement. Headphones in, intentions set, walk it out.',                   tags:['walking','social'],      out:true,  min:60},
-{n:'Ridgewood Runners',     h:'Ridgewood',         c:0,  desc:'Queens-Brooklyn border run club. Tight-knit community, relaxed pace, great routes.',           tags:['running','brooklyn'],    out:true,  min:75},
-{n:'Ridge Runners NYC',     h:'Various',           c:0,  desc:'Multi-borough run club. Welcoming to all speeds, focused on community and fun.',               tags:['running','social'],      out:true,  min:75},
-{n:'Vital Brooklyn',        h:'Crown Heights',     c:20, desc:'Community Brooklyn gym with climbing, fitness classes, and a strong local following.',         tags:['climbing','gym'],        out:false, min:60},
-{n:'Blink Fitness',         h:'Various',           c:12, desc:'Affordable no-frills gym across NYC. Day passes, solid equipment, zero attitude.',             tags:['gym','cheap'],           out:false, min:60},
-{n:'Equinox',               h:'Various',           c:50, desc:'NYC\'s premium gym. World-class facilities, pools, and boutique classes. The gold standard.',  tags:['gym','upscale'],         out:false, min:60},
       ],
       explore:[
         {n:'Brooklyn Bridge Walk',     h:'DUMBO',             c:0,  desc:"Walk the bridge at sunset. One of NYC's most iconic views.",        tags:['walk','views','free'],    out:true,  min:45},
@@ -960,16 +745,6 @@
         {n:'Central Park Boathouse',   h:'Central Park',      c:20, desc:'Row a boat on the lake in Central Park. Romantic and fun.',        tags:['outdoor','romantic'],     out:true,  min:60},
       ],
       chill:[
-        {n:'Georgie\'s Cafe & Bar', h:'Various',           c:6,  desc:'All-day café and bar with great coffee and a WFH-friendly atmosphere. Great wifi and long tables.',   tags:['cafe','wfh'],            out:false, min:60},
-{n:'The Lost Draft',        h:'Various',           c:6,  desc:'Café and bar hybrid perfect for working remotely. Great coffee, cold beer, no-rush atmosphere.',      tags:['cafe','wfh'],            out:false, min:60},
-{n:'Moshav Coffee',         h:'Various',           c:6,  desc:'Israeli-inspired coffee shop with excellent espresso. Laptop-friendly and deeply cosy.',               tags:['coffee','wfh'],          out:false, min:60},
-{n:'Thayer',                h:'Various',           c:6,  desc:'Calm, well-designed café with strong wifi. Excellent coffee, minimal noise, maximum focus.',           tags:['coffee','wfh'],          out:false, min:60},
-{n:'Red Rover',             h:'Various',           c:6,  desc:'Welcoming café with reliable wifi and good coffee. Great for a full day of work.',                     tags:['coffee','wfh'],          out:false, min:60},
-{n:'Cafe Zaffri',           h:'Various',           c:7,  desc:'Middle Eastern-inspired café with excellent coffee and a warm WFH-friendly atmosphere.',               tags:['coffee','wfh'],          out:false, min:60},
-{n:'Public Records',        h:'Gowanus',           c:6,  desc:'Record store, café, bar, and WFH spot in one. Great sound system and creative atmosphere.',            tags:['music','wfh'],           out:false, min:60},
-{n:'Birch Coffee',          h:'Various',           c:6,  desc:'NYC-born specialty coffee roaster with a warm, community-focused atmosphere.',                         tags:['coffee','local'],        out:false, min:30},
-{n:'Maman',                 h:'Various',           c:7,  desc:'French-inspired café with the most beautiful nutty chocolate chip cookie in NYC.',                     tags:['french','cafe'],         out:false, min:30},
-{n:'Buddy Buddy',           h:'Various',           c:6,  desc:'Cheerful neighbourhood café with great drip coffee and a loyal local crowd.',                          tags:['coffee','chill'],        out:false, min:30},
         {n:'Picnic — The Great Lawn',  h:'Central Park',      c:10, desc:"Grab Trader Joe's, picnic on the Great Lawn. Peak NYC summer.",    tags:['picnic','outdoor'],       out:true,  min:120},
         {n:'Little Island',            h:'Hudson River Park', c:0,  desc:'Dreamy free park on the Hudson. Hammocks and great views.',        tags:['park','outdoor','free'],  out:true,  min:60},
         {n:'Sunset — West Side Highway',h:'Hudson River',     c:0,  desc:'Hudson River sunset with Statue of Liberty views. Free.',         tags:['sunset','free'],          out:true,  min:45},
@@ -1153,6 +928,35 @@
       document.getElementById('backBtn').style.display='none';
       document.getElementById('nextBtn').textContent='Continue →';
     }
+    // ── HAMBURGER ──
+  const _hBtn = document.getElementById('hamburgerBtn');
+  const _hMenu = document.getElementById('mobileMenu');
+  if (_hBtn && _hMenu) {
+    _hBtn.addEventListener('click', () => {
+      const open = _hMenu.classList.toggle('open');
+      _hBtn.classList.toggle('open', open);
+      document.body.style.overflow = open ? 'hidden' : '';
+    });
+    _hMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+      _hBtn.classList.remove('open'); _hMenu.classList.remove('open'); document.body.style.overflow = '';
+    }));
+  }
+
+  // ── AUTH STATE ──
+  (async () => {
+    try {
+      const { data: { session } } = await sb.auth.getSession();
+      const cta = document.getElementById('navCta');
+      const mobileLink = document.getElementById('mobileAuthLink');
+      if (session) {
+        const { data: profile } = await sb.from('profiles').select('full_name').eq('id', session.user.id).single();
+        const name = profile?.full_name?.split(' ')[0] || session.user.email?.split('@')[0] || 'You';
+        const initials = (profile?.full_name || name).split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+        if (cta) { cta.textContent = name + ' →'; cta.href = 'plans.html'; }
+        if (mobileLink) { mobileLink.textContent = name + ' →'; mobileLink.href = 'plans.html'; }
+      }
+    } catch(e) {}
+  })();
   </script>
 </body>
 </html>

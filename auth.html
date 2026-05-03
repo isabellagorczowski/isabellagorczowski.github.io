@@ -255,18 +255,7 @@
 
     .signup-only { display: none; }
     .signup-only.show { display: block; }
-
-    footer {
-      border-top: 3px solid var(--lime); padding: 18px var(--pad-sm);
-      background: var(--surface);
-      display: flex; align-items: center; justify-content: space-between;
-    }
-    .footer-stripe { display: flex; height: 4px; }
     .footer-stripe span { flex: 1; }
-    .footer-logo {
-      font-size: 12px; font-weight: 800; text-decoration: none;
-      font-family: 'DM Mono', monospace; text-transform: uppercase; letter-spacing: -0.3px;
-    }
     .footer-logo .after { color: var(--text); }
     .footer-logo .five  { color: var(--lime); }
     footer p { font-size: 10px; color: var(--subdued); font-family: 'DM Mono', monospace; letter-spacing: 0.06em; }
@@ -280,18 +269,32 @@
 
     @media (min-width: 900px) {
       .nav { padding: 0 80px; }
-      footer { padding: 18px 80px; }
     }
+  
+    /* ── FOOTER ── */
+    footer {
+      border-top: 3px solid var(--lime); padding: 20px var(--pad-sm);
+      background: var(--surface);
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 12px; margin-top: auto;
+    }
+    .footer-logo { font-size: 14px; font-weight: 800; text-decoration: none; font-family: 'DM Mono', monospace; text-transform: uppercase; letter-spacing: -0.3px; }
+    .footer-logo .after { color: var(--text); }
+    .footer-logo .five  { color: var(--lime); }
+    .footer-links { display: flex; align-items: center; gap: 12px; }
+    .footer-link-about {
+      font-size: 11px; font-weight: 600; text-decoration: none;
+      font-family: 'DM Mono', monospace; letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--midnight); background: var(--lime);
+      border: 2px solid var(--lime); border-radius: var(--r-btn);
+      padding: 5px 12px; transition: opacity 0.15s;
+    }
+    .footer-link-about:hover { opacity: 0.85; }
+    .footer-ig { display: flex; align-items: center; gap: 6px; color: var(--muted); text-decoration: none; font-size: 11px; font-family: 'DM Mono', monospace; letter-spacing: 0.04em; transition: color 0.15s; }
+    .footer-ig:hover { color: var(--lime); }
+    .footer-tagline { font-size: 10px; color: var(--subdued); font-family: 'DM Mono', monospace; letter-spacing: 0.06em; }
+
   </style>
-  <link rel="manifest" href="/manifest.json" />
-<meta name="theme-color" content="#080A14" />
-<meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<meta name="apple-mobile-web-app-title" content="afterfive" />
-<script>
-  if ('serviceWorker' in navigator)
-    navigator.serviceWorker.register('/sw.js');
-</script>
 </head>
 <body>
 
@@ -427,9 +430,16 @@
     </div>
   </div>
 
-  <footer>
+    <footer>
     <a class="footer-logo" href="index.html"><span class="after">after</span><span class="five">five</span></a>
-    <p><span class="arrival-dot"></span>Free · NYC interns only</p>
+    <div class="footer-links">
+      <a href="about.html" class="footer-link-about">About</a>
+      <a href="https://instagram.com/afterfivenyc" target="_blank" class="footer-ig">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.5" fill="currentColor"/></svg>
+        @afterfivenyc
+      </a>
+    </div>
+    <p class="footer-tagline">"Your NYC nights, sorted."</p>
   </footer>
 
   <script>
