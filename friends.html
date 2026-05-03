@@ -197,6 +197,7 @@
     <a href="ai.html">Plan Generator</a>
     <a href="friends.html">Friends</a>
     <a href="submit.html">Submit a Spot</a>
+    <a class="menu-cta" id="mobileAuthLink" href="auth.html">Sign in →</a>
   </div>
 
   <div class="page-header">
@@ -450,11 +451,7 @@ const SUPABASE_ANON = 'sb_publishable_b8N7U5X4--k8b1VRLiqcew_sRtymSlZ';
     showToast('Friend request sent! 🎉');
   }
 
-  const hBtn = document.getElementById('hamburgerBtn');
-  const hMenu = document.getElementById('mobileMenu');
-  if (hBtn && hMenu) {
-    hBtn.addEventListener('click', () => { const open = hMenu.classList.toggle('open'); hBtn.classList.toggle('open', open); });
-  }
+
 
   function showToast(msg) {
     const existing = document.querySelector('.toast');
