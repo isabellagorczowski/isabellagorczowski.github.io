@@ -151,6 +151,15 @@
     @media (min-width: 640px) { .hamburger { display: none; } .nav-links { display: flex; } .bottom-nav { display: none; } body { padding-bottom: 0; } }
     @media (min-width: 900px) { .nav { padding: 0 80px; } .page-header, .search-wrap, .friend-tabs, .friends-list, .search-results { padding-left: 80px; padding-right: 80px; } footer { padding: 18px 80px; } }
   </style>
+  <link rel="manifest" href="/manifest.json" />
+<meta name="theme-color" content="#080A14" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="afterfive" />
+<script>
+  if ('serviceWorker' in navigator)
+    navigator.serviceWorker.register('/sw.js');
+</script>
 </head>
 <body>
 
