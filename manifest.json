@@ -1,0 +1,14 @@
+{
+  "name": "afterfive — Your NYC nights, sorted.",
+  "short_name": "afterfive",
+  "description": "Curated spots, generated plans, and a community of NYC interns.",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#080A14",
+  "theme_color": "#080A14",
+  "orientation": "portrait",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
