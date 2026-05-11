@@ -523,18 +523,6 @@
     showToast(`Plan shared with ${names.join(', ')}! 🎉`);
   }
 
-  // ── HAMBURGER ──
-  const hBtn = document.getElementById('hamburgerBtn');
-  const hMenu = document.getElementById('mobileMenu');
-  hBtn.addEventListener('click', () => {
-    const open = hMenu.classList.toggle('open');
-    hBtn.classList.toggle('open', open);
-    document.body.style.overflow = open ? 'hidden' : '';
-  });
-  hMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
-    hBtn.classList.remove('open'); hMenu.classList.remove('open'); document.body.style.overflow = '';
-  }));
-
   // ── TOAST ──
   function showToast(msg) {
     const existing = document.querySelector('.toast');
